@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['10.1.1.168', '128.143.71.210', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'show',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -54,7 +55,7 @@ ROOT_URLCONF = 'horseshow.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'horseshow/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

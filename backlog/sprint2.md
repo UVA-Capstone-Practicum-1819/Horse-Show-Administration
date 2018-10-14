@@ -1,17 +1,13 @@
-As a user, I should be able to access the app by entering my username and password
+As a user, I should be able to access the app by entering my username and password.
 
-created a login page
+As a user, I want to be able to enter horse information.
 
-prevented access if they didn't login
+As a user, I want to be able to enter an exhibitor's information.
 
-As a user, I want to fill out all the required fields for a horse that is competing
+As a user, I want to be able to add divisions to a show.
 
-created fields for rider information on a page
+As a user, I want to be able to add classes to divisions of a show.
 
-put them in the database
+As a user, I want to be able to add competitors to a class.
 
-As a user, I want to fill out all the required fields for a rider that is competing
-
-As a user, I want my database's information to line up with the requirements of VHSA
-
-As a user, I want my rider and horse information to be stored for an annual profile
+As a user, I want the app to be able to handle pre-registration and day of registration.
