@@ -16,6 +16,9 @@ from django.utils import timezone
 # Create your views here.
 from .forms import Horse
 
+""" for authentication/signin/signup purposes """
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm
 
 
 def index(request):
@@ -46,9 +49,27 @@ def create_show(request):
     # if failure:
     #     response = {'ok': False, 'error_msg': "This show has already been created!", 'form': form}
     #     return render(request, 'create_show.html', response)
-    new_show = Show.objects.create(show_name=showname, show_date=showdate, show_location=showlocation)
-    response = {'ok': True, 'success_msg': "Show was successfully created", 'form': form, 'show': new_show}
+    new_show = Show.objects.create(
+        show_name=showname, show_date=showdate, show_location=showlocation)
+    response = {'ok': True, 'success_msg': "Show was successfully created",
+                'form': form, 'show': new_show}
     return render(request, 'create_show.html', response)
+
+
+def signup(request):
+    """ signs user up via form """
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('index')
+    else:
+        form = UserCreationForm()
+    return render(request, 'signup.html', {'form': form})
 
 
 def horse_new(request):
@@ -60,11 +81,8 @@ def horse_new(request):
             post.author = request.user
             post.published_date = timezone.now()
             post.save()
-            #return redirect('horse_detail', pk=post.pk)
+            # return redirect('horse_detail', pk=post.pk)
             return render(request, 'horse_edit.html', {'form': form})
     else:
-        form=Horse()
+        form = Horse()
     return render(request, 'horse_edit.html', {'form': form})
-
-
-
