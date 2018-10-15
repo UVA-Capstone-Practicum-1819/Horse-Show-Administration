@@ -16,7 +16,8 @@ urlpatterns = [
         template_name='login.html'), name='login'),
     # path('admin/', admin.site.urls),
     path('horse/new', views.horse_new, name="horse_new"),
-    path('rider/new', views.horse_new, name="newrider"),
+    path('rider/new', views.newrider, name="newrider"),
+    path('class/new', views.new_class, name="classes"),
 
 ]
 """horseshow URL Configuration

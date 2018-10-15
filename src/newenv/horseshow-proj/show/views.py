@@ -98,3 +98,7 @@ def horse_new(request):
     else:
         form = Horse()
     return render(request, 'horse_edit.html', {'form': form})
+
+def new_class(request):
+    form = ShowForm()
+    return render(request, 'classes.html', {'form': form})
