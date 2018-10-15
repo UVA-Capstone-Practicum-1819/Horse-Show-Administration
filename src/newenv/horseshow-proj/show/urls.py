@@ -6,4 +6,5 @@ from show import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('create_show', views.create_show, name='create_show'),
+    path('signup', views.signup, name='signup'),
 ]

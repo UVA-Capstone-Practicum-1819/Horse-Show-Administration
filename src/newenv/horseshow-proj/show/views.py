@@ -9,6 +9,9 @@ from show.forms import ShowForm
 from django.forms.models import model_to_dict
 from show.models import Show
 
+""" for authentication/signin/signup purposes """
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm
 
 
 def index(request):
@@ -39,6 +42,24 @@ def create_show(request):
     # if failure:
     #     response = {'ok': False, 'error_msg': "This show has already been created!", 'form': form}
     #     return render(request, 'create_show.html', response)
-    new_show = Show.objects.create(show_name=showname, show_date=showdate, show_location=showlocation)
-    response = {'ok': True, 'success_msg': "Show was successfully created", 'form': form, 'show': new_show}
+    new_show = Show.objects.create(
+        show_name=showname, show_date=showdate, show_location=showlocation)
+    response = {'ok': True, 'success_msg': "Show was successfully created",
+                'form': form, 'show': new_show}
     return render(request, 'create_show.html', response)
+
+
+def signup(request):
+    """ signs user up via form """
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserCreationForm()
+    return render(request, 'signup.html', {'form': form})
