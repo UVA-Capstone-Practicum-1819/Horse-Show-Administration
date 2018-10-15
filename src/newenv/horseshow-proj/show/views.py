@@ -1,3 +1,4 @@
+
 # Create your views here.
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -8,6 +9,12 @@ import json
 from show.forms import ShowForm
 from django.forms.models import model_to_dict
 from show.models import Show
+from django.shortcuts import render
+from django.shortcuts import redirect, get_object_or_404
+from django.utils import timezone
+
+# Create your views here.
+from .forms import Horse
 
 """ for authentication/signin/signup purposes """
 from django.contrib.auth import login, authenticate
@@ -63,3 +70,19 @@ def signup(request):
     else:
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
+
+
+def horse_new(request):
+    print(request.method)
+    if request.method == "POST":
+        form = Horse(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
+            # return redirect('horse_detail', pk=post.pk)
+            return render(request, 'horse_edit.html', {'form': form})
+    else:
+        form = Horse()
+    return render(request, 'horse_edit.html', {'form': form})
