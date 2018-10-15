@@ -6,15 +6,14 @@ from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
 import json
-from show.forms import ShowForm
+from show.forms import ShowForm, RiderForm, Horse
 from django.forms.models import model_to_dict
-from show.models import Show
+from show.models import Show, Rider, Horse
 from django.shortcuts import render
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
 
 # Create your views here.
-from .forms import Horse
 
 """ for authentication/signin/signup purposes """
 from django.contrib.auth import login, authenticate
@@ -71,6 +70,19 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
+def newrider(request):
+    print(request.method)
+    if request.method == "POST":
+        form = RiderForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
+            return render(request, 'editrider.html', {'form': form})
+    else:
+        form = RiderForm()
+    return render(request, 'editrider.html', {'form': form})
 
 def horse_new(request):
     print(request.method)

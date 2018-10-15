@@ -9,6 +9,12 @@ class Show(models.Model):
     def __str__(self):
         return self.show_name
 
+class Rider (models.Model):
+    name= models.CharField(max_length= 200)
+    address = models.CharField(max_length=200)
+    age= models.IntegerField()
+    email = models.CharField(max_length=200)
+
 class Horse (models.Model):
     name= models.CharField(max_length= 200)
     barn_name = models.CharField(max_length=200)
@@ -17,4 +23,3 @@ class Horse (models.Model):
     owner = models.CharField(max_length=200)
     size = models.CharField(max_length=200)
     type = models.CharField(max_length=200)
-
