@@ -6,7 +6,7 @@ from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
 import json
-from show.forms import ShowForm, RiderForm, Horse
+from show.forms import ShowForm, RiderForm, HorseForm
 from django.forms.models import model_to_dict
 from show.models import Show, Rider, Horse
 from django.shortcuts import render
@@ -87,7 +87,7 @@ def newrider(request):
 def horse_new(request):
     print(request.method)
     if request.method == "POST":
-        form = Horse(request.POST)
+        form = HorseForm(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -96,7 +96,7 @@ def horse_new(request):
             # return redirect('horse_detail', pk=post.pk)
             return render(request, 'horse_edit.html', {'form': form})
     else:
-        form = Horse()
+        form = HorseForm()
     return render(request, 'horse_edit.html', {'form': form})
 
 def new_class(request):

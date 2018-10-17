@@ -14,7 +14,7 @@ class RiderForm(forms.ModelForm):
         model = Rider
         fields = ('name', 'address', 'age', 'email')
 
-class Horse(forms.ModelForm):
+class HorseForm(forms.ModelForm):
 
     class Meta:
         model = Horse
