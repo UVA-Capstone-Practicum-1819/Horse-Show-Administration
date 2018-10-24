@@ -13,11 +13,32 @@ from django.shortcuts import render
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
 
+
 # Create your views here.
 
 """ for authentication/signin/signup purposes """
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+
+
+class AuthRequiredMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Code to be executed for each request before
+        # the view (and later middleware) are called.
+        print("is this doing anything?")
+        response = self.get_response(request)
+
+        if request.path != "/show/login" and not request.user.is_authenticated:
+            return redirect('login')
+
+        print(request.user)
+        # Code to be executed for each request/response after
+        # the view is called.
+
+        return response
 
 
 def index(request):
@@ -70,6 +91,7 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
+
 def newrider(request):
     print(request.method)
     if request.method == "POST":
@@ -83,6 +105,7 @@ def newrider(request):
     else:
         form = RiderForm()
     return render(request, 'editrider.html', {'form': form})
+
 
 def horse_new(request):
     print(request.method)
@@ -98,6 +121,7 @@ def horse_new(request):
     else:
         form = HorseForm()
     return render(request, 'horse_edit.html', {'form': form})
+
 
 def new_class(request):
     form = ShowForm()

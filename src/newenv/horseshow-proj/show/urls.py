@@ -6,7 +6,6 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from . import views
 
-
 urlpatterns = [
     path('', views.index, name='index'),
     path('create_show', views.create_show, name='create_show'),
@@ -18,6 +17,7 @@ urlpatterns = [
     path('horse/new', views.horse_new, name="horse_new"),
     path('rider/new', views.newrider, name="newrider"),
     path('class/new', views.new_class, name="classes"),
+    path('logout', auth_views.LogoutView.as_view(), name='logout')
 
 ]
 """horseshow URL Configuration
