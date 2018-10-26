@@ -5,6 +5,27 @@ from show.models import Show, Rider, Horse
 
 
 class ShowTestCase(TestCase):
-    def setUp(self):
-        Show.objects.create(show_name = "boo palooza", show_date = "10/09/2018", show_location = "Berry Farm")
-        Show.objects.create(show_name = "Horse Show Level 1", show_date = "10/03/2015", show_location = "Pony Day Farm")
+    def create_show(self, title="test", body="test for a show"):
+        return Show.objects.create(show_name = "Boopalooza", show_date="10/02/2018", show_location="Pony Barn")
+
+    def test_show_creation(self):
+        testshow = self.create_show()
+        self.assertTrue(isinstance(testshow, Show))
+
+
+
+class RiderTestCase(TestCase):
+    def create_rider(self, title="test", body="test for rider"):
+        return Rider.objects.create(name = "Lauren", address="234 cotton lane", age=12, email="sdd3ee@virginia.edu")
+
+    def test_rider_creation(self):
+        testrider = self.create_rider()
+        self.assertTrue(isinstance(testrider, Rider))
+
+class HorseTestCase(TestCase):
+    def create_horse(self, title="test", body="test for horse"):
+        return Horse.objects.create(name = "Smokey Mountain", barn_name="Smokey", age=10, coggins=10102, owner="Tina", size="pony", type="shetland")
+
+    def test_horse_creation(self):
+        testhorse = self.create_horse()
+        self.assertTrue(isinstance(testhorse, Horse))
