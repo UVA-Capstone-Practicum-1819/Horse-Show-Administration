@@ -12,6 +12,14 @@ class ShowTestCase(TestCase):
         testshow = self.create_show()
         self.assertTrue(isinstance(testshow, Show))
 
+class ShowTestIntCase(TestCase):
+    def create_show(self, title="test", body="test for a show"):
+        return Show.objects.create(show_name = "Boopalooza", show_date=10022018, show_location="Pony Barn")
+
+    def test_show_creation(self):
+        testshow = self.create_show()
+        self.assertTrue(isinstance(testshow, Show))
+
 
 
 class RiderTestCase(TestCase):
@@ -21,6 +29,19 @@ class RiderTestCase(TestCase):
     def test_rider_creation(self):
         testrider = self.create_rider()
         self.assertTrue(isinstance(testrider, Rider))
+
+class RiderTestFailCase(TestCase):
+    def create_rider(self, title="test", body="test for rider"):
+        try:
+            rider = Rider.objects.create(name = "Lauren", address="234 cotton lane", age="thirteen", email="sdd3ee@virginia.edu")
+        except:
+            print("this is an invalid insert")
+            return 0
+        return rider
+
+    def test_rider_creation(self):
+        testrider = self.create_rider()
+        self.assertFalse(isinstance(testrider, Rider))
 
 class HorseTestCase(TestCase):
     def create_horse(self, title="test", body="test for horse"):
