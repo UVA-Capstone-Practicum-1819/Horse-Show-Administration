@@ -17,6 +17,8 @@ urlpatterns = [
     path('horse/new', views.horse_new, name="horse_new"),
     path('rider/new', views.newrider, name="newrider"),
     path('class/new', views.new_class, name="classes"),
+    path('horse', views.horse_select, name="horse_select"),
+    path('horse-autocomplete', views.HorseAutocomplete.as_view(), name="horse_autocomplete"),
     path('logout', auth_views.LogoutView.as_view(), name='logout')
 
 ]

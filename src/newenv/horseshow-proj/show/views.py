@@ -6,12 +6,13 @@ from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
 import json
-from show.forms import ShowForm, RiderForm, HorseForm
+from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm
 from django.forms.models import model_to_dict
 from show.models import Show, Rider, Horse
 from django.shortcuts import render
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
+from dal import autocomplete
 
 
 # Create your views here.
@@ -103,6 +104,19 @@ def newrider(request):
         form = RiderForm()
     return render(request, 'editrider.html', {'form': form})
 
+def horse_select(request):
+    if request.method == "POST":
+        form = HorseSelectForm(request.POST)
+        if form.is_valid():
+            #post = form.save(commit=False)
+            #post.author = request.user
+            #post.published_date = timezone.now()
+            #post.save()
+            # return redirect('horse_detail', pk=post.pk)
+            return render(request, 'horse_select.html', {'form': form})
+    else:
+        form= HorseSelectForm();
+    return render(request, 'horse_select.html',{'form': form})
 
 def horse_new(request):
     print(request.method)
@@ -119,6 +133,18 @@ def horse_new(request):
         form = HorseForm()
     return render(request, 'horse_edit.html', {'form': form})
 
+class HorseAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+
+        #if not self.request.user.is_authenticated():
+            #return Horse.objects.none()
+
+        qs = Horse.objects.all()
+
+        if self.q:
+            qs = qs.filter(name__istartswith=self.q)
+
+        return qs
 
 def new_class(request):
     form = ShowForm()
