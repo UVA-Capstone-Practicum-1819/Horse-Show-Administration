@@ -28,13 +28,10 @@ class AuthRequiredMiddleware(object):
     def __call__(self, request):
         # Code to be executed for each request before
         # the view (and later middleware) are called.
-        print("is this doing anything?")
         response = self.get_response(request)
-
-        if request.path != "/show/login" and not request.user.is_authenticated:
+        requested_path = request.path
+        if requested_path != "/show/login" and requested_path != "/show/signup" and not request.user.is_authenticated:
             return redirect('login')
-
-        print(request.user)
         # Code to be executed for each request/response after
         # the view is called.
 
