@@ -19,3 +19,10 @@ class HorseForm(forms.ModelForm):
     class Meta:
         model = Horse
         fields = ('name', 'barn_name', 'age', 'coggins','owner', 'size', 'type')
+
+class ClassesForm(forms.ModelForm):
+    type = forms.ChoiceField(choices=Classes.CLASS_CHOICES, widget=forms.CheckboxSelectMultiple)
+
+    class Meta:
+        model = Classes
+        fields = ('type',)
