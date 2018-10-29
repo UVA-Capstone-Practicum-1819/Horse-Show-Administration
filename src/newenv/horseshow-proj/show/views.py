@@ -112,6 +112,8 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
+def viewshow(request):
+    return render(request, 'viewshow.html')
 
 def newrider(request):
     print(request.method)

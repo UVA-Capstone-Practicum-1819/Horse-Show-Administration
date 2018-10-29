@@ -24,7 +24,7 @@ urlpatterns = [
     path('rider-autocomplete', views.RiderAutocomplete.as_view(), name="rider_autocomplete"),
     path('horse-autocomplete', views.HorseAutocomplete.as_view(), name="horse_autocomplete"),
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
-
+    path('show/viewshow', views.viewshow, name = "viewshow"),
 
 ]
 """horseshow URL Configuration
