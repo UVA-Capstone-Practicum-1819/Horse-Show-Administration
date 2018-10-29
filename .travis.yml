@@ -6,6 +6,7 @@ python:
 install:
   - pip install -r requirements.txt
   - pip install Django==2.1
+  - pip install django-autocomplete-light
 
 script:
   - python manage.py makemigrations
