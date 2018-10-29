@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from show.models import Show, Rider, Horse, Classes, Combo
-from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm
+from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, RiderSelectForm
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from show import models
@@ -26,21 +26,29 @@ class ShowTestIntCase(TestCase):
         testshow = self.create_show()
         self.assertTrue(isinstance(testshow, Show))
 
-
 class RiderTestCase(TestCase):
+    def setup(self):
+        user = User.objects.create(username='user')
+        user.set_password('password')
+        user.save()
+
     def create_rider(self, title="test", body="test for rider"):
-        return Rider.objects.create(name="Lauren", address="234 cotton lane", age=12, email="sdd3ee@virginia.edu")
+        return Rider.objects.create(name = "Lauren", address="234 cotton lane", age=12, email="sdd3ee@virginia.edu")
 
     def test_rider_creation(self):
         testrider = self.create_rider()
         self.assertTrue(isinstance(testrider, Rider))
 
+    def test_rider_page(self):
+        c = Client()
+        logged_in = c.login(username='user', password='password')
+        response = self.client.post('show/rider/new', follow=True)
+        self.assertEqual(response.status_code, 200)
 
 class RiderTestFailCase(TestCase):
     def create_rider(self, title="test", body="test for rider"):
         try:
-            rider = Rider.objects.create(
-                name="Lauren", address="234 cotton lane", age="thirteen", email="sdd3ee@virginia.edu")
+            rider = Rider.objects.create(name = "Lauren", address="234 cotton lane", age="thirteen", email="sdd3ee@virginia.edu")
         except:
             print("this is an invalid insert")
             return 0
@@ -50,6 +58,32 @@ class RiderTestFailCase(TestCase):
         testrider = self.create_rider()
         self.assertFalse(isinstance(testrider, Rider))
 
+# redirect from rider select to horse_select
+# redir from ridernew to HorseSelect
+# redir index to RiderSelect
+
+#  if ridernew fails
+class RiderFormsTest(TestCase):
+    def test_RiderForm_valid(self):
+        form = RiderForm(data={'name': "sarah", 'address': "address1", 'age': 9, 'email': "email@123.com"})
+        self.assertTrue(form.is_valid())
+
+    def test_RiderForm_invalid(self):
+        form = RiderForm(data={'name': "", 'address': "", 'age': 9, 'email': ""})
+        self.assertFalse(form.is_valid())
+
+    # def test_RiderSelectForm_valid(self):
+    #     form = RiderSelectForm(data={'name': "shiv"})
+    #     self.assertTrue(form.is_valid())
+    def test_RiderSelectForm_invalid(self):
+        form = RiderSelectForm(data={'name': ""})
+        self.assertFalse(form.is_valid())
+
+    def test_RiderSelectPage(self):
+        c = Client()
+        logged_in = c.login(username='user', password='password')
+        response = self.client.post('rider/horse-autocomplete/', follow=True)
+        self.assertEqual(response.status_code, 200)
 
 class HorseTestCase(TestCase):
     # def setup(self):
