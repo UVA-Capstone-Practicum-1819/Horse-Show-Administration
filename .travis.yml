@@ -10,6 +10,6 @@ install:
 script:
   - python3 src/newenv/horseshow-proj/manage.py makemigrations
   - python3 src/newenv/horseshow-proj/manage.py migrate
-  - python3 src/newenv/horseshow-proj/manage.py test Show
+  - python3 src/newenv/horseshow-proj/manage.py test
 
 sudo: false
