@@ -32,7 +32,7 @@ class AuthRequiredMiddleware(object):
         response = self.get_response(request)
         requested_path = request.path
         excluded_urls = ["/show/login", "/show/signup", "/admin"]
-        if request.user.is_authenticated and requested_path not in excluded_urls:
+        if not request.user.is_authenticated and requested_path not in excluded_urls:
             return redirect('login')
         # Code to be executed for each request/response after
         # the view is called.
