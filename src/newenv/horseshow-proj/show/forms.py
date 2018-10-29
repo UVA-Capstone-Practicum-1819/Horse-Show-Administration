@@ -15,6 +15,16 @@ class RiderForm(forms.ModelForm):
         model = Rider
         fields = ('name', 'address', 'age', 'email')
 
+class RiderSelectForm(forms.ModelForm):
+    #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
+    name= forms.ModelChoiceField(
+        queryset=Rider.objects.all(),
+        widget=autocomplete.ModelSelect2(url='rider_autocomplete')
+    )
+    class Meta:
+        model = Rider
+        fields = ('name',)
+
 class HorseForm(forms.ModelForm):
     class Meta:
         model = Horse
