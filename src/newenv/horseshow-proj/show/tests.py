@@ -74,8 +74,49 @@ class LoginTestCase(TestCase):
     response.context[key] to get the context value for the key
     """
 
+    def setUp(self):
+        self.credentials = {
+            'username': 'testuser',
+            'password': 'secret'}
+        User.objects.create_user(self.credentials)
+        self.client = Client()
+
+    """ using incorrect credentials; should not make valid form """
+
     def signup_with_incorrect_input(self):
         data = {'username': "testexampleuser",
                 'password1': "testuserpassword", 'password2': "testuserpasswordwrong"}
         form = UserCreationForm(data=data)
-        self.assertTrue(form.is_valid())
+        self.assertFalse(form.is_valid())
+
+    """ using correct credentials; should make valid form """
+
+    def signup_with_correct_input(self):
+        data = {'username': "testexampleuser",
+                'password1': "testuserpassword", 'password2': "testuserpassword"}
+        form = UserCreationForm(data=data)
+        self.assertFalse(form.is_valid())
+
+    """ using incorrect credentials; should not make user logged in (active) """
+
+    def login_with_incorrect_input(self):
+        data = {'username': "testuser",
+                'password1': "secretwrong", }
+        response = self.client.post(reverse('login'), data)
+
+        self.assertFalse(response.context['user'].is_active)
+
+    """ using correct credentials; should make user logged in (active) """
+
+    def login_with_correct_input(self):
+        data = {'username': "testuser",
+                'password1': "secret", }
+        response = self.client.post(reverse('login'), data)
+
+        self.assertTrue(response.context['user'].is_active)
+
+    """ log out the user, should be inactive """
+
+    def logout(self):
+        self.client.get(reverse('logout'))
+        self.assertFalse(response.context['user'].is_active)
