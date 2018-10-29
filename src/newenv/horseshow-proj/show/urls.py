@@ -25,6 +25,8 @@ urlpatterns = [
     path('horse-autocomplete', views.HorseAutocomplete.as_view(), name="horse_autocomplete"),
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
     path('show/viewshow', views.viewshow, name = "viewshow"),
+    path('addcombo', views.add_combo, name="addcombo"),
+    path('addcombo/newcombo', views.add_combo, name="newcombo")
 
 ]
 """horseshow URL Configuration
