@@ -1,14 +1,15 @@
 
 # Create your views here.
+import random
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
 import json
-from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm
+from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, ComboForm
 from django.forms.models import model_to_dict
-from show.models import Show, Rider, Horse
+from show.models import Show, Rider, Horse, Combo
 from django.shortcuts import render
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
@@ -71,7 +72,7 @@ def create_show(request):
         show_name=showname, show_date=showdate, show_location=showlocation)
     response = {'ok': True, 'success_msg': "Show was successfully created",
                 'form': form, 'show': new_show}
-    return render(request, 'add_combo.html', response)
+    return render(request, 'create_show.html', response)
 
 
 def signup(request):
@@ -115,7 +116,7 @@ def horse_select(request):
             # return redirect('horse_detail', pk=post.pk)
             return render(request, 'horse_select.html', {'form': form})
     else:
-        form= HorseSelectForm();
+        form= HorseSelectForm()
     return render(request, 'horse_select.html',{'form': form})
 
 def horse_new(request):
@@ -147,29 +148,28 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 def add_combo(request):
-    print(request.method)
-    if request.method == "POST":
-        form = ComboForm(request.post)
-        if form.is_valid():
-            rider = Rider.objects.get(rider_name = rider_name)
-            rn = rider.rider_name
-            horse = Horse.objects.get(horse_name = horse_name)
-            hn = horse.horse_name
-            ho = horse.owner
-            new_combo = random.randint(100,999)
-            combo = ComboForm.objects.create(combo=new_combo, rider_name=rn, horse_name=hn, owner=ho)
+    form = ComboForm()
+    if request.method == "GET":
+        return render(request, 'add_combo.html', {'form': form})
+    f = Combo(request.POST)
+    if not f.is_valid():
+        return render(request, 'add_combo.html', {'form': f})
+    if f.is_valid():
+        post = form.save(commit=False)
+        post.author = request.user
+        post.published_date = timezone.now()
+        post.save()
+        return render(request, 'add_combo.html', {'form': f})
+    combo = random.randint(100,999)
+    ridername = f.cleaned_data['rider_name']
+    horsename = f.cleaned_data['horse_name']
+    owner = f.cleaned_data['owner']
+    
+    new_combo = Combo.objects.create(
+        combo=combo, rider_name=ridername, horse_name=horsename, owner=owner)
     response = {'ok': True, 'success_msg': "Horse rider combination was successfully created",
                 'form': form, 'combo': combo}
-    return render(request, 'create_show.html', response)
-    ###################
-            post = form.save(commit=False)
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.save()
-            return render(request, 'add_combo.html', {'form': form})
-    else:
-        form = ComboForm   
-    return render(request, 'add_combo.html, {'form': form}')
+    return render(request, 'add_combo.html', response)
 
 def new_class(request):
     form = ShowForm()

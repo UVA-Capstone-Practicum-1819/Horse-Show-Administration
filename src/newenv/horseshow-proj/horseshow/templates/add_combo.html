@@ -1,16 +1,17 @@
 {% block content %}
 <h2>Generate Rider Horse Combination</h2>
 <form method="post">
-  {% block content %}
+  {% block content2 %}
   <div>
     <form action="" method="post">
       {% csrf_token %}
       {{ form.as_p }}
-      <input type="submit" />
+      <label>{{ combo }}</label><br />
+      <!-- <button type="submit">Get Combination</button> -->
+      <Button id="submit" onclick="location.href='/show/addcombo/newcombo'" class="button">Get Combination</Button>
+      <Button id="cancel" onclick="location.href='/show'" class="button">Cancel</Button>
     </form>
-    <a href="{% url 'horse_new' %}">Add a New Horse</a>
   </div>
   {% endblock %}
-  <button type="submit">Get Combination</button>
 </form>
 {% endblock %}
