@@ -1,4 +1,5 @@
 from django.db import models
+import random
 
 # Create your models here.
 
@@ -27,6 +28,18 @@ class Horse (models.Model):
     type = models.CharField(max_length=200)
     def __str__(self):
         return self.name
+
+
+def random_string():
+    return str(random.randint(100, 999))
+
+class Combo (models.Model):
+    combo= models.CharField(max_length=3, default = random_string)
+    ridername = models.CharField(max_length=200)
+    horsename = models.CharField(max_length=200)
+    owner = models.CharField(max_length=200)
+    def __str__(self):
+        return self.combo
 
 class Classes (models.Model):
     CLASS_CHOICES = (

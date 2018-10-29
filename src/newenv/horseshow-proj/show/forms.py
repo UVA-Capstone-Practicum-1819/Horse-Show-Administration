@@ -30,6 +30,12 @@ class HorseForm(forms.ModelForm):
         model = Horse
         fields = ('name', 'barn_name', 'age', 'coggins','owner', 'size', 'type')
 
+class ComboForm(forms.Form):
+    combo = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
+    rider_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
+    horse_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
+    owner = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
+    
 class ShowSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
     name= forms.ModelChoiceField(
@@ -62,7 +68,7 @@ class HorseSelectForm(forms.ModelForm):
         #    )
         #    }
 class ClassesForm(forms.ModelForm):
-    type = forms.ChoiceField(choices=Classes.CLASS_CHOICES, widget=forms.CheckboxSelectMultiple)
+    type = forms.ChoiceField(choices=Classes.CLASS_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
 
     class Meta:
         model = Classes
