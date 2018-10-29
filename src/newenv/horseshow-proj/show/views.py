@@ -7,14 +7,13 @@ from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
 import json
-from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, ComboForm
+from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, ClassesForm, ShowSelectForm, RiderSelectForm, ComboForm
 from django.forms.models import model_to_dict
 from show.models import Show, Rider, Horse, Combo
 from django.shortcuts import render
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
 from dal import autocomplete
-
 
 # Create your views here.
 
@@ -75,6 +74,30 @@ def create_show(request):
     return render(request, 'create_show.html', response)
 
 
+def show_select(request):
+    if request.method == "POST":
+        form = ShowSelectForm(request.POST)
+        if form.is_valid():
+            #post = form.save(commit=False)
+            #post.author = request.user
+            #post.published_date = timezone.now()
+            #post.save()
+            # return redirect('horse_detail', pk=post.pk)
+            return render(request, 'show_select.html', {'form': form})
+    else:
+        form= ShowSelectForm();
+    return render(request, 'show_select.html',{'form': form})
+
+class ShowAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        #if not self.request.user.is_authenticated():
+            #return Horse.objects.none()
+        qs = Show.objects.all()
+        if self.q:
+            qs = qs.filter(name__istartswith=self.q)
+        return qs
+
+
 def signup(request):
     """ signs user up via form """
     if request.method == 'POST':
@@ -100,10 +123,28 @@ def newrider(request):
             post.author = request.user
             post.published_date = timezone.now()
             post.save()
-            return render(request, 'editrider.html', {'form': form})
+            # return render(request, 'editrider.html', {'form': form})
+            return redirect('/show/horse')
     else:
         form = RiderForm()
     return render(request, 'editrider.html', {'form': form})
+
+def rider_select(request):
+    if request.method == "POST":
+        form = RiderSelectForm(request.POST)
+        if form.is_valid():
+            # return render(request, 'horse_select.html', {'form': form})
+            return redirect('/show/horse')
+    else:
+        form= RiderSelectForm();
+    return render(request, 'rider_select.html',{'form': form})
+
+class RiderAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Rider.objects.all()
+        if self.q:
+            qs = qs.filter(name__istartswith=self.q)
+        return qs
 
 def horse_select(request):
     if request.method == "POST":
@@ -172,5 +213,16 @@ def add_combo(request):
     return render(request, 'add_combo.html', response)
 
 def new_class(request):
-    form = ShowForm()
+    print(request.method)
+    if request.method == "POST":
+        form = ClassesForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
+            # return redirect('horse_detail', pk=post.pk)
+            return render(request, 'classes.html', {'form': form})
+    else:
+        form = ClassesForm()
     return render(request, 'classes.html', {'form': form})
