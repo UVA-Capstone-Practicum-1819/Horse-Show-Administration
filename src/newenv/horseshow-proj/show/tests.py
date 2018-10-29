@@ -50,3 +50,19 @@ class HorseTestCase(TestCase):
     def test_horse_creation(self):
         testhorse = self.create_horse()
         self.assertTrue(isinstance(testhorse, Horse))
+
+class ClassTestCase(TestCase):
+    def test_name(self):
+        self.assertEqual(Classes.CLASS_CHOICES[0], ('cwu', '1. California Warm Up'))
+
+    def test_check_type(self):
+        self.assertTrue(isinstance(Classes.CLASS_CHOICES[0], tuple))
+
+    def test_index(self):
+        self.assertEqual(Classes.CLASS_CHOICES.index(('pef', '35. Pony Equitation on the Flat')), 34)
+
+    def test_length(self):
+        self.assertEqual(len(Classes.CLASS_CHOICES), 48)
+
+    def test_selected(self):
+        self.assertFalse(Classes.CLASS_CHOICES[0] == 'on')
