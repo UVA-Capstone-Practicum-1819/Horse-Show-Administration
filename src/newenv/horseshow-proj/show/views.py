@@ -80,17 +80,18 @@ def show_select(request):
             #post = form.save(commit=False)
             #post.author = request.user
             #post.published_date = timezone.now()
-            #post.save()
+            # post.save()
             # return redirect('horse_detail', pk=post.pk)
             return render(request, 'show_select.html', {'form': form})
     else:
-        form= ShowSelectForm();
-    return render(request, 'show_select.html',{'form': form})
+        form = ShowSelectForm()
+    return render(request, 'show_select.html', {'form': form})
+
 
 class ShowAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        #if not self.request.user.is_authenticated():
-            #return Horse.objects.none()
+        # if not self.request.user.is_authenticated():
+            # return Horse.objects.none()
         qs = Show.objects.all()
         if self.q:
             qs = qs.filter(name__istartswith=self.q)
@@ -101,6 +102,7 @@ def signup(request):
     """ signs user up via form """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
+        print(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
@@ -128,6 +130,7 @@ def newrider(request):
         form = RiderForm()
     return render(request, 'editrider.html', {'form': form})
 
+
 def rider_select(request):
     if request.method == "POST":
         form = RiderSelectForm(request.POST)
@@ -135,8 +138,9 @@ def rider_select(request):
             # return render(request, 'horse_select.html', {'form': form})
             return redirect('/show/horse')
     else:
-        form= RiderSelectForm();
-    return render(request, 'rider_select.html',{'form': form})
+        form = RiderSelectForm()
+    return render(request, 'rider_select.html', {'form': form})
+
 
 class RiderAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -145,6 +149,7 @@ class RiderAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(name__istartswith=self.q)
         return qs
 
+
 def horse_select(request):
     if request.method == "POST":
         form = HorseSelectForm(request.POST)
@@ -152,12 +157,13 @@ def horse_select(request):
             #post = form.save(commit=False)
             #post.author = request.user
             #post.published_date = timezone.now()
-            #post.save()
+            # post.save()
             # return redirect('horse_detail', pk=post.pk)
             return render(request, 'horse_select.html', {'form': form})
     else:
-        form= HorseSelectForm();
-    return render(request, 'horse_select.html',{'form': form})
+        form = HorseSelectForm()
+    return render(request, 'horse_select.html', {'form': form})
+
 
 def horse_new(request):
     print(request.method)
@@ -174,11 +180,12 @@ def horse_new(request):
         form = HorseForm()
     return render(request, 'horse_edit.html', {'form': form})
 
+
 class HorseAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
 
-        #if not self.request.user.is_authenticated():
-            #return Horse.objects.none()
+        # if not self.request.user.is_authenticated():
+            # return Horse.objects.none()
 
         qs = Horse.objects.all()
 
@@ -186,6 +193,7 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(name__istartswith=self.q)
 
         return qs
+
 
 def new_class(request):
     print(request.method)
