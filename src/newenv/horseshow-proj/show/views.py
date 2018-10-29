@@ -6,7 +6,7 @@ from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
 import json
-from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm
+from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, ClassesForm
 from django.forms.models import model_to_dict
 from show.models import Show, Rider, Horse
 from django.shortcuts import render
@@ -147,5 +147,16 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 def new_class(request):
-    form = ShowForm()
+    print(request.method)
+    if request.method == "POST":
+        form = ClassesForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
+            # return redirect('horse_detail', pk=post.pk)
+            return render(request, 'classes.html', {'form': form})
+    else:
+        form = ClassesForm()
     return render(request, 'classes.html', {'form': form})

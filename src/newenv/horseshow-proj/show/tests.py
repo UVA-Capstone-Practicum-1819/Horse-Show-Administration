@@ -1,5 +1,5 @@
 from django.test import TestCase
-from show.models import Show, Rider, Horse
+from show.models import Show, Rider, Horse, Classes
 
 # Create your tests here.
 

@@ -35,3 +35,9 @@ class HorseSelectForm(forms.ModelForm):
             #    attrs={'data-html': True}
         #    )
         #    }
+class ClassesForm(forms.ModelForm):
+    type = forms.ChoiceField(choices=Classes.CLASS_CHOICES, widget=forms.CheckboxSelectMultiple)
+
+    class Meta:
+        model = Classes
+        fields = ('type',)
