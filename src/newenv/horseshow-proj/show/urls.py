@@ -24,6 +24,8 @@ urlpatterns = [
     path('rider-autocomplete', views.RiderAutocomplete.as_view(), name="rider_autocomplete"),
     path('horse-autocomplete', views.HorseAutocomplete.as_view(), name="horse_autocomplete"),
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
+    path('addcombo', views.add_combo, name="addcombo"),
+    path('addcombo/newcombo', views.add_combo, name="newcombo")
 
 
 ]

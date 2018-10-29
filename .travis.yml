@@ -1,0 +1,15 @@
+language: python
+
+python:
+  - "3.5.1"
+
+install:
+  - pip install Django==2.1
+  - pip install django-autocomplete-light
+
+script:
+  - python manage.py makemigrations
+  - python manage.py migrate
+  - python manage.py test Show
+
+sudo: false
