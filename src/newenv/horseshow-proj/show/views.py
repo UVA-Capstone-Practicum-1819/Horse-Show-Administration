@@ -6,7 +6,7 @@ from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
 import json
-from show.forms import ShowForm, RiderForm, HorseForm, RiderSelectForm, HorseSelectForm, ClassesForm
+from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, ClassesForm, ShowSelectForm, RiderSelectForm
 from django.forms.models import model_to_dict
 from show.models import Show, Rider, Horse
 from django.shortcuts import render
@@ -71,6 +71,30 @@ def create_show(request):
     response = {'ok': True, 'success_msg': "Show was successfully created",
                 'form': form, 'show': new_show}
     return render(request, 'create_show.html', response)
+
+
+def show_select(request):
+    if request.method == "POST":
+        form = ShowSelectForm(request.POST)
+        if form.is_valid():
+            #post = form.save(commit=False)
+            #post.author = request.user
+            #post.published_date = timezone.now()
+            #post.save()
+            # return redirect('horse_detail', pk=post.pk)
+            return render(request, 'show_select.html', {'form': form})
+    else:
+        form= ShowSelectForm();
+    return render(request, 'show_select.html',{'form': form})
+
+class ShowAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        #if not self.request.user.is_authenticated():
+            #return Horse.objects.none()
+        qs = Show.objects.all()
+        if self.q:
+            qs = qs.filter(name__istartswith=self.q)
+        return qs
 
 
 def signup(request):

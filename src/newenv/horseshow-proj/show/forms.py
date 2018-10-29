@@ -30,6 +30,22 @@ class HorseForm(forms.ModelForm):
         model = Horse
         fields = ('name', 'barn_name', 'age', 'coggins','owner', 'size', 'type')
 
+class ShowSelectForm(forms.ModelForm):
+    #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
+    name= forms.ModelChoiceField(
+        queryset=Show.objects.all(),
+        widget=autocomplete.ModelSelect2(url='show_autocomplete')
+    )
+    class Meta:
+        model = Show
+        fields = ('show_date',)
+        #widgets = {
+        #    'name': autocomplete.ModelSelect2(
+            #    url='horse-autocomplete',
+            #    attrs={'data-html': True}
+        #    )
+        #    }
+
 class HorseSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
     name= forms.ModelChoiceField(

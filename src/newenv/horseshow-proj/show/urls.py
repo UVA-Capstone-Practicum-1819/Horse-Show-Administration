@@ -18,10 +18,13 @@ urlpatterns = [
     path('rider/new', views.newrider, name="newrider"),
     path('class/new', views.new_class, name="classes"),
     path('horse', views.horse_select, name="horse_select"),
+    path('show', views.show_select, name="show_select"),
+    path('show-autocomplete', views.ShowAutocomplete.as_view(), name="show_autocomplete"),
     path('rider', views.rider_select, name="rider_select"),
     path('rider-autocomplete', views.RiderAutocomplete.as_view(), name="rider_autocomplete"),
     path('horse-autocomplete', views.HorseAutocomplete.as_view(), name="horse_autocomplete"),
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
+
 
 ]
 """horseshow URL Configuration
