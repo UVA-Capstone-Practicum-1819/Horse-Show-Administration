@@ -6,6 +6,6 @@ python:
 install:
   - pip install Django==2.1
 
-script: python manage.py test
+script: python3 manage.py test
 
 sudo: false
