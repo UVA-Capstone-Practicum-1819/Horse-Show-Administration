@@ -31,7 +31,12 @@ class Horse (models.Model):
 
 
 def random_string():
-    return str(random.randint(100, 999))
+    rand_str = ""
+    for i in range(3):
+        rand_str += random.choice("0123456789")
+    return rand_str
+
+    # return str(random.randint(100, 999))
 
 class Combo (models.Model):
     combo= models.CharField(max_length=3, default = random_string)
