@@ -71,7 +71,7 @@ def create_show(request):
         show_name=showname, show_date=showdate, show_location=showlocation)
     response = {'ok': True, 'success_msg': "Show was successfully created",
                 'form': form, 'show': new_show}
-    return render(request, 'create_show.html', response)
+    return render(request, 'add_combo.html', response)
 
 
 def signup(request):
@@ -145,6 +145,31 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(name__istartswith=self.q)
 
         return qs
+
+def add_combo(request):
+    print(request.method)
+    if request.method == "POST":
+        form = ComboForm(request.post)
+        if form.is_valid():
+            rider = Rider.objects.get(rider_name = rider_name)
+            rn = rider.rider_name
+            horse = Horse.objects.get(horse_name = horse_name)
+            hn = horse.horse_name
+            ho = horse.owner
+            new_combo = random.randint(100,999)
+            combo = ComboForm.objects.create(combo=new_combo, rider_name=rn, horse_name=hn, owner=ho)
+    response = {'ok': True, 'success_msg': "Horse rider combination was successfully created",
+                'form': form, 'combo': combo}
+    return render(request, 'create_show.html', response)
+    ###################
+            post = form.save(commit=False)
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
+            return render(request, 'add_combo.html', {'form': form})
+    else:
+        form = ComboForm   
+    return render(request, 'add_combo.html, {'form': form}')
 
 def new_class(request):
     form = ShowForm()

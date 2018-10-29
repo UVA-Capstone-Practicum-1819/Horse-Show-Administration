@@ -20,6 +20,8 @@ urlpatterns = [
     path('horse', views.horse_select, name="horse_select"),
     path('horse-autocomplete', views.HorseAutocomplete.as_view(), name="horse_autocomplete"),
     path('logout', auth_views.LogoutView.as_view(), name='logout')
+    path('addrider/addhorse/combo', views.add_combo, name="addcombo"),
+    
 
 ]
 """horseshow URL Configuration
