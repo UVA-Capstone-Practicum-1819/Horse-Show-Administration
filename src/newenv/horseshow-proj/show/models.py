@@ -14,6 +14,8 @@ class Rider (models.Model):
     address = models.CharField(max_length=200)
     age= models.IntegerField()
     email = models.CharField(max_length=200)
+    def __str__(self):
+        return self.name
 
 class Horse (models.Model):
     name= models.CharField(max_length= 200)
@@ -78,4 +80,3 @@ class Classes (models.Model):
         ('phd3', '48. Pony Hunter Under Saddle'),
     )
     type = models.BooleanField(max_length=100, choices=CLASS_CHOICES)
-
