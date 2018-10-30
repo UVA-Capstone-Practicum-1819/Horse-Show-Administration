@@ -49,6 +49,24 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
+def showpage(request):
+    latest_show_list = Show.objects.all
+    template = loader.get_template('showpage.html')
+    context = {
+        'latest_show_list': latest_show_list,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def classpage(request):
+    latest_show_list = Show.objects.all
+    template = loader.get_template('classpage.html')
+    context = {
+        'latest_show_list': latest_show_list,
+    }
+    return HttpResponse(template.render(context, request))
+
+
 def create_show(request):
     form = ShowForm()
     if request.method == "GET":
