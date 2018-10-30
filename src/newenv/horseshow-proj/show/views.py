@@ -134,6 +134,19 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
+def billing(request):
+    if request.method == "POST":
+        form = RiderSelectForm(request.POST)
+        if form.is_valid():
+            #post = form.save(commit=False)
+            #post.author = request.user
+            #post.published_date = timezone.now()
+            # post.save()
+            # return redirect('horse_detail', pk=post.pk)
+            return render(request, 'billing.html', {'form': form})
+    else:
+        form = RiderSelectForm()
+    return render(request, 'billing.html', {'form': form})
 
 def newrider(request):
     print(request.method)
