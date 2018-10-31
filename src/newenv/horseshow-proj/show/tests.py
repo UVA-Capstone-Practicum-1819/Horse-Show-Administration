@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from show.models import Show, Rider, Horse, Classes, Combo
+from show.models import Show, Rider, Horse, Classes
 from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, RiderSelectForm
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -219,43 +219,43 @@ class LoginTestCase(TestCase):
         self.client.get(reverse('logout'))
         self.assertFalse(response.context['user'].is_active)
         
-class ComboTestCase(TestCase):
-    def create_combo(self, title="test", body="test for add combo"):
-        return Combo.objects.create(combo='234', ridername="Richard Lee", horsename = "Jenny", owner="John Doe")
+# class ComboTestCase(TestCase):
+#     def create_combo(self, title="test", body="test for add combo"):
+#         return Combo.objects.create(combo='234', ridername="Richard Lee", horsename = "Jenny", owner="John Doe")
 
-    def test_create_combo(self):
-        test_combo = self.create_combo()
-        self.assertTrue(isinstance(test_combo, Combo))
+#     def test_create_combo(self):
+#         test_combo = self.create_combo()
+#         self.assertTrue(isinstance(test_combo, Combo))
 
-class ComboIntTestCase(TestCase):
-    def create_combo(self, title="test", body="test for add int combo"):
-        return Combo.objects.create(combo=564, ridername="Jane Doe", horsename = "Toby", owner="Oliver Parker")
+# class ComboIntTestCase(TestCase):
+#     def create_combo(self, title="test", body="test for add int combo"):
+#         return Combo.objects.create(combo=564, ridername="Jane Doe", horsename = "Toby", owner="Oliver Parker")
 
-    def test_create_combo(self):
-        test_combo = self.create_combo()
-        self.assertTrue(isinstance(test_combo, Combo))
+#     def test_create_combo(self):
+#         test_combo = self.create_combo()
+#         self.assertTrue(isinstance(test_combo, Combo))
 
-class ComboRandomTestCase(TestCase):
-    def create_combo(self, title="test", body="test for add random combo"):
-        return Combo.objects.create(combo= models.random_string(), ridername="Jane Doe", horsename = "Toby", owner="Oliver Parker")
+# class ComboRandomTestCase(TestCase):
+#     def create_combo(self, title="test", body="test for add random combo"):
+#         return Combo.objects.create(combo= models.random_string(), ridername="Jane Doe", horsename = "Toby", owner="Oliver Parker")
 
-    def test_create_combo(self):
-        test_combo = self.create_combo()
-        self.assertTrue(isinstance(test_combo, Combo))
+#     def test_create_combo(self):
+#         test_combo = self.create_combo()
+#         self.assertTrue(isinstance(test_combo, Combo))
 
-class RandomCombinationTestCase1(TestCase):
-    def generate_random_three_digit_int(self, title="test", body="test for three digit integer"):
-        return models.random_string()
-    def test_generate_random(self):
-        for i in range (10):
-            test_random_int = self.generate_random_three_digit_int()
-            self.assertTrue(len(test_random_int), 3)
+# class RandomCombinationTestCase1(TestCase):
+#     def generate_random_three_digit_int(self, title="test", body="test for three digit integer"):
+#         return models.random_string()
+#     def test_generate_random(self):
+#         for i in range (10):
+#             test_random_int = self.generate_random_three_digit_int()
+#             self.assertTrue(len(test_random_int), 3)
 
-class RandomCombinationTestCase2(TestCase):
-    def generate_random_int(self, title="test", body="test for integer range"):
-        return models.random_string()
-    def test_generate_random(self):
-        for i in range (10):
-            test_random_int = self.generate_random_int()
-            self.assertTrue(0 <= int(test_random_int) <= 999)
+# class RandomCombinationTestCase2(TestCase):
+#     def generate_random_int(self, title="test", body="test for integer range"):
+#         return models.random_string()
+#     def test_generate_random(self):
+#         for i in range (10):
+#             test_random_int = self.generate_random_int()
+#             self.assertTrue(0 <= int(test_random_int) <= 999)
 

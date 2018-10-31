@@ -7,7 +7,7 @@ from django.urls import resolve, reverse
 import json
 from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, ClassesForm, ShowSelectForm, RiderSelectForm, ComboForm
 from django.forms.models import model_to_dict
-from show.models import Show, Rider, Horse, Combo
+from show.models import Show, Rider, Horse
 from django.shortcuts import render
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
@@ -227,29 +227,45 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def add_combo(request):
-    form = ComboForm()
-    if request.method == "GET":
-        return render(request, 'add_combo.html', {'form': form})
-    f = Combo(request.POST)
-    if not f.is_valid():
-        return render(request, 'add_combo.html', {'form': f})
-    if f.is_valid():
-        post = form.save(commit=False)
-        post.author = request.user
-        post.published_date = timezone.now()
-        post.save()
-        return render(request, 'add_combo.html', {'form': f})
-    combo = random.randint(100, 999)
-    ridername = f.cleaned_data['rider_name']
-    horsename = f.cleaned_data['horse_name']
-    owner = f.cleaned_data['owner']
+# def add_combo(request):
+#     form = ComboForm()
+#     if request.method == "GET":
+#         return render(request, 'add_combo.html', {'form': form})
+#     f = Combo(request.POST)
+#     if not f.is_valid():
+#         return render(request, 'add_combo.html', {'form': f})
+#     if f.is_valid():
+#         post = form.save(commit=False)
+#         post.author = request.user
+#         post.published_date = timezone.now()
+#         post.save()
+#         return render(request, 'add_combo.html', {'form': f})
+#     combo = random.randint(100, 999)
+#     ridername = f.cleaned_data['rider_name']
+#     horsename = f.cleaned_data['horse_name']
+#     owner = f.cleaned_data['owner']
 
-    new_combo = Combo.objects.create(
-        combo=combo, rider_name=ridername, horse_name=horsename, owner=owner)
-    response = {'ok': True, 'success_msg': "Horse rider combination was successfully created",
-                'form': form, 'combo': combo}
-    return render(request, 'add_combo.html', response)
+#     new_combo = Combo.objects.create(
+#         combo=combo, rider_name=ridername, horse_name=horsename, owner=owner)
+#     response = {'ok': True, 'success_msg': "Horse rider combination was successfully created",
+#                 'form': form, 'combo': combo}
+#     return render(request, 'add_combo.html', response)
+
+def combo(request, rider_name, horse_name):
+    rider = get_object_or_404(Rider, pk=rider_name)
+    try:
+        selected_rider = rider.choice_set.get(pk=request.POST['rider name'])
+    except (KeyError, Choice.DoesNotExist):
+        # Add a rider to the database
+        return render(request, 'rider/new.html', {
+            'error_message': "Rider do not exist in database, add a new rider",
+        })
+    else:
+        selected_rider.save()
+        # Always return an HttpResponseRedirect after successfully dealing
+        # with POST data. This prevents data from being posted twice if a
+        # user hits the Back button.
+        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
 
 def new_class(request):
