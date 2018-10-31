@@ -1,5 +1,3 @@
-
-# Create your views here.
 import random
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
