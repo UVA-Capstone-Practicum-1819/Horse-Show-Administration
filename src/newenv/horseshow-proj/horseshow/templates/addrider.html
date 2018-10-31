@@ -1,19 +1,23 @@
+{% extends "add_combo.html" %}
 {% load static %}
 <html>
-    <head>
-        <title>Rider</title>
-    </head>
-    <body>
-        <div class="page-header">
-            <a href="{% url 'newrider' %}" >Add Rider</a>
-        </div>
-        <div class="content container">
-            <div class="row">
-                <div class="col-md-8">
-                    {% block content %}
-                    {% endblock %}
-                </div>
+
+<head>
+    <title>Rider</title>
+</head>
+
+<body>
+    <div class="page-header">
+        <a href="{% url 'newrider' %}">Add Rider</a>
+    </div>
+    <div class="content container">
+        <div class="row">
+            <div class="col-md-8">
+                {% block content %}
+                {% endblock %}
             </div>
         </div>
-    </body>
+    </div>
+</body>
+
 </html>
