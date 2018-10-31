@@ -251,7 +251,7 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
 #                 'form': form, 'combo': combo}
 #     return render(request, 'add_combo.html', response)
 
-def combo(request, rider_name, horse_name):
+def add_combo(request, rider_name, horse_name):
     rider = get_object_or_404(Rider, pk=rider_name)
     try:
         selected_rider = rider.choice_set.get(pk=request.POST['rider name'])
