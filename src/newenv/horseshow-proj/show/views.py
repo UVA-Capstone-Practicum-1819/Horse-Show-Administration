@@ -1,20 +1,15 @@
 import random
+import json
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
-import json
 from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, ClassesForm, ShowSelectForm, RiderSelectForm, ComboForm
 from django.forms.models import model_to_dict
 from show.models import Show, Rider, Horse
-from django.shortcuts import render
-from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
 from dal import autocomplete
-
-# Create your views here.
-
 """ for authentication/signin/signup purposes """
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
