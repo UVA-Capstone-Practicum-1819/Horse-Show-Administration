@@ -1,7 +1,6 @@
 from django.db import models
 import random
 
-
 class Show(models.Model):
     show_name = models.CharField(max_length=100)
     show_date = models.CharField(max_length=100)
@@ -41,7 +40,6 @@ def random_string():
     for i in range(3):
         rand_str += random.choice("0123456789")
     return rand_str
-
     # return str(random.randint(100, 999))
 
 
