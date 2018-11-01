@@ -8,11 +8,8 @@ urlpatterns = [
     path('create_show', views.create_show, name='create_show'),
     path('showpage', views.showpage, name='showpage'),
     path('classpage', views.classpage, name = 'classpage'),
-
     path('signup', views.signup, name='signup'),
-    path('login', auth_views.LoginView.as_view(
-        template_name='login.html'), name='login'),
-    # path('admin/', admin.site.urls),
+    path('login', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('horse/new', views.horse_new, name="horse_new"),
     path('rider/new', views.newrider, name="newrider"),
     path('class/new', views.new_class, name="classes"),
@@ -26,7 +23,6 @@ urlpatterns = [
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
     path('addcombo', views.add_combo, name="addcombo"),
     path('addcombo/newcombo', views.add_combo, name="newcombo")
-
 
 ]
 """horseshow URL Configuration
