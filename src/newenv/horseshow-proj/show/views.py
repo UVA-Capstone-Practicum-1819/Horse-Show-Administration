@@ -84,7 +84,7 @@ def show_select(request):
             #post.published_date = timezone.now()
             # post.save()
             # return redirect('horse_detail', pk=post.pk)
-            return render(request, 'show_select.html', {'form': form})
+            return redirect('viewshow', showname=form.cleaned_data['name'])
     else:
         form = ShowSelectForm()
     return render(request, 'show_select.html', {'form': form})
@@ -116,8 +116,24 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
-def viewshow(request):
-    return render(request, 'viewshow.html')
+def viewshow(request, showname):
+    try:
+        # find the show to be viewed
+        # store data in context to be accessible by html page
+        shows = Show.objects.all()
+        for show in shows:
+            if showname == show.show_name:
+                context = {
+                    "show_name" : show.show_name,
+                    "show_date" : show.show_date,
+                    "show_location" : show.show_location,
+                }
+                return render(request, 'viewshow.html', context = context)
+    except Exception as e:
+        return HttpResponse(e)
+
+def edit_show(request, showname):
+    return render(request,"edit_show.html")
 
 def newrider(request):
     print(request.method)

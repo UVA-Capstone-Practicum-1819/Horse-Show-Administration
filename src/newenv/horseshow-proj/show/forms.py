@@ -44,7 +44,7 @@ class ShowSelectForm(forms.ModelForm):
     )
     class Meta:
         model = Show
-        fields = ('show_date',)
+        fields = ('name', 'show_date')
         #widgets = {
         #    'name': autocomplete.ModelSelect2(
             #    url='horse-autocomplete',
