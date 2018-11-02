@@ -1,22 +1,15 @@
-
-# Create your views here.
 import random
+import json
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
-import json
 from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, ClassesForm, ShowSelectForm, RiderSelectForm, ComboForm
 from django.forms.models import model_to_dict
-from show.models import Show, Rider, Horse, Combo
-from django.shortcuts import render
-from django.shortcuts import redirect, get_object_or_404
+from show.models import Show, Rider, Horse
 from django.utils import timezone
 from dal import autocomplete
-
-# Create your views here.
-
 """ for authentication/signin/signup purposes """
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -32,7 +25,7 @@ class AuthRequiredMiddleware(object):
         response = self.get_response(request)
         requested_path = request.path
         excluded_urls = ["/show/login", "/show/signup", "/admin"]
-        if request.user.is_authenticated and requested_path not in excluded_urls:
+        if not request.user.is_authenticated and requested_path not in excluded_urls:
             return redirect('login')
         # Code to be executed for each request/response after
         # the view is called.
@@ -43,6 +36,24 @@ class AuthRequiredMiddleware(object):
 def index(request):
     latest_show_list = Show.objects.all
     template = loader.get_template('index.html')
+    context = {
+        'latest_show_list': latest_show_list,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def showpage(request):
+    latest_show_list = Show.objects.all
+    template = loader.get_template('showpage.html')
+    context = {
+        'latest_show_list': latest_show_list,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def classpage(request):
+    latest_show_list = Show.objects.all
+    template = loader.get_template('classpage.html')
     context = {
         'latest_show_list': latest_show_list,
     }
@@ -135,6 +146,20 @@ def viewshow(request, showname):
 def edit_show(request, showname):
     return render(request,"edit_show.html")
 
+def billing(request):
+    if request.method == "POST":
+        form = RiderSelectForm(request.POST)
+        if form.is_valid():
+            #post = form.save(commit=False)
+            #post.author = request.user
+            #post.published_date = timezone.now()
+            # post.save()
+            # return redirect('horse_detail', pk=post.pk)
+            return render(request, 'billing.html', {'form': form})
+    else:
+        form = RiderSelectForm()
+    return render(request, 'billing.html', {'form': form})
+
 def newrider(request):
     print(request.method)
     if request.method == "POST":
@@ -216,29 +241,45 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def add_combo(request):
-    form = ComboForm()
-    if request.method == "GET":
-        return render(request, 'add_combo.html', {'form': form})
-    f = Combo(request.POST)
-    if not f.is_valid():
-        return render(request, 'add_combo.html', {'form': f})
-    if f.is_valid():
-        post = form.save(commit=False)
-        post.author = request.user
-        post.published_date = timezone.now()
-        post.save()
-        return render(request, 'add_combo.html', {'form': f})
-    combo = random.randint(100, 999)
-    ridername = f.cleaned_data['rider_name']
-    horsename = f.cleaned_data['horse_name']
-    owner = f.cleaned_data['owner']
+# def add_combo(request):
+#     form = ComboForm()
+#     if request.method == "GET":
+#         return render(request, 'add_combo.html', {'form': form})
+#     f = Combo(request.POST)
+#     if not f.is_valid():
+#         return render(request, 'add_combo.html', {'form': f})
+#     if f.is_valid():
+#         post = form.save(commit=False)
+#         post.author = request.user
+#         post.published_date = timezone.now()
+#         post.save()
+#         return render(request, 'add_combo.html', {'form': f})
+#     combo = random.randint(100, 999)
+#     ridername = f.cleaned_data['rider_name']
+#     horsename = f.cleaned_data['horse_name']
+#     owner = f.cleaned_data['owner']
 
-    new_combo = Combo.objects.create(
-        combo=combo, rider_name=ridername, horse_name=horsename, owner=owner)
-    response = {'ok': True, 'success_msg': "Horse rider combination was successfully created",
-                'form': form, 'combo': combo}
-    return render(request, 'add_combo.html', response)
+#     new_combo = Combo.objects.create(
+#         combo=combo, rider_name=ridername, horse_name=horsename, owner=owner)
+#     response = {'ok': True, 'success_msg': "Horse rider combination was successfully created",
+#                 'form': form, 'combo': combo}
+#     return render(request, 'add_combo.html', response)
+
+def add_combo(request, rider_name, horse_name):
+    rider = get_object_or_404(Rider, pk=rider_name)
+    try:
+        selected_rider = rider.choice_set.get(pk=request.POST['rider name'])
+    except (KeyError, Choice.DoesNotExist):
+        # Add a rider to the database
+        return render(request, 'rider/new.html', {
+            'error_message': "Rider do not exist in database, add a new rider",
+        })
+    else:
+        selected_rider.save()
+        # Always return an HttpResponseRedirect after successfully dealing
+        # with POST data. This prevents data from being posted twice if a
+        # user hits the Back button.
+        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
 
 def new_class(request):

@@ -1,9 +1,7 @@
 from django import forms
-#from show import views
 from show.models import *
 from .models import *
 from dal import autocomplete
-
 
 class ShowForm(forms.Form):
     show_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
@@ -17,10 +15,7 @@ class RiderForm(forms.ModelForm):
 
 class RiderSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
-    name= forms.ModelChoiceField(
-        queryset=Rider.objects.all(),
-        widget=autocomplete.ModelSelect2(url='rider_autocomplete')
-    )
+    name= forms.ModelChoiceField(queryset=Rider.objects.all(), widget=autocomplete.ModelSelect2(url='rider_autocomplete'))
     class Meta:
         model = Rider
         fields = ('name',)
@@ -35,7 +30,7 @@ class ComboForm(forms.Form):
     rider_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
     horse_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
     owner = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
-    
+
 class ShowSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
     name= forms.ModelChoiceField(
