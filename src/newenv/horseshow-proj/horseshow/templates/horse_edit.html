@@ -1,20 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+{% load static %}
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Horse</title>
 </head>
 <body>
-
-{% extends 'add_horse.html' %}
-
-{% block content %}
-    <h1>Horse</h1>
-    <form method="POST" class="post-form">{% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save</button>
-    </form>
-{% endblock %}
-
-</body>
+      <div class="page-header">
+          <a href="{% url 'horse_new' %}" >Add Horse</a>
+      </div>
+      <div class="content container">
+          <div class="row">
+              <div class="col-md-8">
+                  {% block content %}
+                  <h1>Horse</h1>
+                  <form method="POST" class="post-form">{% csrf_token %}
+                      {{ form.as_p }}
+                      <button type="submit">Save</button>
+                  </form>
+                  {% endblock %}
+              </div>
+          </div>
+      </div>
+  </body>
 </html>
