@@ -1,6 +1,7 @@
 from django.db import models
 import random
 
+
 class Show(models.Model):
     show_name = models.CharField(max_length=100)
     show_date = models.CharField(max_length=100)
@@ -15,7 +16,8 @@ class Rider (models.Model):
     address = models.CharField(max_length=200)
     age = models.IntegerField()
     email = models.CharField(max_length=200)
-    combo_num = models.IntegerField(blank=True, null=True)
+
+    horses = models.ManyToManyField(Horse, through=HorseRiderCombo)
 
     def __str__(self):
         return self.name
@@ -33,6 +35,12 @@ class Horse (models.Model):
 
     def __str__(self):
         return self.name
+
+
+class HorseRiderCombo(models.Model):
+    rider = models.ForeignKey(Rider, on_delete=models.CASCADE)
+    horse = models.ForeignKey(Horse, on_delete=models.CASCADE)
+    num = models.IntegerField()
 
 
 def random_string():

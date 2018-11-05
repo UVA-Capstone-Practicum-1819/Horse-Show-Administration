@@ -218,7 +218,22 @@ class LoginTestCase(TestCase):
     def logout(self):
         self.client.get(reverse('logout'))
         self.assertFalse(response.context['user'].is_active)
+
+
+class HorseRiderComboTest(TestCase):
+    def setUp(self):
+        horse1 = Horse.objects.create(name = "Misty", barn_name="Misty", age=4, coggins=12345, owner="Tina", size="pony", type="shetland")
+        horse2 = Horse.objects.create(name = "Brock", barn_name="Brock", age=5, coggins=73854, owner="Brock has no Owner!", size="unicorn", type="unicorn")
+        horse3 = Horse.objects.create(name = "Ash", barn_name="Ash", age=5, coggins=747, owner="May", size="pony", type="pony")
+        horse4 = Horse.objects.create(name = "Pikachu", barn_name="Pikachu", age=1, coggins=8736, owner="Ash", size="mouse", type="mouse")
+
+        rider1 = Rider.objects.create(name = "Tarun", address="116 Chelsea Dr", age=22, email="ts4pe@virginia.edu")
+        rider2 = Rider.objects.create(name = "Yunzhe", address="idunno ln.", age=22, email="ts4pe@virginia.edu")
+        rider3 = Rider.objects.create(name = "Shannon", address="sfds", age=22, email="ts4pe@virginia.edu")
         
+
+
+
 # class ComboTestCase(TestCase):
 #     def create_combo(self, title="test", body="test for add combo"):
 #         return Combo.objects.create(combo='234', ridername="Richard Lee", horsename = "Jenny", owner="John Doe")
