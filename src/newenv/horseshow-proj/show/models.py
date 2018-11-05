@@ -16,6 +16,7 @@ class Rider (models.Model):
     address = models.CharField(max_length=200)
     age = models.IntegerField()
     email = models.CharField(max_length=200)
+
     horses = models.ManyToManyField(Horse, through=HorseRiderCombo)
 
     def __str__(self):
@@ -30,6 +31,7 @@ class Horse (models.Model):
     owner = models.CharField(max_length=200)
     size = models.CharField(max_length=200)
     type = models.CharField(max_length=200)
+    combo_num = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.name

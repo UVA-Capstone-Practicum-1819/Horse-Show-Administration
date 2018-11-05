@@ -1,16 +1,16 @@
 {% load static %}
 <html>
     <head>
-        <title>Horse</title>
+        <title>{{show_name}}</title>
     </head>
     <body>
-        <div class="page-header">
-            <a href="{% url 'horse_new' %}" >Add Horse</a>
-        </div>
         <div class="content container">
             <div class="row">
                 <div class="col-md-8">
                     {% block content %}
+                        <h1>Show: {{show_name}}</h1>
+                        <p>Date: {{show_date}}</p><br>
+                        <p>Location: {{show_location}}</p>
                     {% endblock %}
                 </div>
             </div>
