@@ -11,18 +11,6 @@ class Show(models.Model):
         return self.show_name
 
 
-class Rider (models.Model):
-    name = models.CharField(max_length=200)
-    address = models.CharField(max_length=200)
-    age = models.IntegerField()
-    email = models.CharField(max_length=200)
-
-    horses = models.ManyToManyField(Horse, through=HorseRiderCombo)
-
-    def __str__(self):
-        return self.name
-
-
 class Horse (models.Model):
     name = models.CharField(max_length=200)
     barn_name = models.CharField(max_length=200)
@@ -31,7 +19,16 @@ class Horse (models.Model):
     owner = models.CharField(max_length=200)
     size = models.CharField(max_length=200)
     type = models.CharField(max_length=200)
-    combo_num = models.IntegerField(blank=True, null=True)
+    def __str__(self):
+        return self.name
+
+
+class Rider (models.Model):
+    name = models.CharField(max_length=200)
+    address = models.CharField(max_length=200)
+    age = models.IntegerField()
+    email = models.CharField(max_length=200)
+    horses = models.ManyToManyField(Horse, through='HorseRiderCombo')
 
     def __str__(self):
         return self.name
@@ -41,14 +38,6 @@ class HorseRiderCombo(models.Model):
     rider = models.ForeignKey(Rider, on_delete=models.CASCADE)
     horse = models.ForeignKey(Horse, on_delete=models.CASCADE)
     num = models.IntegerField()
-
-
-def random_string():
-    rand_str = ""
-    for i in range(3):
-        rand_str += random.choice("0123456789")
-    return rand_str
-    # return str(random.randint(100, 999))
 
 
 class Classes (models.Model):
