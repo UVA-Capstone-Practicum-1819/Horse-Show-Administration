@@ -5,9 +5,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
-from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, ClassForm, ShowSelectForm, RiderSelectForm, ComboForm, ClassSelectForm
+from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, ClassForm, DivisionForm, ShowSelectForm, RiderSelectForm, ComboForm, ClassSelectForm, DivisionSelectForm
 from django.forms.models import model_to_dict
-from show.models import Show, Rider, Horse, Classes
+from show.models import Show, Rider, Horse, Classes, Division
 from django.utils import timezone
 from dal import autocomplete
 """ for authentication/signin/signup purposes """
@@ -187,6 +187,36 @@ def class_select(request):
 class ClassAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = Classes.objects.all()
+        if self.q:
+            qs = qs.filter(class_name__istartswith=self.q)
+        return qs
+
+def new_division(request):
+    if request.method == "POST":
+        form = DivisionForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
+            return redirect('/show/class')
+    else:
+        form = DivisionForm()
+    return render(request, 'new_division.html', {'form': form})
+
+def division_select(request):
+    if request.method == "POST":
+        form = DivisionSelectForm(request.POST)
+        if form.is_valid():
+            # return render(request, 'horse_select.html', {'form': form})
+            return redirect('/show/')
+    else:
+        form = DivisionSelectForm()
+    return render(request, 'division_select.html', {'form': form})
+
+class DivisionAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Division.objects.all()
         if self.q:
             qs = qs.filter(class_name__istartswith=self.q)
         return qs

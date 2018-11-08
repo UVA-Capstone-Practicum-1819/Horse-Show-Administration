@@ -75,3 +75,17 @@ class ClassSelectForm(forms.ModelForm):
     class Meta:
         model = Classes
         fields = ('name',)
+
+class DivisionForm(forms.ModelForm):
+    class Meta:
+        model = Division
+        fields = ('division_name', 'division_number')
+
+class DivisionSelectForm(forms.ModelForm):
+    name = forms.ModelChoiceField(
+        queryset=Division.objects.all(),
+        widget=autocomplete.ModelSelect2(url='division_autocomplete')
+    )
+    class Meta:
+        model = Division
+        fields = ('name',)

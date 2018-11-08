@@ -6,7 +6,14 @@ class Classes(models.Model):
     class_number = models.IntegerField(default = 0)
 
     def __str__(self):
-        return str(self.class_number) + ". " + self.class_name
+        return str(self.class_number) + ". " + str(self.class_name)
+
+class Division(models.Model):
+    division_name = models.CharField(max_length=100, default = "")
+    division_number = models.IntegerField(default = 0)
+
+    def __str__(self):
+        return str(self.division_number) + ". " + str(self.division_name)
 
 class Show(models.Model):
     show_name = models.CharField(max_length=100)
