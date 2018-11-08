@@ -49,7 +49,7 @@ class ShowSelectForm(forms.ModelForm):
 
 class HorseSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
-    name= forms.ModelChoiceField(
+    name = forms.ModelChoiceField(
         queryset=Horse.objects.all(),
         widget=autocomplete.ModelSelect2(url='horse_autocomplete')
     )
@@ -62,9 +62,16 @@ class HorseSelectForm(forms.ModelForm):
             #    attrs={'data-html': True}
         #    )
         #    }
-class ClassesForm(forms.ModelForm):
-    type = forms.ChoiceField(choices=Classes.CLASS_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-
+class ClassForm(forms.ModelForm):
     class Meta:
         model = Classes
-        fields = ('type',)
+        fields = ('class_name', 'class_number')
+
+class ClassSelectForm(forms.ModelForm):
+    name = forms.ModelChoiceField(
+        queryset=Classes.objects.all(),
+        widget=autocomplete.ModelSelect2(url='classes_autocomplete')
+    )
+    class Meta:
+        model = Classes
+        fields = ('name',)

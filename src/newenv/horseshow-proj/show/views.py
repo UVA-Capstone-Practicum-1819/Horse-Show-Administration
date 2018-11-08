@@ -5,9 +5,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
-from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, ClassesForm, ShowSelectForm, RiderSelectForm, ComboForm
+from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, ClassForm, ShowSelectForm, RiderSelectForm, ComboForm, ClassSelectForm
 from django.forms.models import model_to_dict
-from show.models import Show, Rider, Horse
+from show.models import Show, Rider, Horse, Classes
 from django.utils import timezone
 from dal import autocomplete
 """ for authentication/signin/signup purposes """
@@ -107,7 +107,7 @@ class ShowAutocomplete(autocomplete.Select2QuerySetView):
             # return Horse.objects.none()
         qs = Show.objects.all()
         if self.q:
-            qs = qs.filter(name__istartswith=self.q)
+            qs = qs.filter(show_name__istartswith=self.q)
         return qs
 
 
@@ -159,6 +159,37 @@ def billing(request):
     else:
         form = RiderSelectForm()
     return render(request, 'billing.html', {'form': form})
+
+def new_class(request):
+    if request.method == "POST":
+        form = ClassForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
+            # return render(request, 'editrider.html', {'form': form})
+            return redirect('/show')
+    else:
+        form = ClassForm()
+    return render(request, 'new_class.html', {'form': form})
+
+def class_select(request):
+    if request.method == "POST":
+        form = ClassSelectForm(request.POST)
+        if form.is_valid():
+            # return render(request, 'horse_select.html', {'form': form})
+            return redirect('/show/')
+    else:
+        form = ClassSelectForm()
+    return render(request, 'class_select.html', {'form': form})
+
+class ClassAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Classes.objects.all()
+        if self.q:
+            qs = qs.filter(class_name__istartswith=self.q)
+        return qs
 
 def newrider(request):
     print(request.method)
@@ -282,17 +313,17 @@ def add_combo(request, rider_name, horse_name):
         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
 
-def new_class(request):
-    print(request.method)
-    if request.method == "POST":
-        form = ClassesForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.save()
-            # return redirect('horse_detail', pk=post.pk)
-            return render(request, 'classes.html', {'form': form})
-    else:
-        form = ClassesForm()
-    return render(request, 'classes.html', {'form': form})
+# def new_class(request):
+#     print(request.method)
+#     if request.method == "POST":
+#         form = ClassesForm(request.POST)
+#         if form.is_valid():
+#             post = form.save(commit=False)
+#             post.author = request.user
+#             post.published_date = timezone.now()
+#             post.save()
+#             # return redirect('horse_detail', pk=post.pk)
+#             return render(request, 'classes.html', {'form': form})
+#     else:
+#         form = ClassesForm()
+#     return render(request, 'classes.html', {'form': form})
