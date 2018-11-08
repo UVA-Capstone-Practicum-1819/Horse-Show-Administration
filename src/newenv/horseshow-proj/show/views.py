@@ -130,6 +130,7 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
+
 def viewshow(request, showname):
     try:
         # find the show to be viewed
@@ -143,12 +144,14 @@ def viewshow(request, showname):
                     "show_location" : show.show_location,
                     "show_divisions" : show.show_divisions.all,
                 }
-                return render(request, 'viewshow.html', context = context)
+                return render(request, 'viewshow.html', context=context)
     except Exception as e:
         return HttpResponse(e)
 
+
 def edit_show(request, showname):
-    return render(request,"edit_show.html")
+    return render(request, "edit_show.html")
+
 
 def billing(request):
     if request.method == "POST":
@@ -253,13 +256,7 @@ def newrider(request):
 
 
 def rider_select(request):
-    if request.method == "POST":
-        form = RiderSelectForm(request.POST)
-        if form.is_valid():
-            # return render(request, 'horse_select.html', {'form': form})
-            return redirect('/show/horse')
-    else:
-        form = RiderSelectForm()
+    form = RiderSelectForm()
     return render(request, 'rider_select.html', {'form': form})
 
 
@@ -272,19 +269,26 @@ class RiderAutocomplete(autocomplete.Select2QuerySetView):
 
 
 def horse_select(request):
-    if request.method == "POST":
-        form = HorseSelectForm(request.POST)
-        if form.is_valid():
-            #post = form.save(commit=False)
-            #post.author = request.user
-            #post.published_date = timezone.now()
-            # post.save()
-            # return redirect('horse_detail', pk=post.pk)
-            return render(request, 'horse_select.html', {'form': form})
-    else:
+    if request.method == 'POST':
+        form = RiderSelectForm(request.POST)
+        request.session['rider_name'] = form.name
+    form = HorseSelectForm()
+    return render(request, 'horse_select.html', {'form': form, })
 
-        form = HorseSelectForm()
-    return render(request, 'horse_select.html', {'form': form})
+
+def edit_combo(request):
+    if request.method == 'POST':
+        form = HorseSelectForm(request.POST)
+        rider_name = request.session['rider_name']
+        horse_name = form.name
+        combo_form = ComboForm()
+    elif request.method == 'GET':
+        combo_num = request.GET['combo_num']
+        horserider_combo = HorseRiderCombo.objects.get(combo_num)
+        rider_name = horserider_combo.rider.name
+        horse_name = horserider_combo.horse.name
+        combo_form = ComboForm(num=combo_num)
+    return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider_name': rider_name, 'horse_name': horse_name})
 
 
 def horse_new(request):
@@ -341,7 +345,7 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
 #                 'form': form, 'combo': combo}
 #     return render(request, 'add_combo.html', response)
 
-def add_combo(request, rider_name, horse_name):
+""" def add_combo(request, rider_name, horse_name):
     rider = get_object_or_404(Rider, pk=rider_name)
     try:
         selected_rider = rider.choice_set.get(pk=request.POST['rider name'])
@@ -355,7 +359,7 @@ def add_combo(request, rider_name, horse_name):
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
-        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+        return HttpResponseRedirect(reverse('polls:results', args=(question.id,))) """
 
 def new_class(request):
     print(request.method)
