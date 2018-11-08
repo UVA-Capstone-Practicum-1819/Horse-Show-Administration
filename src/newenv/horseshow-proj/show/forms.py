@@ -91,9 +91,10 @@ class HorseSelectForm(forms.ModelForm):
         #    }
 
 
-class ClassesForm(forms.ModelForm):
-    type = forms.ChoiceField(choices=Classes.CLASS_CHOICES,
-                             widget=forms.CheckboxSelectMultiple, required=False)
+class ClassForm(forms.ModelForm):
+    class Meta:
+        model = Classes
+        fields = ('class_name', 'class_number')
 
 
 class ClassSelectForm(forms.ModelForm):
@@ -122,7 +123,6 @@ class DivisionSelectForm(forms.ModelForm):
     class Meta:
         model = Division
         fields = ('name',)
-
 
 class ComboNumForm(forms.Form):
     num = forms.IntegerField(label='Combo Num')
