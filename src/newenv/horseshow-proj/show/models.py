@@ -33,6 +33,7 @@ class Horse (models.Model):
     owner = models.CharField(max_length=200)
     size = models.CharField(max_length=200)
     type = models.CharField(max_length=200)
+
     def __str__(self):
         return self.name
 
@@ -48,9 +49,9 @@ class Rider (models.Model):
         return self.name
 
 class HorseRiderCombo(models.Model):
+    num = models.IntegerField(primary_key=True)
     rider = models.ForeignKey(Rider, on_delete=models.CASCADE)
     horse = models.ForeignKey(Horse, on_delete=models.CASCADE)
-    num = models.IntegerField()
 
 def random_string():
     rand_str = ""
