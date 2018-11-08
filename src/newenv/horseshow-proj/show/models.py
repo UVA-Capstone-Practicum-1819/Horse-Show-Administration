@@ -12,15 +12,9 @@ class Show(models.Model):
     show_name = models.CharField(max_length=100)
     show_date = models.CharField(max_length=100)
     show_location = models.CharField(max_length=100)
-    show_classes = models.ManyToManyField(Classes)
 
     def __str__(self):
         return self.show_name
-
-class HorseRiderCombo(models.Model):
-    rider = models.ForeignKey('Rider', on_delete=models.CASCADE)
-    horse = models.ForeignKey('Horse', on_delete=models.CASCADE)
-    num = models.IntegerField()
 
 
 class Horse (models.Model):
@@ -31,21 +25,24 @@ class Horse (models.Model):
     owner = models.CharField(max_length=200)
     size = models.CharField(max_length=200)
     type = models.CharField(max_length=200)
-    combo_num = models.IntegerField(blank=True, null=True)
-
     def __str__(self):
         return self.name
+
 
 class Rider (models.Model):
     name = models.CharField(max_length=200)
     address = models.CharField(max_length=200)
     age = models.IntegerField()
     email = models.CharField(max_length=200)
-
-    horses = models.ManyToManyField(Horse, through=HorseRiderCombo)
+    horses = models.ManyToManyField(Horse, through='HorseRiderCombo')
 
     def __str__(self):
         return self.name
+
+class HorseRiderCombo(models.Model):
+    rider = models.ForeignKey(Rider, on_delete=models.CASCADE)
+    horse = models.ForeignKey(Horse, on_delete=models.CASCADE)
+    num = models.IntegerField()
 
 def random_string():
     rand_str = ""
