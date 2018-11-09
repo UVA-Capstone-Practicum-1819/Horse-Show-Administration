@@ -297,7 +297,7 @@ def horse_select(request):
     if request.method == 'POST':
         form = RiderSelectForm(request.POST)
         if form.is_valid():
-            request.session['rider_name'] = form.cleaned_data['name'].email
+            request.session['rider_pk'] = form.cleaned_data['name'].pk
             # test = form.cleaned_data['name'].name
     form = HorseSelectForm()
     return render(request, 'horse_select.html', {'form': form})
@@ -306,9 +306,9 @@ def horse_select(request):
 def add_combo(request):
     if request.method == 'POST':
         form = HorseSelectForm(request.POST)
-        rider_name = request.session['rider_name']
+        rider_pk = request.session['rider_pk']
         if form.is_valid():
-            horse_name = form.cleaned_data['name'].name
+            horse_pk = form.cleaned_data['name'].pk
         combo_form = ComboNumForm()
     return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider_name': rider_name, 'horse_name': horse_name})
 
