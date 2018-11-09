@@ -249,18 +249,7 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
 
 
 def newrider(request):
-    print(request.method)
-    if request.method == "POST":
-        form = RiderForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.save()
-            # return render(request, 'editrider.html', {'form': form})
-            return redirect('/show/horse')
-    else:
-        form = RiderForm()
+    form = RiderForm()
     return render(request, 'editrider.html', {'form': form})
 
 
@@ -295,22 +284,44 @@ def horse_new(request):
 
 def horse_select(request):
     if request.method == 'POST':
-        form = RiderSelectForm(request.POST)
-        if form.is_valid():
-            request.session['rider_pk'] = form.cleaned_data['name'].pk
-            # test = form.cleaned_data['name'].name
+        rider = request.POST.get('rider', None)
+        if rider is None:
+            form = RiderForm(request.POST)
+            if form.is_valid:
+                rider = form.save(commit=False)
+                rider_pk = rider.pk
+                rider.save()
+        else:
+            rider_pk = request.POST['name'].pk
+    request.session['rider_pk'] = rider_pk
     form = HorseSelectForm()
     return render(request, 'horse_select.html', {'form': form})
 
 
 def add_combo(request):
     if request.method == 'POST':
+        horse = request.POST.get('horse', None)
+        if horse is None:
+            form = HorseForm(request.POST)
+            if form.is_valid:
+                horse = form.save(commit=False)
+                horse_pk = horse.pk
+                horse.save()
+        else:
+            horse_pk = request.POST['name'].pk
+    request.session['horse_pk'] = horse_pk
+    combo_form = ComboNumForm()
+    return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider_name': rider_name, 'horse_name': horse_name})
+
+
+"""     if request.method == 'POST':
         form = HorseSelectForm(request.POST)
         rider_pk = request.session['rider_pk']
         if form.is_valid():
             horse_pk = form.cleaned_data['name'].pk
         combo_form = ComboNumForm()
     return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider_name': rider_name, 'horse_name': horse_name})
+ """
 
 
 def edit_combo(request, combo_num=-1):
