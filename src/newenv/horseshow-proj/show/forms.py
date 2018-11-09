@@ -30,12 +30,12 @@ class RiderForm(forms.ModelForm):
 class RiderSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
         # rider_names =  [rider.name for rider in Rider.objects.all()]
-    name = forms.ModelChoiceField(queryset=Rider.objects.all(
+    rider = forms.ModelChoiceField(queryset=Rider.objects.all(
     ), widget=autocomplete.ModelSelect2(url='rider_autocomplete'))
 
     class Meta:
         model = Rider
-        fields = ('name',)
+        fields = ('rider',)
 
 
 class HorseForm(forms.ModelForm):
@@ -76,14 +76,14 @@ class ShowSelectForm(forms.ModelForm):
 
 class HorseSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
-    name = forms.ModelChoiceField(
+    horse = forms.ModelChoiceField(
         queryset=Horse.objects.all(),
         widget=autocomplete.ModelSelect2(url='horse_autocomplete')
     )
 
     class Meta:
         model = Horse
-        fields = ('name',)
+        fields = ('horse',)
         # widgets = {
         #    'name': autocomplete.ModelSelect2(
         #    url='horse-autocomplete',
