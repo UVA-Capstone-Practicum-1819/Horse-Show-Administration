@@ -38,9 +38,9 @@ urlpatterns = [
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
     path('<showname>', views.viewshow, name="viewshow"),
     path('<showname>/edit', views.edit_show, name="edit_show"),
-    path('edit-combo', views.edit_combo, name="edit_combo"),
+    path('add-combo', views.add_combo, name="add_combo"),
     path('edit-combo/<int:combo_num>',
-         views.edit_combo, name="edit_combo_with_num"),
+         views.edit_combo, name="edit_combo"),
 
 ]
 urlpatterns += staticfiles_urlpatterns()
