@@ -1,16 +1,9 @@
 <h1>Rider Select</h1>
 {% block content %}
 <div>
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" />
-    </form>
-    <a href="{% url 'newrider' %}">Add a New Rider</a>
+  <form action="{% url 'horse_select' %}" method="post">
+    {% csrf_token %} {{ form.as_p }} <input type="submit" />
+  </form>
+  <a href="{% url 'newrider' %}">Add a New Rider</a>
 </div>
-{% endblock %}
-
-{% block footer %}
-
 {{ form.media }}
-{% endblock %}
