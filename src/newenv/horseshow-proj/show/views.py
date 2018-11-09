@@ -139,10 +139,10 @@ def viewshow(request, showname):
         for show in shows:
             if showname == show.show_name:
                 context = {
-                    "show_name" : show.show_name,
-                    "show_date" : show.show_date,
-                    "show_location" : show.show_location,
-                    "show_divisions" : show.show_divisions.all,
+                    "show_name": show.show_name,
+                    "show_date": show.show_date,
+                    "show_location": show.show_location,
+                    "show_divisions": show.show_divisions.all,
                 }
                 return render(request, 'viewshow.html', context=context)
     except Exception as e:
@@ -167,6 +167,7 @@ def billing(request):
         form = RiderSelectForm()
     return render(request, 'billing.html', {'form': form})
 
+
 def new_class(request):
     if request.method == "POST":
         form = ClassForm(request.POST)
@@ -181,6 +182,7 @@ def new_class(request):
         form = ClassForm()
     return render(request, 'new_class.html', {'form': form})
 
+
 def class_select(request):
     if request.method == "POST":
         form = ClassSelectForm(request.POST)
@@ -191,6 +193,7 @@ def class_select(request):
         form = ClassSelectForm()
     return render(request, 'class_select.html', {'form': form})
 
+
 class ClassAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = Classes.objects.all()
@@ -198,8 +201,9 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
 
+
 def new_division(request, showname):
-    show = Show.objects.get(show_name = showname)
+    show = Show.objects.get(show_name=showname)
     if request.method == "POST":
         form = DivisionForm(request.POST)
         if form.is_valid():
@@ -207,7 +211,8 @@ def new_division(request, showname):
             post.author = request.user
             post.published_date = timezone.now()
             post.save()
-            division = Division.objects.get(division_name=form.cleaned_data['division_name'])
+            division = Division.objects.get(
+                division_name=form.cleaned_data['division_name'])
             divisions = show.show_divisions
             divisions.add(division)
             show.save()
@@ -216,13 +221,15 @@ def new_division(request, showname):
         form = DivisionForm()
     return render(request, 'new_division.html', {'form': form})
 
+
 def division_select(request, showname):
     if request.method == "POST":
         form = DivisionSelectForm(request.POST)
         if form.is_valid():
             show = Show.objects.get(show_name=showname)
             current_divisions = show.show_divisions
-            division = Division.objects.get(division_name=form.cleaned_data['name'])
+            division = Division.objects.get(
+                division_name=form.cleaned_data['name'])
             current_divisions.add(division)
             show.save()
             # return render(request, 'horse_select.html', {'form': form})
@@ -230,7 +237,8 @@ def division_select(request, showname):
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:
         form = DivisionSelectForm()
-    return render(request, 'division_select.html', {'form': form, 'show_name':showname})
+    return render(request, 'division_select.html', {'form': form, 'show_name': showname})
+
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -238,6 +246,7 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
         if self.q:
             qs = qs.filter(division_name__istartswith=self.q)
         return qs
+
 
 def newrider(request):
     print(request.method)
@@ -268,29 +277,6 @@ class RiderAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def horse_select(request):
-    if request.method == 'POST':
-        form = RiderSelectForm(request.POST)
-        request.session['rider_name'] = form.name
-    form = HorseSelectForm()
-    return render(request, 'horse_select.html', {'form': form, })
-
-
-def edit_combo(request):
-    if request.method == 'POST':
-        form = HorseSelectForm(request.POST)
-        rider_name = request.session['rider_name']
-        horse_name = form.name
-        combo_form = ComboForm()
-    elif request.method == 'GET':
-        combo_num = request.GET['combo_num']
-        horserider_combo = HorseRiderCombo.objects.get(combo_num)
-        rider_name = horserider_combo.rider.name
-        horse_name = horserider_combo.horse.name
-        combo_form = ComboForm(num=combo_num)
-    return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider_name': rider_name, 'horse_name': horse_name})
-
-
 def horse_new(request):
     print(request.method)
     if request.method == "POST":
@@ -307,6 +293,45 @@ def horse_new(request):
     return render(request, 'horse_edit.html', {'form': form})
 
 
+def horse_select(request):
+    if request.method == 'POST':
+        form = RiderSelectForm(request.POST)
+        if form.is_valid():
+            request.session['rider_name'] = form.cleaned_data['name'].email
+            # test = form.cleaned_data['name'].name
+    form = HorseSelectForm()
+    return render(request, 'horse_select.html', {'form': form})
+
+
+def add_combo(request):
+    if request.method == 'POST':
+        form = HorseSelectForm(request.POST)
+        rider_name = request.session['rider_name']
+        if form.is_valid():
+            horse_name = form.cleaned_data['name'].name
+        combo_form = ComboNumForm()
+    return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider_name': rider_name, 'horse_name': horse_name})
+
+
+def edit_combo(request, combo_num=-1):
+    if request.method == "POST":
+        form = ComboNumForm(request.POST)
+        if form.is_valid:
+            combo_num = form.cleaned_data['num']
+        horserider_combo = HorseRiderCombo.objects.get(combo_num)
+        rider_name = horserider_combo.rider.name
+        horse_name = horserider_combo.horse.name
+        HorseRiderCombo.objects.create(rider)
+
+    # else:
+    horserider_combo = HorseRiderCombo.objects.get(combo_num)
+    rider_name = horserider_combo.rider.name
+    horse_name = horserider_combo.horse.name
+    combo_form = ComboNumForm(num=combo_num)
+
+    return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider_name': rider_name, 'horse_name': horse_name})
+
+
 class HorseAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
 
@@ -320,46 +345,6 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
 
         return qs
 
-
-# def add_combo(request):
-#     form = ComboForm()
-#     if request.method == "GET":
-#         return render(request, 'add_combo.html', {'form': form})
-#     f = Combo(request.POST)
-#     if not f.is_valid():
-#         return render(request, 'add_combo.html', {'form': f})
-#     if f.is_valid():
-#         post = form.save(commit=False)
-#         post.author = request.user
-#         post.published_date = timezone.now()
-#         post.save()
-#         return render(request, 'add_combo.html', {'form': f})
-#     combo = random.randint(100, 999)
-#     ridername = f.cleaned_data['rider_name']
-#     horsename = f.cleaned_data['horse_name']
-#     owner = f.cleaned_data['owner']
-
-#     new_combo = Combo.objects.create(
-#         combo=combo, rider_name=ridername, horse_name=horsename, owner=owner)
-#     response = {'ok': True, 'success_msg': "Horse rider combination was successfully created",
-#                 'form': form, 'combo': combo}
-#     return render(request, 'add_combo.html', response)
-
-""" def add_combo(request, rider_name, horse_name):
-    rider = get_object_or_404(Rider, pk=rider_name)
-    try:
-        selected_rider = rider.choice_set.get(pk=request.POST['rider name'])
-    except (KeyError, Choice.DoesNotExist):
-        # Add a rider to the database
-        return render(request, 'rider/new.html', {
-            'error_message': "Rider do not exist in database, add a new rider",
-        })
-    else:
-        selected_rider.save()
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button.
-        return HttpResponseRedirect(reverse('polls:results', args=(question.id,))) """
 
 def new_class(request):
     print(request.method)
@@ -376,11 +361,13 @@ def new_class(request):
         form = ClassesForm()
     return render(request, 'classes.html', {'form': form})
 
+
 def populate_pdf(request):
-     data_dict = {
-                'show': '11/7/2018',
-                'judge': 'Bertha',
-                }
-     write_fillable_pdf("show/static/VHSA_Results_2015.pdf", "show/static/VHSA_Final_Results.pdf", data_dict)
-     print(os.getcwd())
-     return render(request, 'finalresults.html',{"filename":"show/static/VHSA_Final_Results.pdf"})
+    data_dict = {
+        'show': '11/7/2018',
+        'judge': 'Bertha',
+    }
+    write_fillable_pdf("show/static/VHSA_Results_2015.pdf",
+                       "show/static/VHSA_Final_Results.pdf", data_dict)
+    print(os.getcwd())
+    return render(request, 'finalresults.html', {"filename": "show/static/VHSA_Final_Results.pdf"})
