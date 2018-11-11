@@ -6,6 +6,7 @@ python:
 install:
   - pip3 install Django==2.1
   - pip3 install django-autocomplete-light
+  - pip3 install pdfrw
 
 script:
   - python3 src/newenv/horseshow-proj/manage.py makemigrations
