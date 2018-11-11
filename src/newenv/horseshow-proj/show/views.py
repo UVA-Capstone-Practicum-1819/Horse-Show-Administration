@@ -1,5 +1,7 @@
 import random
+import os
 import json
+import pdfrw
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
@@ -11,6 +13,7 @@ from show.models import Show, Rider, Horse
 from django.utils import timezone
 from dal import autocomplete
 """ for authentication/signin/signup purposes """
+from .populatepdf import write_fillable_pdf
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
@@ -296,3 +299,12 @@ def new_class(request):
     else:
         form = ClassesForm()
     return render(request, 'classes.html', {'form': form})
+
+def populate_pdf(request):
+     data_dict = {
+                'show': '11/7/2018',
+                'judge': 'Bertha',
+                }
+     write_fillable_pdf("show/static/VHSA_Results_2015.pdf", "show/static/VHSA_Final_Results.pdf", data_dict)
+     print(os.getcwd())
+     return render(request, 'finalresults.html',{"filename":"show/static/VHSA_Final_Results.pdf"})
