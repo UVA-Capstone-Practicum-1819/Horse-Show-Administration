@@ -169,7 +169,7 @@ def new_class(request):
             post.published_date = timezone.now()
             post.save()
             # return render(request, 'editrider.html', {'form': form})
-            return redirect('/show')
+            return redirect('/show/class')
     else:
         form = ClassForm()
     return render(request, 'new_class.html', {'form': form})
@@ -199,7 +199,7 @@ def new_division(request):
             post.author = request.user
             post.published_date = timezone.now()
             post.save()
-            return redirect('/show/class')
+            return redirect('/show/division')
     else:
         form = DivisionForm()
     return render(request, 'new_division.html', {'form': form})
