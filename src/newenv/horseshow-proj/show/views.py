@@ -221,7 +221,7 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = Division.objects.all()
         if self.q:
-            qs = qs.filter(class_name__istartswith=self.q)
+            qs = qs.filter(division_name__istartswith=self.q)
         return qs
 
 def newrider(request):
