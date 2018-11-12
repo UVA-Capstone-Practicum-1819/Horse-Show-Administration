@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
 urlpatterns = [
@@ -23,8 +26,12 @@ urlpatterns = [
     path('rider', views.rider_select, name="rider_select"),
     path('rider-autocomplete', views.RiderAutocomplete.as_view(), name="rider_autocomplete"),
     path('horse-autocomplete', views.HorseAutocomplete.as_view(), name="horse_autocomplete"),
+<<<<<<< HEAD
     path('class_autocomplete', views.ClassAutocomplete.as_view(), name="classes_autocomplete"),
     path('division_autocomplete', views.DivisionAutocomplete.as_view(), name="division_autocomplete"),
+=======
+    path('genpdf', views.populate_pdf, name="populate_pdf"),
+>>>>>>> 93014528be4eaa201d225630d6291709d6bbe23c
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
     path('<showname>', views.viewshow, name = "viewshow"),
     path('<showname>/edit', views.edit_show, name = "edit_show"),
@@ -32,6 +39,8 @@ urlpatterns = [
     path('addcombo/newcombo', views.add_combo, name="newcombo")
 
 ]
+urlpatterns += staticfiles_urlpatterns()
+urlpatterns+= static(settings.STATIC_URL, document_root= settings.STATIC_ROOT)
 """horseshow URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
