@@ -294,8 +294,8 @@ def select_horse(request):
             form = RiderForm(request.POST)
             if form.is_valid:
                 rider = form.save(commit=False)
-                rider_pk = rider.pk
                 rider.save()
+                rider_pk = rider.pk
         else:
             rider_pk = request.POST['rider']
     request.session['rider_pk'] = rider_pk
@@ -334,12 +334,12 @@ def edit_combo(request):
         combo_form = ComboNumForm(request.POST)
         if combo_form.is_valid:
             combo_num = combo_form.cleaned_data['num']
-            horse_rider_combo = HorseRiderCombo.objects.create()
-            horse_rider_combo.num = combo_num
-            rider = Rider.objects.get(pk=request.session['rider_pk'])
-            horse = Horse.objects.get(pk=request.session['horse_pk'])
-            horse_rider_combo.rider = rider
-            horse_rider_combo.horse = horse
+            rider = get_object_or_404(Rider, pk=request.session['rider_pk'])
+            horse = get_object_or_404(Horse, pk=request.session['horse_pk'])
+            # print(rider)
+            # print(horse)
+            horse_rider_combo = HorseRiderCombo.objects.create(
+                num=combo_num, rider=rider, horse=horse)
             return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
         else:
             return redirect(reverse('show'))
