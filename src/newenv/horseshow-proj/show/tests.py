@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from show.models import Show, Rider, Horse, Classes
+from show.models import Show, Rider, Horse
 from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, RiderSelectForm
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -139,21 +139,21 @@ class HorseSelectCase(TestCase):
         form= HorseSelectForm(data=form_vals)
         self.assertFalse(form.is_valid())
 
-class ClassTestCase(TestCase):
-    def test_name(self):
-        self.assertEqual(Classes.CLASS_CHOICES[0], ('cwu', '1. California Warm Up'))
+# class ClassTestCase(TestCase):
+#     def test_name(self):
+#         self.assertEqual(Classes.CLASS_CHOICES[0], ('cwu', '1. California Warm Up'))
 
-    def test_check_type(self):
-        self.assertTrue(isinstance(Classes.CLASS_CHOICES[0], tuple))
+#     def test_check_type(self):
+#         self.assertTrue(isinstance(Classes.CLASS_CHOICES[0], tuple))
 
-    def test_index(self):
-        self.assertEqual(Classes.CLASS_CHOICES.index(('pef', '35. Pony Equitation on the Flat')), 34)
+#     def test_index(self):
+#         self.assertEqual(Classes.CLASS_CHOICES.index(('pef', '35. Pony Equitation on the Flat')), 34)
 
-    def test_length(self):
-        self.assertEqual(len(Classes.CLASS_CHOICES), 48)
+#     def test_length(self):
+#         self.assertEqual(len(Classes.CLASS_CHOICES), 48)
 
-    def test_selected(self):
-        self.assertFalse(Classes.CLASS_CHOICES[0] == 'on')
+#     def test_selected(self):
+#         self.assertFalse(Classes.CLASS_CHOICES[0] == 'on')
 
 class LoginTestCase(TestCase):
     """
