@@ -9,6 +9,10 @@ class ShowForm(forms.Form):
     show_location = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
 
 class RiderForm(forms.ModelForm):
+    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Name', 'required': True,}))
+    address = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Address', 'required': True,}))
+    # age = forms.IntegerField(widget=forms.TextInput(attrs={'placeholder': 'Age', 'required': True,}))
+    email = forms.CharField(max_length=100, widget=forms.EmailInput(attrs={'placeholder': 'Email', 'required': True,}))
     class Meta:
         model = Rider
         fields = ('name', 'address', 'age', 'email')
