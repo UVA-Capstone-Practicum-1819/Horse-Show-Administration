@@ -290,6 +290,7 @@ def horse_new(request):
 def select_horse(request):
     if request.method == 'POST':
         rider = request.POST.get('rider', None)
+        """ if rider doesn't exist yet, the request comes from add rider page, takes in the form information, save rider, save rider's primary key """
         if rider is None:
             form = RiderForm(request.POST)
             if form.is_valid:
