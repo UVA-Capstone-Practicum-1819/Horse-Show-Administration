@@ -345,23 +345,6 @@ def add_combo(request, rider_name, horse_name):
         # user hits the Back button.
         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
-
-<<<<<<< HEAD
-# def new_class(request):
-#     print(request.method)
-#     if request.method == "POST":
-#         form = ClassesForm(request.POST)
-#         if form.is_valid():
-#             post = form.save(commit=False)
-#             post.author = request.user
-#             post.published_date = timezone.now()
-#             post.save()
-#             # return redirect('horse_detail', pk=post.pk)
-#             return render(request, 'classes.html', {'form': form})
-#     else:
-#         form = ClassesForm()
-#     return render(request, 'classes.html', {'form': form})
-=======
 def new_class(request):
     print(request.method)
     if request.method == "POST":
@@ -385,4 +368,3 @@ def populate_pdf(request):
      write_fillable_pdf("show/static/VHSA_Results_2015.pdf", "show/static/VHSA_Final_Results.pdf", data_dict)
      print(os.getcwd())
      return render(request, 'finalresults.html',{"filename":"show/static/VHSA_Final_Results.pdf"})
->>>>>>> 93014528be4eaa201d225630d6291709d6bbe23c
