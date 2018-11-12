@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
-from show.models import Show, Rider, Horse
-from show.forms import ShowForm, RiderForm, HorseForm, HorseSelectForm, RiderSelectForm
+from show.models import Show, Rider, Horse, Classes, Division
+from show.forms import ShowForm, RiderForm, HorseForm, DivisionForm, HorseSelectForm, RiderSelectForm, DivisionSelectForm
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from show import models
@@ -230,8 +230,32 @@ class HorseRiderComboTest(TestCase):
         rider1 = Rider.objects.create(name = "Tarun", address="116 Chelsea Dr", age=22, email="ts4pe@virginia.edu")
         rider2 = Rider.objects.create(name = "Yunzhe", address="idunno ln.", age=22, email="ts4pe@virginia.edu")
         rider3 = Rider.objects.create(name = "Shannon", address="sfds", age=22, email="ts4pe@virginia.edu")
-        
 
+class DivisionsTest(TestCase):
+    def test_create_division(self):
+        div1 = Division.objects.create(division_name="Division 1", division_number="1")
+        self.assertTrue(isinstance(div1, Division))
+
+    def test_DivisionSelectPage(self):
+        c = Client()
+        logged_in = c.login(username='user', password='password')
+        response = self.client.post('division/division-autocomplete/', follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_invalid_division(self):
+        form_vals = {'division_name': '', 'division_number': '5'}
+        form = DivisionForm(data=form_vals)
+        self.assertFalse(form.is_valid())
+
+    def test_valid_division(self):
+        form_vals = {'division_name': 'div example', 'division_number': '5'}
+        form = DivisionForm(data=form_vals)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_division_select(self):
+        form_vals = {'name': ''}
+        form = DivisionSelectForm(data=form_vals)
+        self.assertFalse(form.is_valid())
 
 
 # class ComboTestCase(TestCase):
