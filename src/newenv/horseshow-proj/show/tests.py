@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from show.models import Show, Rider, Horse, Classes, Division
-from show.forms import ShowForm, RiderForm, HorseForm, DivisionForm, HorseSelectForm, RiderSelectForm, DivisionSelectForm
+from show.forms import ShowForm, RiderForm, ClassForm, ClassSelectForm, HorseForm, DivisionForm, HorseSelectForm, RiderSelectForm, DivisionSelectForm
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from show import models
@@ -257,6 +257,35 @@ class DivisionsTest(TestCase):
         form = DivisionSelectForm(data=form_vals)
         self.assertFalse(form.is_valid())
 
+class ClassesTest(TestCase):
+    def test_create_class(self):
+        c = Classes.objects.create(class_name="Test", class_number="1")
+        self.assertTrue(isinstance(c, Classes))
+
+    def test_invalid_class_create(self):
+        form_values = {'class_name': 'test', 'class_number':''}
+        form = ClassForm(data=form_values)
+        self.assertFalse(form.is_valid())
+
+    def test_class_select_form(self):
+        c = Classes.objects.create(class_name="Test", class_number="1")
+        values = {'name': "Test"}
+        form = ClassSelectForm(data=values)
+        self.assertTrue(form.is_valid)
+
+class AddDivToShowTest(TestCase):
+    def test_add_division(self):
+        show = Show.objects.create(show_name="test", show_date="11/11/2018", show_location="here")
+        division = Division.objects.create(division_name="div", division_number=1)
+        show.show_divisions.add(division)
+        self.assertTrue(show.show_divisions.all()[0]==division)
+
+    def test_duplicate_division(self):
+        show = Show.objects.create(show_name="test", show_date="11/11/2018", show_location="here")
+        division = Division.objects.create(division_name="div", division_number=1)
+        show.show_divisions.add(division)
+        show.show_divisions.add(division)
+        self.assertTrue(len(show.show_divisions.all())==1)
 
 # class ComboTestCase(TestCase):
 #     def create_combo(self, title="test", body="test for add combo"):
