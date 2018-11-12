@@ -65,11 +65,32 @@ class RiderTestFailCase(TestCase):
 #  if ridernew fails
 class RiderFormsTest(TestCase):
     def test_RiderForm_valid(self):
-        form = RiderForm(data={'name': "sarah", 'address': "address1", 'age': 9, 'email': "email@123.com"})
+        form = RiderForm(data={'name': "x", 'address': "xx", 'age': 9, 'email': "x@x.com"})
         self.assertTrue(form.is_valid())
 
-    def test_RiderForm_invalid(self):
-        form = RiderForm(data={'name': "", 'address': "", 'age': 9, 'email': ""})
+    def test_RiderForm_invalidname(self):
+        form = RiderForm(data={'name': "", 'address': "xx", 'age': 9, 'email': "x@x.com"})
+        self.assertFalse(form.is_valid())
+    def test_RiderForm_invalidaddress(self):
+        form = RiderForm(data={'name': "x", 'address': "", 'age': 9, 'email': "x@x.com"})
+        self.assertFalse(form.is_valid())
+    def test_RiderForm_invalidagetype(self):
+        form = RiderForm(data={'name': "x", 'address': "xx", 'age': "xxx", 'email': "x@x.com"})
+        self.assertFalse(form.is_valid())
+    def test_RiderForm_invalidageempty(self):
+        form = RiderForm(data={'name': "x", 'address': "xx", 'age': '', 'email': "x@x.com"})
+        self.assertFalse(form.is_valid())
+    def test_RiderForm_invalidagerange(self):
+        form = RiderForm(data={'name': "x", 'address': "xx", 'age': -1, 'email': "x@x.com"})
+        self.assertFalse(form.is_valid())
+    def test_RiderForm_invalidemail(self):
+        form = RiderForm(data={'name': "x", 'address': "xx", 'age': 9, 'email': "xx.com"})
+        self.assertFalse(form.is_valid())
+    def test_RiderForm_invalidemailnodot(self):
+        form = RiderForm(data={'name': "x", 'address': "xx", 'age': 9, 'email': "xx@com"})
+        self.assertFalse(form.is_valid())
+    def test_RiderForm_invalidemailempty(self):
+        form = RiderForm(data={'name': "x", 'address': "xx", 'age': 9, 'email': ""})
         self.assertFalse(form.is_valid())
 
     # def test_RiderSelectForm_valid(self):
@@ -297,4 +318,3 @@ class DivisionsTest(TestCase):
 #         for i in range (10):
 #             test_random_int = self.generate_random_int()
 #             self.assertTrue(0 <= int(test_random_int) <= 999)
-

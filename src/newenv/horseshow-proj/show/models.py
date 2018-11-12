@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator, EmailValidator
 import random
 
 class Classes(models.Model):
@@ -39,8 +40,8 @@ class Horse (models.Model):
 class Rider (models.Model):
     name = models.CharField(max_length=200)
     address = models.CharField(max_length=200)
-    age = models.IntegerField()
-    email = models.CharField(max_length=200)
+    age = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(120)])
+    email = models.EmailField(max_length=200, validators=[EmailValidator()])
     horses = models.ManyToManyField(Horse, through='HorseRiderCombo')
 
     def __str__(self):
