@@ -6,6 +6,6 @@
     {% csrf_token %} {{ form.as_p }} <input type="submit" />
   </form>
   <!-- <p>{{ test }}</p> -->
-  <a href="{% url 'horse_new' %}">Add a New Horse</a>
+  <a href="{% url 'add_horse' %}">Add a New Horse</a>
 </div>
 {{ form.media }}

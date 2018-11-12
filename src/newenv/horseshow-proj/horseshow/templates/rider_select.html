@@ -1,9 +1,9 @@
 <h1>Rider Select</h1>
 {% block content %}
 <div>
-  <form action="{% url 'horse_select' %}" method="post">
+  <form action="{% url 'select_horse' %}" method="post">
     {% csrf_token %} {{ form.as_p }} <input type="submit" />
   </form>
-  <a href="{% url 'newrider' %}">Add a New Rider</a>
+  <a href="{% url 'add_rider' %}">Add a New Rider</a>
 </div>
 {{ form.media }}

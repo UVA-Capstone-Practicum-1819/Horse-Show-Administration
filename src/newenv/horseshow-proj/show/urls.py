@@ -14,18 +14,18 @@ urlpatterns = [
     path('signup', views.signup, name='signup'),
     path('login', auth_views.LoginView.as_view(
         template_name='login.html'), name='login'),
-    path('horse/new', views.horse_new, name="horse_new"),
-    path('rider/new', views.newrider, name="newrider"),
+    path('horse/new', views.add_horse, name="add_horse"),
+    path('rider/new', views.add_rider, name="add_rider"),
     path('class/new', views.new_class, name="classes"),
     path('<showname>/division/new', views.new_division, name="divisions"),
-    path('horse', views.horse_select, name="horse_select"),
+    path('horse', views.select_horse, name="select_horse"),
     path('show', views.show_select, name="show_select"),
     path('class', views.class_select, name="class_select"),
     path('<showname>/division', views.division_select, name="division_select"),
     path('billing', views.billing, name="billing"),
     path('show-autocomplete', views.ShowAutocomplete.as_view(),
          name="show_autocomplete"),
-    path('rider', views.rider_select, name="rider_select"),
+    path('rider', views.select_rider, name="select_rider"),
     path('rider-autocomplete', views.RiderAutocomplete.as_view(),
          name="rider_autocomplete"),
     path('horse-autocomplete', views.HorseAutocomplete.as_view(),
@@ -39,8 +39,9 @@ urlpatterns = [
     path('<showname>', views.viewshow, name="viewshow"),
     path('<showname>/edit', views.edit_show, name="edit_show"),
     path('add-combo', views.add_combo, name="add_combo"),
+    path('edit-combo', views.edit_combo, name="edit_combo"),
     path('edit-combo/<int:combo_num>',
-         views.edit_combo, name="edit_combo"),
+         views.edit_combo, name="edit_combo_get"),
 
 ]
 urlpatterns += staticfiles_urlpatterns()

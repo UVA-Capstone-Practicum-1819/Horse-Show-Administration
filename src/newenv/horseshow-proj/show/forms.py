@@ -126,4 +126,4 @@ class DivisionSelectForm(forms.ModelForm):
         fields = ('name',)
 
 class ComboNumForm(forms.Form):
-    num = forms.IntegerField(label='Combo Num')
+    num = forms.IntegerField()
