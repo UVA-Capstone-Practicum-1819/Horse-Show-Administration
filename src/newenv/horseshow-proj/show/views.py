@@ -141,6 +141,7 @@ def viewshow(request, showname):
                     "show_name" : show.show_name,
                     "show_date" : show.show_date,
                     "show_location" : show.show_location,
+                    "show_divisions" : show.show_divisions.all,
                 }
                 return render(request, 'viewshow.html', context = context)
     except Exception as e:
@@ -194,7 +195,8 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
 
-def new_division(request):
+def new_division(request, showname):
+    show = Show.objects.get(show_name = showname)
     if request.method == "POST":
         form = DivisionForm(request.POST)
         if form.is_valid():
@@ -202,20 +204,30 @@ def new_division(request):
             post.author = request.user
             post.published_date = timezone.now()
             post.save()
-            return redirect('/show/division')
+            division = Division.objects.get(division_name=form.cleaned_data['division_name'])
+            divisions = show.show_divisions
+            divisions.add(division)
+            show.save()
+            return redirect('/show')
     else:
         form = DivisionForm()
     return render(request, 'new_division.html', {'form': form})
 
-def division_select(request):
+def division_select(request, showname):
     if request.method == "POST":
         form = DivisionSelectForm(request.POST)
         if form.is_valid():
+            show = Show.objects.get(show_name=showname)
+            current_divisions = show.show_divisions
+            division = Division.objects.get(division_name=form.cleaned_data['name'])
+            current_divisions.add(division)
+            show.save()
             # return render(request, 'horse_select.html', {'form': form})
-            return redirect('/show/')
+            # return redirect('/')
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:
         form = DivisionSelectForm()
-    return render(request, 'division_select.html', {'form': form})
+    return render(request, 'division_select.html', {'form': form, 'show_name':showname})
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

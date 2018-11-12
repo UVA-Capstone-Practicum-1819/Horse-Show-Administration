@@ -10,7 +10,7 @@ class Classes(models.Model):
 class Division(models.Model):
     division_name = models.CharField(max_length=100, default = "")
     division_number = models.IntegerField(default = 0)
-    classes = models.ManyToManyField(Classes)
+    classes = models.ManyToManyField(Classes, blank=True, null=True)
     def __str__(self):
         return self.division_name
 
@@ -18,6 +18,7 @@ class Show(models.Model):
     show_name = models.CharField(max_length=100)
     show_date = models.CharField(max_length=100)
     show_location = models.CharField(max_length=100)
+    show_divisions = models.ManyToManyField(Division, blank=True, null=True)
 
     def __str__(self):
         return self.show_name
