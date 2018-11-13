@@ -1,6 +1,11 @@
 from django.test import TestCase, Client
+<<<<<<< 56980ff9218ae1e14c3343276dca826f2d9c2335
 from show.models import Show, Rider, Horse, Classes, Division
 from show.forms import ShowForm, RiderForm, ClassForm, ClassSelectForm, HorseForm, DivisionForm, HorseSelectForm, RiderSelectForm, DivisionSelectForm
+=======
+from show.models import *
+from show.forms import *
+>>>>>>> yw6fy sprint 4 unit tests
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from show import models
@@ -347,3 +352,71 @@ class AddDivToShowTest(TestCase):
 #         for i in range (10):
 #             test_random_int = self.generate_random_int()
 #             self.assertTrue(0 <= int(test_random_int) <= 999)
+
+
+
+class ComboRiderTestCase(TestCase):
+    def setup(self):
+        user = User.objects.create(username='user')
+        user.set_password('password')
+        user.save()
+
+    def test_rider_pk(self):
+        c = Client()
+        logged_in = c.login(username='user', password='password')
+        data = {'name': "sarah", 'address': "address1", 'age': 9, 'email': "email@123.com"}
+        response = self.client.post('show/horse', data)
+        form = RiderForm(data)
+        rider = form.save(commit=False)
+        rider_pk = rider.pk
+        self.assertTrue(rider_pk == "email@123.com")
+
+class ComboHorseTestCase(TestCase):
+    def setup(self):
+        user = User.objects.create(username='user')
+        user.set_password('password')
+        user.save()
+
+    def test_rider_pk(self):
+        c = Client()
+        logged_in = c.login(username='user', password='password')
+        data = {"name": "Misty", "barn_name": "Misty", "age":4, "coggins":12345, "owner":"Tina", "size":"pony", "type":"shetland"}
+        response = self.client.post('show/add-combo', data)
+        form = HorseForm(data)
+        horse = form.save(commit=False)
+        horse_pk = horse.pk
+        self.assertTrue(horse_pk == None)
+
+class ComboRiderSessionTestCase(TestCase):
+    def setup(self):
+        user = User.objects.create(username='user')
+        user.set_password('password')
+        user.save()
+
+    def test_rider_pk(self):
+        c = Client()
+        logged_in = c.login(username='user', password='password')
+        data = {'name': "sarah", 'address': "address1", 'age': 9, 'email': "email@123.com"}
+        form = RiderForm(data)
+        rider = form.save(commit=False)
+        session = self.client.session
+        session['rider_pk'] = rider.pk
+        session.save() 
+        self.assertTrue(session['rider_pk'] == "email@123.com")
+
+class ComboHorseSessionTestCase(TestCase):
+    def setup(self):
+        user = User.objects.create(username='user')
+        user.set_password('password')
+        user.save()
+
+    def test_rider_pk(self):
+        c = Client()
+        logged_in = c.login(username='user', password='password')
+        data = {"name": "Misty", "barn_name": "Misty", "age":4, "coggins":12345, "owner":"Tina", "size":"pony", "type":"shetland"}
+        form = HorseForm(data)
+        horse = form.save(commit=False)
+        session = self.client.session
+        session['horse_pk'] = horse.pk
+        session.save() 
+        self.assertTrue(session['horse_pk']==None)

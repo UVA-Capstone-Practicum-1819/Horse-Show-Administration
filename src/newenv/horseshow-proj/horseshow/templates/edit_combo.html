@@ -1,0 +1,9 @@
+<h1>Edit Horse-Rider Combination</h1>
+
+<div>
+  <div>Rider: {{ rider.name }}</div>
+  <div>Horse: {{ horse.name }}</div>
+  <form action="{% url 'edit_combo' %}" method="post">
+    {% csrf_token %} {{ combo_form.as_p }} <input type="submit" />
+  </form>
+</div>
