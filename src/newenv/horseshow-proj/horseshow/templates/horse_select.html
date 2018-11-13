@@ -1,6 +1,5 @@
 <h1>Horse Select</h1>
 
-{% block content %}
 <div>
   <form action="{% url 'add_combo' %}" method="post">
     {% csrf_token %} {{ form.as_p }} <input type="submit" />

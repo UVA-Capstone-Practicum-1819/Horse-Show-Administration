@@ -1,5 +1,4 @@
 <h1>Rider Select</h1>
-{% block content %}
 <div>
   <form action="{% url 'select_horse' %}" method="post">
     {% csrf_token %} {{ form.as_p }} <input type="submit" />

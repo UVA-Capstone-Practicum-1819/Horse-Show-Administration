@@ -36,13 +36,12 @@ urlpatterns = [
          name="division_autocomplete"),
     path('genpdf', views.populate_pdf, name="populate_pdf"),
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
-    path('<showname>', views.viewshow, name="viewshow"),
-    path('<showname>/edit', views.edit_show, name="edit_show"),
     path('add-combo', views.add_combo, name="add_combo"),
     path('edit-combo', views.edit_combo, name="edit_combo"),
     path('edit-combo/<int:combo_num>',
          views.edit_combo, name="edit_combo_get"),
-
+    path('<showname>', views.viewshow, name="viewshow"),
+    path('<showname>/edit', views.edit_show, name="edit_show"),
 ]
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
