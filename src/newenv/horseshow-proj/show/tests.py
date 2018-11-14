@@ -1,18 +1,10 @@
 from django.test import TestCase, Client
-<<<<<<< 56980ff9218ae1e14c3343276dca826f2d9c2335
-from show.models import Show, Rider, Horse, Classes, Division
-from show.forms import ShowForm, RiderForm, ClassForm, ClassSelectForm, HorseForm, DivisionForm, HorseSelectForm, RiderSelectForm, DivisionSelectForm
-=======
 from show.models import *
 from show.forms import *
->>>>>>> yw6fy sprint 4 unit tests
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from show import models
-
-
 # Create your tests here.
-
 
 class ShowTestCase(TestCase):
     def create_show(self, title="test", body="test for a show"):
@@ -21,7 +13,6 @@ class ShowTestCase(TestCase):
     def test_show_creation(self):
         testshow = self.create_show()
         self.assertTrue(isinstance(testshow, Show))
-
 
 class ShowTestIntCase(TestCase):
     def create_show(self, title="test", body="test for a show"):
@@ -184,20 +175,13 @@ class HorseSelectCase(TestCase):
 class LoginTestCase(TestCase):
     """
     test cases for logging in and signing up (users)
-
     can use c = Client() for creating a client and
-
     response = c.post(url, context_params) to post data to the url page
-
     response = c.get(url) to get the page (doing c.get(url, follow=True) allows you to get the redirect chain via response.redirect_chain )
-
     also
-
     c.login(username='fred', password='secret') to login users (returns True if successful)
-
     response.context[key] to get the context value for the key
     """
-
     def setUp(self):
         self.credentials = {
             'username': 'testuser',
@@ -206,7 +190,6 @@ class LoginTestCase(TestCase):
         self.client = Client()
 
     """ using incorrect credentials; should not make valid form """
-
     def signup_with_incorrect_input(self):
         data = {'username': "testexampleuser",
                 'password1': "testuserpassword", 'password2': "testuserpasswordwrong"}
@@ -214,37 +197,27 @@ class LoginTestCase(TestCase):
         self.assertFalse(form.is_valid())
 
     """ using correct credentials; should make valid form """
-
     def signup_with_correct_input(self):
-        data = {'username': "testexampleuser",
-                'password1': "testuserpassword", 'password2': "testuserpassword"}
+        data = {'username': "testexampleuser", 'password1': "testuserpassword", 'password2': "testuserpassword"}
         form = UserCreationForm(data=data)
         self.assertFalse(form.is_valid())
 
     """ using incorrect credentials; should not make user logged in (active) """
-
     def login_with_incorrect_input(self):
-        data = {'username': "testuser",
-                'password1': "secretwrong", }
+        data = {'username': "testuser", 'password1': "secretwrong", }
         response = self.client.post(reverse('login'), data)
-
         self.assertFalse(response.context['user'].is_active)
 
     """ using correct credentials; should make user logged in (active) """
-
     def login_with_correct_input(self):
-        data = {'username': "testuser",
-                'password1': "secret", }
+        data = {'username': "testuser", 'password1': "secret", }
         response = self.client.post(reverse('login'), data)
-
         self.assertTrue(response.context['user'].is_active)
 
     """ log out the user, should be inactive """
-
     def logout(self):
         self.client.get(reverse('logout'))
         self.assertFalse(response.context['user'].is_active)
-
 
 class HorseRiderComboTest(TestCase):
     def setUp(self):
@@ -252,7 +225,6 @@ class HorseRiderComboTest(TestCase):
         horse2 = Horse.objects.create(name = "Brock", barn_name="Brock", age=5, coggins=73854, owner="Brock has no Owner!", size="unicorn", type="unicorn")
         horse3 = Horse.objects.create(name = "Ash", barn_name="Ash", age=5, coggins=747, owner="May", size="pony", type="pony")
         horse4 = Horse.objects.create(name = "Pikachu", barn_name="Pikachu", age=1, coggins=8736, owner="Ash", size="mouse", type="mouse")
-
         rider1 = Rider.objects.create(name = "Tarun", address="116 Chelsea Dr", age=22, email="ts4pe@virginia.edu")
         rider2 = Rider.objects.create(name = "Yunzhe", address="idunno ln.", age=22, email="ts4pe@virginia.edu")
         rider3 = Rider.objects.create(name = "Shannon", address="sfds", age=22, email="ts4pe@virginia.edu")
@@ -354,7 +326,6 @@ class AddDivToShowTest(TestCase):
 #             self.assertTrue(0 <= int(test_random_int) <= 999)
 
 
-
 class ComboRiderTestCase(TestCase):
     def setup(self):
         user = User.objects.create(username='user')
@@ -401,7 +372,7 @@ class ComboRiderSessionTestCase(TestCase):
         rider = form.save(commit=False)
         session = self.client.session
         session['rider_pk'] = rider.pk
-        session.save() 
+        session.save()
         self.assertTrue(session['rider_pk'] == "email@123.com")
 
 class ComboHorseSessionTestCase(TestCase):
@@ -418,5 +389,5 @@ class ComboHorseSessionTestCase(TestCase):
         horse = form.save(commit=False)
         session = self.client.session
         session['horse_pk'] = horse.pk
-        session.save() 
+        session.save()
         self.assertTrue(session['horse_pk']==None)
