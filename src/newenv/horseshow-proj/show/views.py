@@ -45,12 +45,22 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
-def showpage(request):
-    latest_show_list = Show.objects.all
+def showpage(request, showname):
     template = loader.get_template('showpage.html')
+    form = ComboNumForm()
+    shows = Show.objects.all()
     context = {
-        'latest_show_list': latest_show_list,
+        'form' : form,
     }
+    for show in shows:
+        if showname == show.show_name:
+            context = {
+                "show_name": show.show_name,
+                "show_date": show.show_date,
+                "show_location": show.show_location,
+                "show_divisions": show.show_divisions.all,
+                'form' : form,
+            }
     return HttpResponse(template.render(context, request))
 
 
