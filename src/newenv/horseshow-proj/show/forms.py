@@ -9,6 +9,9 @@ class ShowForm(forms.Form):
     show_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
     show_date = forms.DateField(initial=datetime.date.today)
     show_location = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
+    dayOfPrice = forms.IntegerField()
+    preRegistrationPrice = forms.IntegerField()
+
 
 class RiderForm(forms.ModelForm):
     name = forms.CharField(max_length=100, widget=forms.TextInput(
