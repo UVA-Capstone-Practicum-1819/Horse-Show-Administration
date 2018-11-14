@@ -98,7 +98,7 @@ def show_select(request):
             #post.published_date = timezone.now()
             # post.save()
             # return redirect('horse_detail', pk=post.pk)
-            return redirect('viewshow', showname=form.cleaned_data['name'])
+            return redirect('viewshow', showname=form.cleaned_data['show_date'])
     else:
         form = ShowSelectForm()
     return render(request, 'show_select.html', {'form': form})

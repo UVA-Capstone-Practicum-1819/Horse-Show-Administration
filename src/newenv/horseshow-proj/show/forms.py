@@ -1,17 +1,14 @@
 from django import forms
 from show.models import *
 from .models import *
+import datetime
 from dal import autocomplete
 
 
 class ShowForm(forms.Form):
-    show_name = forms.CharField(
-        max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
-    show_date = forms.CharField(
-        max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
-    show_location = forms.CharField(
-        max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
-
+    show_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
+    show_date = forms.DateField(initial=datetime.date.today)
+    show_location = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
 
 class RiderForm(forms.ModelForm):
     name = forms.CharField(max_length=100, widget=forms.TextInput(
@@ -58,15 +55,15 @@ class ComboForm(forms.Form):
 
 class ShowSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
-    name = forms.ModelChoiceField(
+    date= forms.ModelChoiceField(
         queryset=Show.objects.all(),
         widget=autocomplete.ModelSelect2(url='show_autocomplete')
     )
 
     class Meta:
         model = Show
-        fields = ('name', 'show_date')
-        # widgets = {
+        fields = ('show_date',)
+        #widgets = {
         #    'name': autocomplete.ModelSelect2(
         #    url='horse-autocomplete',
         #    attrs={'data-html': True}

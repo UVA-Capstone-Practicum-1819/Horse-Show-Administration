@@ -1,4 +1,5 @@
 from django.test import TestCase, Client
+from show.models import Show, Rider, Horse, Classes
 from show.models import *
 from show.forms import *
 from django.contrib.auth.models import User
@@ -8,15 +9,44 @@ from show import models
 
 class ShowTestCase(TestCase):
     def create_show(self, title="test", body="test for a show"):
-        return Show.objects.create(show_name="Boopalooza", show_date="10/02/2018", show_location="Pony Barn")
+        return Show.objects.create(show_name="Boopalooza", show_date="2018-10-07", show_location="Pony Barn")
 
     def test_show_creation(self):
         testshow = self.create_show()
         self.assertTrue(isinstance(testshow, Show))
 
+class ShowFormTestCase(TestCase):
+    def test_showForm_validsdashes(self):
+        form = ShowForm(data={'show_name':'Boopalooza', 'show_date':'2018-10-02', 'show_location':'Pony Barn'})
+        self.assertTrue(form.is_valid())
+
+    def test_showForm_validslashes(self):
+        form = ShowForm(data={'show_name':'Boopalooza', 'show_date':'10/12/2018', 'show_location':'Pony Barn'})
+        self.assertTrue(form.is_valid())
+
+    def test_showForm_invaliddatenomarks(self):
+        form = ShowForm(data={'show_name':'Balooza', 'show_date':'20191003', 'show_location':'Pony'})
+        self.assertFalse(form.is_valid())
+
+    def test_showForm_invalidorder(self):
+        form = ShowForm(data={'show_name':'Boopalooza', 'show_date':'10-30-3029', 'show_location':'Pony Barn'})
+        self.assertFalse(form.is_valid())
+
+    def test_showForm_invalidstring(self):
+        form = ShowForm(data={'show_name':'Balooza', 'show_date':'30th of September', 'show_location':'Pony'})
+        self.assertFalse(form.is_valid())
+
+    def test_showForm_invalidemptyfields(self):
+        form = ShowForm(data={'show_name':'', 'show_date':'', 'show_location':''})
+        self.assertFalse(form.is_valid())
+
+    def test_ShowSelectForm_invalid(self):
+        form = ShowSelectForm(data={'name': ""})
+        self.assertFalse(form.is_valid())
+        
 class ShowTestIntCase(TestCase):
     def create_show(self, title="test", body="test for a show"):
-        return Show.objects.create(show_name="Boopalooza", show_date=10022018, show_location="Pony Barn")
+        return Show.objects.create(show_name="Boopalooza", show_date="2019-10-03", show_location="Pony Barn")
 
     def test_show_creation(self):
         testshow = self.create_show()
@@ -134,6 +164,11 @@ class HorseTestCase(TestCase):
         form= HorseForm(data=form_vals)
         self.assertTrue(form.is_valid())
 
+    def test_horse_ValidformInt(self):
+        values= {'name': 'Boi', 'barn_name': 'Boiiii', 'age': 5, 'coggins': 12345, 'owner':'Joe', 'size':'horse', 'type':'Thoroughbred'}
+        form= HorseForm(data=values)
+        self.assertTrue(form.is_valid())
+
 class HorseSelectCase(TestCase):
     # def setup(self):
     #     user = User.objects.create(username='user')
@@ -228,6 +263,7 @@ class HorseRiderComboTest(TestCase):
         rider1 = Rider.objects.create(name = "Tarun", address="116 Chelsea Dr", age=22, email="ts4pe@virginia.edu")
         rider2 = Rider.objects.create(name = "Yunzhe", address="idunno ln.", age=22, email="ts4pe@virginia.edu")
         rider3 = Rider.objects.create(name = "Shannon", address="sfds", age=22, email="ts4pe@virginia.edu")
+
 
 class DivisionsTest(TestCase):
     def test_create_division(self):
