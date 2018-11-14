@@ -1,0 +1,16 @@
+<h1>Select Division</h1>
+{% block content %}
+<div>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" />
+    </form>
+    <a href="{% url 'divisions' showname=show_name%}">Add a New Division</a>
+</div>
+{% endblock %}
+
+{% block footer %}
+
+{{ form.media }}
+{% endblock %}

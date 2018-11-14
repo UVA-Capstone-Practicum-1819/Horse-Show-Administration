@@ -1,28 +1,24 @@
-<!DOCTYPE html>
-{% load static %}
+<!DOCTYPE html> {% load static %}
 
 <html lang="en">
-<head>
+  <head>
     <title>Rider</title>
-</head>
-<body>
+  </head>
 
-      <div class="page-header">
-          <a href="{% url 'newrider' %}">Add Rider</a>
+  <body>
+    <div class="content container">
+      <div class="row">
+        <div class="col-md-8">
+          <h1>Add Rider</h1>
+          <form
+            action="{% url 'select_horse' %}"
+            method="POST"
+            class="post-form"
+          >
+            {% csrf_token %} {{ form.as_p }} <button type="submit">Save</button>
+          </form>
+        </div>
       </div>
-      <div class="content container">
-          <div class="row">
-              <div class="col-md-8">
-                  {% block content %}
-                  <h1>Rider</h1>
-                  <form method="POST" class="post-form">{% csrf_token %}
-                      {{ form.as_p }}
-                      <button type="submit">Save</button>
-                  </form>
-                  {% endblock %}
-              </div>
-          </div>
-      </div>
+    </div>
   </body>
-
 </html>

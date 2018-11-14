@@ -1,33 +1,10 @@
-
 <h1>Horse Select</h1>
-<!--<form method="POST" class="post-form">{% csrf_token %}
-    <table>
-    {{ form.as_table }}
-    </table>
-    <button type="submit">Save</button>
-</form>-->
 
-<!-- <form method="POST" class="post-form">{% csrf_token %}
-<select>
-  {% for element in objectlist %}
-  <option value={{ element.id }}>{{ element.name }}
-  {%endfor%}
-</select>
-<button type="submit">Save</button>
-</form> -->
-
-{% block content %}
 <div>
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" />
-    </form>
-    <a href="{% url 'horse_new' %}">Add a New Horse</a>
+  <form action="{% url 'add_combo' %}" method="post">
+    {% csrf_token %} {{ form.as_p }} <input type="submit" />
+  </form>
+  <!-- <p>{{ test }}</p> -->
+  <a href="{% url 'add_horse' %}">Add a New Horse</a>
 </div>
-{% endblock %}
-
-{% block footer %}
-
 {{ form.media }}
-{% endblock %}
