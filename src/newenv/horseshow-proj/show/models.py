@@ -15,7 +15,7 @@ class Classes(models.Model):
 class Division(models.Model):
     division_name = models.CharField(max_length=100, default="")
     division_number = models.IntegerField(default=0)
-    classes = models.ManyToManyField(Classes, blank=True, null=True)
+    classes = models.ManyToManyField(Classes)
 
     def __str__(self):
         return self.division_name
@@ -51,7 +51,8 @@ class Rider (models.Model):
     address = models.CharField(max_length=200)
     age = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(120)])
-    email = models.EmailField(max_length=200, validators=[EmailValidator()])
+    email = models.EmailField(
+        primary_key=True, max_length=200, validators=[EmailValidator()])
     horses = models.ManyToManyField(Horse, through='HorseRiderCombo')
 
     def __str__(self):
