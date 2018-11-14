@@ -2,6 +2,7 @@ from django import forms
 from show.models import *
 from .models import *
 import datetime
+from django.forms import HiddenInput
 from dal import autocomplete
 
 
@@ -11,6 +12,10 @@ class ShowForm(forms.Form):
     show_location = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
     dayOfPrice = forms.IntegerField()
     preRegistrationPrice = forms.IntegerField()
+
+    class Meta:
+        model = Show
+        fields = ('show_name', 'show_date', 'show_location', 'dayOfPrice', 'preRegistrationPrice')
 
 
 class RiderForm(forms.ModelForm):
@@ -30,8 +35,10 @@ class RiderForm(forms.ModelForm):
 class RiderSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
         # rider_names =  [rider.name for rider in Rider.objects.all()]
-    rider = forms.ModelChoiceField(queryset=Rider.objects.all(
-    ), widget=autocomplete.ModelSelect2(url='rider_autocomplete'))
+    rider = forms.ModelChoiceField(
+        queryset=Rider.objects.all(),
+        widget=autocomplete.ModelSelect2(url='rider_autocomplete')
+    )
 
     class Meta:
         model = Rider
@@ -66,6 +73,7 @@ class ShowSelectForm(forms.ModelForm):
     class Meta:
         model = Show
         fields = ('show_date',)
+
         #widgets = {
         #    'name': autocomplete.ModelSelect2(
         #    url='horse-autocomplete',

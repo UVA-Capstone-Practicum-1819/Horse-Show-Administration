@@ -100,17 +100,7 @@ def create_show(request):
 
 
 def show_select(request):
-    if request.method == "POST":
-        form = ShowSelectForm(request.POST)
-        if form.is_valid():
-            #post = form.save(commit=False)
-            #post.author = request.user
-            #post.published_date = timezone.now()
-            # post.save()
-            # return redirect('horse_detail', pk=post.pk)
-            return redirect('viewshow', showname=form.cleaned_data['show_date'])
-    else:
-        form = ShowSelectForm()
+    form = ShowSelectForm()
     return render(request, 'show_select.html', {'form': form})
 
 

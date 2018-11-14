@@ -1,17 +1,9 @@
 <h1>Show Select</h1>
-
-{% block content %}
 <div>
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" />
+    <form action="{% url 'show_select' %}" method="post">
+        {% csrf_token %} {{ form.as_p }} <input type="submit" />
     </form>
     <a href="{% url 'create_show' %}">Can't find it? Create a New Show</a>
 </div>
-{% endblock %}
-
-{% block footer %}
 
 {{ form.media }}
-{% endblock %}
