@@ -1,4 +1,5 @@
 from django.db import models
+import datetime
 from django.core.validators import MinValueValidator, MaxValueValidator, EmailValidator
 import random
 
@@ -22,7 +23,7 @@ class Division(models.Model):
 
 class Show(models.Model):
     show_name = models.CharField(max_length=100)
-    show_date = models.CharField(primary_key=True, max_length=100)
+    show_date = models.DateField(primary_key=True)
     show_location = models.CharField(max_length=100)
     show_divisions = models.ManyToManyField(Division)
 
