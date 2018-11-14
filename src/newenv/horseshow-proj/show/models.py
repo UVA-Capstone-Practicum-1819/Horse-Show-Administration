@@ -30,7 +30,7 @@ class Show(models.Model):
     preRegistrationPrice = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        return self.show_name
+        return str(self.show_date)
 
 
 class Horse (models.Model):
