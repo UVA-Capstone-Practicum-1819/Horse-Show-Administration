@@ -110,7 +110,7 @@ class ShowAutocomplete(autocomplete.Select2QuerySetView):
             # return Horse.objects.none()
         qs = Show.objects.all()
         if self.q:
-            qs = qs.filter(show_name__istartswith=self.q)
+            qs = qs.filter(show_date__istartswith=self.q)
         return qs
 
 
