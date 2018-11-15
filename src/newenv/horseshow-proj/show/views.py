@@ -334,18 +334,27 @@ def add_combo(request):
 def edit_combo(request):
     if request.method == "POST":
         combo_form = ComboNumForm(request.POST)
-        if combo_form.is_valid():
-            combo_num = combo_form.cleaned_data['num']
-            rider = get_object_or_404(Rider, pk=request.session['rider_pk'])
-            horse = get_object_or_404(Horse, pk=request.session['horse_pk'])
-            print(rider)
-            print(horse)
+    elif request.method == "GET":
+        combo_form = ComboNumForm(request.GET)
+    else:
+        return redirect(reverse('viewshow'))
+
+    if combo_form.is_valid():
+        combo_num = combo_form.cleaned_data['num']
+        horse_rider_combo = HorseRiderCombo.objects.filter(
+            combo_num=combo_num)
+        # add combo if it doesn't exist
+        if len(result) == 0:
+            rider = get_object_or_404(
+                Rider, pk=request.session['rider_pk'])
+            horse = get_object_or_404(
+                Horse, pk=request.session['horse_pk'])
             horse_rider_combo = HorseRiderCombo.objects.create(
                 num=combo_num, rider=rider, horse=horse)
-            return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
-        else:
-            return redirect(reverse('show'))
-    return redirect(reverse('index'))
+
+        return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
+    else:
+        return redirect(reverse('show'))
 
 
 class HorseAutocomplete(autocomplete.Select2QuerySetView):
