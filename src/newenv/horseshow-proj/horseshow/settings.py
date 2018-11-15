@@ -40,7 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms'
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -108,13 +111,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 STATICFILES_DIRS = (
-os.path.join(BASE_DIR, "static"),
-'/Users/Student/Horse-Show-Administration/src/newenv/horseshow-proj/show/static/',
+    os.path.join(BASE_DIR, "static"),
 
- )
+)
 
-
- # Internationalization
+# Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
@@ -132,7 +133,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT= os.path.join(REPOSITORY_ROOT, 'static/')
+STATIC_ROOT = os.path.join(REPOSITORY_ROOT, 'static/')
 
 LOGIN_REDIRECT_URL = '/show/'
 LOGOUT_REDIRECT_URL = '/show/login'
