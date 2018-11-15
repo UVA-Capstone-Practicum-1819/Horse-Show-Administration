@@ -13,9 +13,6 @@ class ShowForm(forms.Form):
     dayOfPrice = forms.IntegerField()
     preRegistrationPrice = forms.IntegerField()
 
-    class Meta:
-        model = Show
-        fields = ('show_name', 'show_date', 'show_location', 'dayOfPrice', 'preRegistrationPrice')
 
 
 class RiderForm(forms.ModelForm):

@@ -2,6 +2,7 @@ import random
 import os
 import json
 import pdfrw
+import datetime
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
@@ -45,7 +46,7 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
-def showpage(request, showname):
+def showpage(request, showdate):
     template = loader.get_template('showpage.html')
     form = ComboNumForm()
     shows = Show.objects.all()
@@ -53,7 +54,7 @@ def showpage(request, showname):
         'form' : form,
     }
     for show in shows:
-        if showname == show.show_name:
+        if showdate == show.show_date:
             context = {
                 "show_name": show.show_name,
                 "show_date": show.show_date,
@@ -82,25 +83,22 @@ def create_show(request):
         return render(request, 'create_show.html', {'form': f})
     showname = f.cleaned_data['show_name']
     showdate = f.cleaned_data['show_date']
+    showdatestring = str(showdate)
     showlocation = f.cleaned_data['show_location']
-    #get_shows = Show.objects.all()
-    # all_shows = [show for show in get_shows]
-    # failure = False
-    # for show in all_shows:
-    #     if showname == show.object.get(show_name = showname) and showdate == show['show_date'] and showlocation == show['show_location']:
-    #         failure = True
-    # if failure:
-    #     response = {'ok': False, 'error_msg': "This show has already been created!", 'form': form}
-    #     return render(request, 'create_show.html', response)
     new_show = Show.objects.create(
-        show_name=showname, show_date=showdate, show_location=showlocation)
+        show_name=showname, show_date=showdatestring, show_location=showlocation)
     response = {'ok': True, 'success_msg': "Show was successfully created",
                 'form': form, 'show': new_show}
     return render(request, 'create_show.html', response)
 
 
 def show_select(request):
-    form = ShowSelectForm()
+    if request.method == "POST":
+        form = ShowSelectForm(request.POST)
+        if form.is_valid():
+            return redirect('showpage', showdate=form.cleaned_data['show_date'])
+    else:
+        form = ShowSelectForm()
     return render(request, 'show_select.html', {'form': form})
 
 
