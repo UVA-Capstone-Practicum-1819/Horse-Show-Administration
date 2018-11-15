@@ -23,14 +23,16 @@ class Division(models.Model):
 
 class Show(models.Model):
     show_name = models.CharField(max_length=100)
-    show_date = models.DateField(primary_key=True)
+    show_date = models.CharField(max_length=100, primary_key=True)
     show_location = models.CharField(max_length=100)
     show_divisions = models.ManyToManyField(Division, blank=True, null=True)
     dayOfPrice = models.IntegerField(null=True, blank=True)
     preRegistrationPrice = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        return str(self.show_date)
+        return self.show_date
+
+
 
 
 class Horse (models.Model):
