@@ -1,5 +1,8 @@
-<h1>Select Classes</h1>
+{% extends 'base.html' %}
+
 {% block content %}
+<h1>Select Classes</h1>
+
 <div>
     <form action="" method="post">
         {% csrf_token %}
@@ -8,9 +11,7 @@
     </form>
     <a href="{% url 'classes' %}">Add a New Class</a>
 </div>
-{% endblock %}
-
-{% block footer %}
 
 {{ form.media }}
+
 {% endblock %}

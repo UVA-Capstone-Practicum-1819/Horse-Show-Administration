@@ -1,24 +1,12 @@
-<!DOCTYPE html> {% load static %}
+{% extends 'base.html' %}
 
-<html lang="en">
-  <head>
-    <title>Rider</title>
-  </head>
+{% block content %}
+{% load crispy_forms_tags %}
 
-  <body>
-    <div class="content container">
-      <div class="row">
-        <div class="col-md-8">
-          <h1>Add Rider</h1>
-          <form
-            action="{% url 'select_horse' %}"
-            method="POST"
-            class="post-form"
-          >
-            {% csrf_token %} {{ form.as_p }} <button type="submit">Save</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </body>
-</html>
+<h3>Add Rider</h3>
+<form action="{% url 'select_horse' %}" method="POST" class="post-form">
+  {% csrf_token %} {{ form | crispy}} <button type="submit" class="btn btn-success">Save</button>
+</form>
+
+
+{% endblock %}

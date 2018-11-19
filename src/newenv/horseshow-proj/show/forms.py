@@ -7,12 +7,13 @@ from dal import autocomplete
 
 
 class ShowForm(forms.Form):
-    show_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
+    show_name = forms.CharField(
+        max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
     show_date = forms.DateField(initial=datetime.date.today)
-    show_location = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
+    show_location = forms.CharField(
+        max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
     dayOfPrice = forms.IntegerField()
     preRegistrationPrice = forms.IntegerField()
-
 
 
 class RiderForm(forms.ModelForm):
@@ -20,7 +21,8 @@ class RiderForm(forms.ModelForm):
         attrs={'placeholder': 'Name', 'required': True, }))
     address = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'placeholder': 'Address', 'required': True, }))
-    # age = forms.IntegerField(widget=forms.TextInput(attrs={'placeholder': 'Age', 'required': True,}))
+    age = forms.IntegerField(widget=forms.TextInput(
+        attrs={'placeholder': 'Age', 'required': True, }))
     email = forms.CharField(max_length=100, widget=forms.EmailInput(
         attrs={'placeholder': 'Email', 'required': True, }))
 
@@ -62,7 +64,7 @@ class ComboForm(forms.Form):
 
 class ShowSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
-    show_date= forms.ModelChoiceField(
+    show_date = forms.ModelChoiceField(
         queryset=Show.objects.all(),
         widget=autocomplete.ModelSelect2(url='show_autocomplete')
     )
@@ -71,7 +73,7 @@ class ShowSelectForm(forms.ModelForm):
         model = Show
         fields = ('show_date',)
 
-        #widgets = {
+        # widgets = {
         #    'name': autocomplete.ModelSelect2(
         #    url='horse-autocomplete',
         #    attrs={'data-html': True}
@@ -129,6 +131,7 @@ class DivisionSelectForm(forms.ModelForm):
     class Meta:
         model = Division
         fields = ('name',)
+
 
 class ComboNumForm(forms.Form):
     num = forms.IntegerField()
