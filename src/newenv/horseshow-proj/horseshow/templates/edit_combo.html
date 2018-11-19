@@ -1,3 +1,6 @@
+{% extends 'base.html' %}
+
+{% block content %}
 <h1>Edit Horse-Rider Combination</h1>
 
 <div>
@@ -7,3 +10,4 @@
     {% csrf_token %} {{ combo_form.as_p }} <input type="submit" />
   </form>
 </div>
+{% endblock %}

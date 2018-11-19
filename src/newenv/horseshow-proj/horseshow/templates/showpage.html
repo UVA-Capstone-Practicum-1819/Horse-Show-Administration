@@ -1,13 +1,17 @@
+
 {% load static %}
+                    
+{% extends 'base.html' %}
 <html>
     <head>
         <title>{{show_name}}</title>
     </head>
     <body>
+      {% block content %}
         <div class="content container">
             <div class="row">
                 <div class="col-md-8">
-                    {% block content %}
+           
                         <h1>Show: {{show_name}}</h1>
                         <p>Date: {{show_date}}</p>
                         <p>Location: {{show_location}}</p>
@@ -24,12 +28,9 @@
                             {% csrf_token %}
                             {{ form.as_p }}
                             <button type="submit">Search Combo Number</button>
-                        </form>
-                    {% endblock %}
+                  </form>
                 </div>
             </div>
-        </div>
-    </div>
-</body>
-
-</html>
+          </div>
+      </div>
+  {% endblock %}
