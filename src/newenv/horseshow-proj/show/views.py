@@ -56,10 +56,10 @@ def showpage(request, showdate):
     for show in shows:
         if showdate == show.show_date:
             context = {
-                "show_name": show.show_name,
-                "show_date": show.show_date,
-                "show_location": show.show_location,
-                "show_divisions": show.show_divisions.all,
+                "name": show.name,
+                "date": show.date,
+                "location": show.location,
+                "divisions": show.divisions.all,
                 'form' : form,
             }
     return HttpResponse(template.render(context, request))
@@ -81,12 +81,12 @@ def create_show(request):
     f = ShowForm(request.POST)
     if not f.is_valid():
         return render(request, 'create_show.html', {'form': f})
-    showname = f.cleaned_data['show_name']
-    showdate = f.cleaned_data['show_date']
+    showname = f.cleaned_data['name']
+    showdate = f.cleaned_data['date']
     showdatestring = str(showdate)
-    showlocation = f.cleaned_data['show_location']
+    showlocation = f.cleaned_data['location']
     new_show = Show.objects.create(
-        show_name=showname, show_date=showdatestring, show_location=showlocation)
+        name=showname, date=showdatestring, location=showlocation)
     response = {'ok': True, 'success_msg': "Show was successfully created",
                 'form': form, 'show': new_show}
     return render(request, 'create_show.html', response)
@@ -96,7 +96,7 @@ def show_select(request):
     if request.method == "POST":
         form = ShowSelectForm(request.POST)
         if form.is_valid():
-            return redirect('showpage', showdate=form.cleaned_data['show_date'])
+            return redirect('showpage', showdate=form.cleaned_data['date'])
     else:
         form = ShowSelectForm()
     return render(request, 'show_select.html', {'form': form})
@@ -135,12 +135,12 @@ def viewshow(request, showname):
         # store data in context to be accessible by html page
         shows = Show.objects.all()
         for show in shows:
-            if showname == show.show_name:
+            if showname == show.name:
                 context = {
-                    "show_name": show.show_name,
-                    "show_date": show.show_date,
-                    "show_location": show.show_location,
-                    "show_divisions": show.show_divisions.all,
+                    "show_name": show.name,
+                    "show_date": show.date,
+                    "show_location": show.location,
+                    "show_divisions": show.divisions.all,
                 }
                 return render(request, 'viewshow.html', context=context)
     except Exception as e:
@@ -201,7 +201,7 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
 
 
 def new_division(request, showname):
-    show = Show.objects.get(show_name=showname)
+    show = Show.objects.get(name=showname)
     if request.method == "POST":
         form = DivisionForm(request.POST)
         if form.is_valid():
@@ -210,8 +210,8 @@ def new_division(request, showname):
             post.published_date = timezone.now()
             post.save()
             division = Division.objects.get(
-                division_name=form.cleaned_data['division_name'])
-            divisions = show.show_divisions
+                name=form.cleaned_data['name'])
+            divisions = show.divisions
             divisions.add(division)
             show.save()
             return redirect('/show')
@@ -224,10 +224,10 @@ def division_select(request, showname):
     if request.method == "POST":
         form = DivisionSelectForm(request.POST)
         if form.is_valid():
-            show = Show.objects.get(show_name=showname)
-            current_divisions = show.show_divisions
+            show = Show.objects.get(name=showname)
+            current_divisions = show.divisions
             division = Division.objects.get(
-                division_name=form.cleaned_data['name'])
+                name=form.cleaned_data['name'])
             current_divisions.add(division)
             show.save()
             # return render(request, 'horse_select.html', {'form': form})
@@ -235,7 +235,7 @@ def division_select(request, showname):
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:
         form = DivisionSelectForm()
-    return render(request, 'division_select.html', {'form': form, 'show_name': showname})
+    return render(request, 'division_select.html', {'form': form, 'name': showname})
 
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
