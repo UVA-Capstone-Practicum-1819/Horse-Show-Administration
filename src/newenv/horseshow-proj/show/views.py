@@ -82,7 +82,7 @@ def create_show(request):
     if not f.is_valid():
         return render(request, 'create_show.html', {'form': f})
     showname = f.cleaned_data['show_name']
-    showdate = f.cleaned_data['show_date']
+    showdate = f.cleaned_data['dateofshow']
     showdatestring = str(showdate)
     showlocation = f.cleaned_data['show_location']
     new_show = Show.objects.create(
@@ -96,19 +96,19 @@ def show_select(request):
     if request.method == "POST":
         form = ShowSelectForm(request.POST)
         if form.is_valid():
-            return redirect('showpage', showdate=form.cleaned_data['show_date'])
+            return redirect('viewshow', showname=form.cleaned_data['name'])
     else:
         form = ShowSelectForm()
     return render(request, 'show_select.html', {'form': form})
 
 
 class ShowAutocomplete(autocomplete.Select2QuerySetView):
-    def get_queryset(self):
+      def get_queryset(self):
         # if not self.request.user.is_authenticated():
             # return Horse.objects.none()
         qs = Show.objects.all()
         if self.q:
-            qs = qs.filter(show_date__istartswith=self.q)
+            qs = qs.filter(show_name__istartswith=self.q)
         return qs
 
 
@@ -200,8 +200,8 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def new_division(request, showname):
-    show = Show.objects.get(show_name=showname)
+def new_division(request, showdate):
+    show = Show.objects.get(show_date=showdate)
     if request.method == "POST":
         form = DivisionForm(request.POST)
         if form.is_valid():
@@ -369,21 +369,21 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def new_class(request):
-    print(request.method)
-    if request.method == "POST":
-        form = ClassesForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.save()
-            # return redirect('horse_detail', pk=post.pk)
-            return render(request, 'classes.html', {'form': form})
-    else:
-        form = ClassesForm()
-    return render(request, 'classes.html', {'form': form})
-
+# def new_class(request):
+#     print(request.method)
+#     if request.method == "POST":
+#         form = ClassesForm(request.POST)
+#         if form.is_valid():
+#             post = form.save(commit=False)
+#             post.author = request.user
+#             post.published_date = timezone.now()
+#             post.save()
+#             # return redirect('horse_detail', pk=post.pk)
+#             return render(request, 'classes.html', {'form': form})
+#     else:
+#         form = ClassesForm()
+#     return render(request, 'classes.html', {'form': form})
+#
 
 def populate_pdf(request):
     data_dict = {

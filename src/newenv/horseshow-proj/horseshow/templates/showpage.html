@@ -1,30 +1,36 @@
+
+{% load static %}
+                    
 {% extends 'base.html' %}
-
-
-{% block content %}
-<div class="content container">
-    <div class="row">
-        <div class="col-md-8">
-
-            <h1>Show: {{show_name}}</h1>
-            <p>Date: {{show_date}}</p>
-            <p>Location: {{show_location}}</p>
-            <p>Divisions:</p>
-            {% for division in show_divisions %}
-            <li>{{ division }}</li>
-            {% endfor %}
-            <p>
-                <a href="{% url 'edit_show' showname=show_name %}">Edit</a>
-                <a href="{% url 'division_select' showname=show_name %}">Add Division</a>
-            </p>
-            <h1> Check Combo </h1>
-            <form method="POST" class="post-form" action="{% url 'edit_combo' %}">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Search Combo Number</button>
-            </form>
-        </div>
-    </div>
-</div>
-</div>
-{% endblock %}
+<html>
+    <head>
+        <title>{{show_name}}</title>
+    </head>
+    <body>
+      {% block content %}
+        <div class="content container">
+            <div class="row">
+                <div class="col-md-8">
+           
+                        <h1>Show: {{show_name}}</h1>
+                        <p>Date: {{show_date}}</p>
+                        <p>Location: {{show_location}}</p>
+                        <p>Divisions:</p>
+                        {% for division in show_divisions %}
+                            <li>{{ division }}</li>
+                        {% endfor %}
+                        <p>
+                            <a href = "{% url 'edit_show' showname=show_date %}">Edit</a>
+                            <a href = "{% url 'division_select' showname=show_date %}">Add Division</a>
+                        </p>
+                        <h1> Check Combo </h1>
+                        <form method="POST" class="post-form" action="{% url 'edit_combo' %}">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit">Search Combo Number</button>
+                  </form>
+                </div>
+            </div>
+          </div>
+      </div>
+  {% endblock %}
