@@ -1,17 +1,14 @@
-<h1>New Class</h1>
+{% extends 'base.html' %}
 
 {% block content %}
+<h1>New Class</h1>
 <div>
     <form action="" method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" />
     </form>
-<!--     <a href="{% url 'create_show' %}">Can't find it? Create a New Show</a>
- --></div>
-{% endblock %}
 
-{% block footer %}
-
+</div>
 {{ form.media }}
 {% endblock %}

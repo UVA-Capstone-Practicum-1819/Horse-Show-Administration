@@ -1,29 +1,25 @@
-{% load static %}
-<html>
-    <head>
-        <title>{{show_name}}</title>
-    </head>
-    <body>
-        <div class="content container">
-            <div class="row">
-                <div class="col-md-8">
-                    {% block content %}
-                        <h1>Show: {{show_name}}</h1>
-                        <p>Date: {{show_date}}</p>
-                        <p>Location: {{show_location}}</p>
-                        <p>Divisions:</p>
-                        {% for division in show_divisions %}
-                            <li>{{ division }}</li>
-                        {% endfor %}
-                        <p>
-                            <a href = "{% url 'edit_show' showname=show_name %}">Edit</a>
-                            <a href = "{% url 'division_select' showname=show_name %}">Add Division</a>
-                        </p>
-                    {% endblock %}
-                </div>
-            </div>
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="content container">
+    <div class="row">
+        <div class="col-md-8">
+
+            <h1>Show: {{show_name}}</h1>
+            <p>Date: {{show_date}}</p>
+            <p>Location: {{show_location}}</p>
+            <p>Divisions:</p>
+            {% for division in show_divisions %}
+            <li>{{ division }}</li>
+            {% endfor %}
+            <p>
+                <a href="{% url 'edit_show' showname=show_name %}">Edit</a>
+                <a href="{% url 'division_select' showname=show_name %}">Add Division</a>
+            </p>
+
         </div>
     </div>
-</body>
-
-</html>
+</div>
+</div>
+{% endblock %}

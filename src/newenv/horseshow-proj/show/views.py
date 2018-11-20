@@ -103,12 +103,12 @@ def show_select(request):
 
 
 class ShowAutocomplete(autocomplete.Select2QuerySetView):
-    def get_queryset(self):
+      def get_queryset(self):
         # if not self.request.user.is_authenticated():
             # return Horse.objects.none()
         qs = Show.objects.all()
         if self.q:
-            qs = qs.filter(show_date__istartswith=self.q)
+            qs = qs.filter(show_name__istartswith=self.q)
         return qs
 
 
@@ -369,21 +369,21 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def new_class(request):
-    print(request.method)
-    if request.method == "POST":
-        form = ClassesForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.save()
-            # return redirect('horse_detail', pk=post.pk)
-            return render(request, 'classes.html', {'form': form})
-    else:
-        form = ClassesForm()
-    return render(request, 'classes.html', {'form': form})
-
+# def new_class(request):
+#     print(request.method)
+#     if request.method == "POST":
+#         form = ClassesForm(request.POST)
+#         if form.is_valid():
+#             post = form.save(commit=False)
+#             post.author = request.user
+#             post.published_date = timezone.now()
+#             post.save()
+#             # return redirect('horse_detail', pk=post.pk)
+#             return render(request, 'classes.html', {'form': form})
+#     else:
+#         form = ClassesForm()
+#     return render(request, 'classes.html', {'form': form})
+#
 
 def populate_pdf(request):
     data_dict = {

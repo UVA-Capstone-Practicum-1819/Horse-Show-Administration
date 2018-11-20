@@ -1,5 +1,7 @@
-<h1>Billing</h1>
+{% extends 'base.html' %}
 {% block content %}
+<h1>Billing</h1>
+
 <div>
     <form action="" method="post">
         {% csrf_token %}
@@ -7,9 +9,5 @@
         <input type="submit" />
     </form>
 </div>
-{% endblock %}
-
-{% block footer %}
-
 {{ form.media }}
 {% endblock %}

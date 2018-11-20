@@ -1,24 +1,23 @@
-{% load static %}
-<html>
-    <head>
-        <title>Select Classes</title>
-    </head>
-    <body>
-        <div class="page-header">
-            <a href="{% url 'classes' %}" >Add Classes</a>
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+    <a href="{% url 'classes' %}">Add Classes</a>
+</div>
+<div class="content container">
+    <div class="row">
+        <div class="col-md-8">
+
+            <h1>Select Classes</h1>
+            <form method="POST" class="post-form">{% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Submit</button>
+            </form>
+
         </div>
-        <div class="content container">
-            <div class="row">
-                <div class="col-md-8">
-                    {% block content %}
-                        <h1>Select Classes</h1>
-                        <form method="POST" class="post-form">{% csrf_token %}
-                            {{ form.as_p }}
-                            <button type="submit">Submit</button>
-                        </form>
-                    {% endblock %}
-                </div>
-            </div>
-        </div>
-    </body>
-</html>
+    </div>
+</div>
+{% endblock %}
