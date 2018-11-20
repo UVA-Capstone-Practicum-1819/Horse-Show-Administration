@@ -7,9 +7,9 @@ from dal import autocomplete
 
 
 class ShowForm(forms.Form):
-    show_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
-    dateofshow = forms.DateField(initial=datetime.date.today)
-    show_location = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
+    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
+    date = forms.DateField(initial=datetime.date.today)
+    location = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
     dayOfPrice = forms.IntegerField()
     preRegistrationPrice = forms.IntegerField()
 
@@ -62,14 +62,17 @@ class ComboForm(forms.Form):
 
 class ShowSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
-    show_date = forms.ModelChoiceField(
+
+       date= forms.ModelChoiceField(
         queryset=Show.objects.all(),
         widget=autocomplete.ModelSelect2(url='show_autocomplete')
     )
+    admin_name = forms.CharField(max_length=100, widget=forms.TextInput(
+        attrs={'autocomplete': 'off', }))
 
     class Meta:
         model = Show
-        fields = ('show_date',)
+        fields = ('date',)
 
         # widgets = {
         #    'name': autocomplete.ModelSelect2(
@@ -100,7 +103,7 @@ class HorseSelectForm(forms.ModelForm):
 class ClassForm(forms.ModelForm):
     class Meta:
         model = Classes
-        fields = ('class_name', 'class_number')
+        fields = ('name', 'number')
 
 
 class ClassSelectForm(forms.ModelForm):
@@ -117,7 +120,7 @@ class ClassSelectForm(forms.ModelForm):
 class DivisionForm(forms.ModelForm):
     class Meta:
         model = Division
-        fields = ('division_name', 'division_number')
+        fields = ('name', 'number')
 
 
 class DivisionSelectForm(forms.ModelForm):

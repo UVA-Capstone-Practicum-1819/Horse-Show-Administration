@@ -4,24 +4,26 @@
 {% extends 'base.html' %}
 <html>
     <head>
-        <title>{{show_name}}</title>
+        <title>{{name}}</title>
     </head>
     <body>
       {% block content %}
         <div class="content container">
             <div class="row">
                 <div class="col-md-8">
-           
-                        <h1>Show: {{show_name}}</h1>
-                        <p>Date: {{show_date}}</p>
-                        <p>Location: {{show_location}}</p>
+                    {% block content %}
+                        <h1>Show: {{name}}</h1>
+                        <p>Date: {{date}}</p>
+                        <p>Location: {{location}}</p>
+
                         <p>Divisions:</p>
                         {% for division in show_divisions %}
                             <li>{{ division }}</li>
                         {% endfor %}
                         <p>
-                            <a href = "{% url 'edit_show' showname=show_date %}">Edit</a>
-                            <a href = "{% url 'division_select' showname=show_date %}">Add Division</a>
+                            <a href = "{% url 'edit_show' showname=name %}">Edit</a>
+                            <a href = "{% url 'division_select' showname=name %}">Add Division</a>
+
                         </p>
                         <h1> Check Combo </h1>
                         <form method="POST" class="post-form" action="{% url 'edit_combo' %}">
