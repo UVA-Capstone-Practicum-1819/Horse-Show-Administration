@@ -63,7 +63,7 @@ class ComboForm(forms.Form):
 class ShowSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
 
-       date= forms.ModelChoiceField(
+    date= forms.ModelChoiceField(
         queryset=Show.objects.all(),
         widget=autocomplete.ModelSelect2(url='show_autocomplete')
     )
