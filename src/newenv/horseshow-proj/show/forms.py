@@ -63,19 +63,28 @@ class ComboForm(forms.Form):
 class ShowSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
 
-       date= forms.ModelChoiceField(
+    date= forms.ModelChoiceField(
         queryset=Show.objects.all(),
         widget=autocomplete.ModelSelect2(url='show_autocomplete')
-    )
-    admin_name = forms.CharField(max_length=100, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', }))
+        )
+
 
     class Meta:
         model = Show
         fields = ('date',)
 
+    def clean_date(self):
+        showobj = self.cleaned_data['date']
+        shows = Show.objects.all()
+        if showobj in shows:
+            showobj.date = showobj.date + 'foo'
+            return showobj
+
+    #def clean(self):
+
+
         # widgets = {
-        #    'name': autocomplete.ModelSelect2(
+        #    'name': autocomplete.ModelSelect2(nk
         #    url='horse-autocomplete',
         #    attrs={'data-html': True}
         #    )

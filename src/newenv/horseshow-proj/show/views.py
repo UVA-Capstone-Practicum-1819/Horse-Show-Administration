@@ -54,7 +54,7 @@ def showpage(request, showdate):
         'form' : form,
     }
     for show in shows:
-        if showdate == show.show_date:
+        if showdate == show.date:
             context = {
                 "name": show.name,
                 "date": show.date,
@@ -96,7 +96,10 @@ def show_select(request):
     if request.method == "POST":
         form = ShowSelectForm(request.POST)
         if form.is_valid():
-            return redirect('showpage', showdate=form.cleaned_data['date'])
+            show = form.cleaned_data['date']
+            show.date = show.date[:-3]
+            showdate = show.date
+            return redirect('showpage', showdate)
     else:
         form = ShowSelectForm()
     return render(request, 'show_select.html', {'form': form})
