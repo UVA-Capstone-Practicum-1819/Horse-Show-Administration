@@ -25,7 +25,7 @@ class Show(models.Model):
     name = models.CharField(max_length=100)
     date = models.CharField(max_length=100, primary_key=True)
     location = models.CharField(max_length=100)
-    divisions = models.ManyToManyField(Division, blank=True, null=True)
+    divisions = models.ManyToManyField(Division, blank=True)
     dayOfPrice = models.IntegerField(null=True, blank=True)
     preRegistrationPrice = models.IntegerField(null=True, blank=True)
 

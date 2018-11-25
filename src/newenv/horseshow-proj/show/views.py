@@ -156,7 +156,7 @@ def edit_show(request, showname):
 
 def billing(request):
     if request.method == "POST":
-        form = RiderSelectForm(request.POST)
+        form = ClassSelectForm(request.POST)
         if form.is_valid():
             #post = form.save(commit=False)
             #post.author = request.user
@@ -165,7 +165,7 @@ def billing(request):
             # return redirect('horse_detail', pk=post.pk)
             return render(request, 'billing.html', {'form': form})
     else:
-        form = RiderSelectForm()
+        form = ClassSelectForm()
     return render(request, 'billing.html', {'form': form})
 
 
