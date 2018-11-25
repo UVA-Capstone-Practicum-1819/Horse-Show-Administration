@@ -5,7 +5,7 @@
 <div>
     <form action="{% url 'show_select' %}" method="post">
         {% csrf_token %}
-        <p>{{ form }} </p>
+        <p>{{ form | crispy }} </p>
         <p><button type="submit" class="btn btn-success">Select Show</button></p>
     </form>
     <a href="{% url 'create_show' %}">Can't find it? Create a New Show</a>
