@@ -51,7 +51,7 @@ def showpage(request, showdate):
     form = ComboNumForm()
     shows = Show.objects.all()
     context = {
-        'form' : form,
+        'form': form,
     }
     for show in shows:
         if showdate == show.date:
@@ -60,7 +60,7 @@ def showpage(request, showdate):
                 "date": show.date,
                 "location": show.location,
                 "divisions": show.divisions.all,
-                'form' : form,
+                'form': form,
             }
     return HttpResponse(template.render(context, request))
 
@@ -106,7 +106,7 @@ def show_select(request):
 
 
 class ShowAutocomplete(autocomplete.Select2QuerySetView):
-      def get_queryset(self):
+    def get_queryset(self):
         # if not self.request.user.is_authenticated():
             # return Horse.objects.none()
         qs = Show.objects.all()
@@ -249,11 +249,6 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def newrider(request):
-    form = RiderForm()
-    return render(request, 'editrider.html', {'form': form})
-
-
 def select_rider(request):
     form = RiderSelectForm()
     return render(request, 'rider_select.html', {'form': form})
@@ -270,22 +265,6 @@ class RiderAutocomplete(autocomplete.Select2QuerySetView):
         if self.q:
             qs = qs.filter(name__istartswith=self.q)
         return qs
-
-
-# def horse_new(request):
-#     print(request.method)
-#     if request.method == "POST":
-#         form = HorseForm(request.POST)
-#         if form.is_valid():
-#             post = form.save(commit=False)
-#             post.author = request.user
-#             post.published_date = timezone.now()
-#             post.save()
-#             # return redirect('horse_detail', pk=post.pk)
-#             return render(request, 'horse_edit.html', {'form': form})
-#     else:
-#         form = HorseForm()
-#     return render(request, 'horse_edit.html', {'form': form})
 
 
 def select_horse(request):
