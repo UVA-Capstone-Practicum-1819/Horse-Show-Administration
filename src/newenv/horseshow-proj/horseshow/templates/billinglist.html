@@ -14,6 +14,7 @@
         <thead>
           <th>Class name</th>
           <th>Class name</th>
+          <th>reg type</th
         </thead>
 
         <tbody>
@@ -22,20 +23,24 @@
               <td>
                 {{ c.name }}
               </td>
-                <td>
+              <td>
                   <a class="btn btn-primary btn-sm" href="{% url 'scratch'%}?next={{request.path}}&cname={{c.name}}&combonum={{combo_num}}">Scratch?</a>
               </td>
+              <td>
+                {{ form | crispy}}
 
+              </td>
             </tr>
 
           {% endfor %}
         </tbody>
       </table>
 
-      <p>
+
+        <h1>Total Classes: {{tot}}</h1>
           <!-- <a href = "{% url 'edit_show' showname=name %}">Edit</a> -->
           <!-- <a href = "{% url 'division_select' showname=name %}">Add</a> -->
-      </p>
+
 
 
 

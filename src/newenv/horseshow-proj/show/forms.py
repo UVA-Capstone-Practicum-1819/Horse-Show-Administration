@@ -13,6 +13,10 @@ class ShowForm(forms.Form):
     dayOfPrice = forms.IntegerField()
     preRegistrationPrice = forms.IntegerField()
 
+class RegistrationBillForm(forms.Form):
+    typels = ['prereg', 'dayof']
+    registrationtype = forms.ChoiceField(choices=typels)
+
 
 class RiderForm(forms.ModelForm):
     name = forms.CharField(max_length=100, widget=forms.TextInput(

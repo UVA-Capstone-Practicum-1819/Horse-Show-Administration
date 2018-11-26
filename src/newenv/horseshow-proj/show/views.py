@@ -183,8 +183,10 @@ def billing(request):
     return render(request, 'billing.html', {'form': form})
 
 def billinglist(request, combonum):
+    form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num = combonum)
-    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num}
+    tot = combo.classes.count()
+    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
     return render(request, 'billinglist.html', context)
 
 def scratch(request):
@@ -195,7 +197,8 @@ def scratch(request):
     dcls = combo.classes.get(name=cls)
     # dcls.delete()
     combo.classes.remove(dcls)
-    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num}
+    tot = combo.classes.count()
+    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
     return render(request, 'billinglist.html', context)
 
 def deleteReport(request):
