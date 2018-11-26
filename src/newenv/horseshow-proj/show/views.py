@@ -186,8 +186,8 @@ def billinglist(request, combonum):
     form = RiderForm()
     template = loader.get_template('billinglist.html')
     combo = HorseRiderCombo.objects.get(num = combonum)
-    class1 = combo.classes
-    context = {'name': combo.rider, 'classes1': class1}
+    classes = combo.classes.all
+    context = {'name': combo.rider, 'classes': classes}
     return HttpResponse(template.render(context, request))
 
 def new_class(request):
