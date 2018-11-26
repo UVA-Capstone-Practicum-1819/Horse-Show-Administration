@@ -156,18 +156,27 @@ def edit_show(request, showname):
 
 def billing(request):
     if request.method == "POST":
-        form = ClassSelectForm(request.POST)
+        form = RiderSelectForm(request.POST)
         if form.is_valid():
-            #post = form.save(commit=False)
-            #post.author = request.user
-            #post.published_date = timezone.now()
-            # post.save()
-            # return redirect('horse_detail', pk=post.pk)
-            return render(request, 'billing.html', {'form': form})
+            rider = form.cleaned_data['rider']
+            # show.date = show.date[:-3]
+            rr = rider.name
+            return redirect('billinglist')
     else:
-        form = ClassSelectForm()
+        form = RiderSelectForm()
     return render(request, 'billing.html', {'form': form})
 
+def billinglist(request):
+    form = RiderForm()
+    return render(request, 'billinglist.html', {'form': form})
+    # template = loader.get_template('billinglist.html')
+    # form = ComboNumForm()
+    # shows = Show.objects.all()
+    # context = {}
+    # for show in shows:
+        # if showdate == show.date:
+            # context = {"name": show.name, "date": show.date, "location": show.location, "divisions": show.divisions.all, 'form': form, }
+    # return HttpResponse(template.render(context, request))
 
 def new_class(request):
     if request.method == "POST":
@@ -182,7 +191,6 @@ def new_class(request):
     else:
         form = ClassForm()
     return render(request, 'new_class.html', {'form': form})
-
 
 def class_select(request):
     if request.method == "POST":
@@ -202,7 +210,6 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
 
-
 def new_division(request, showname):
     show = Show.objects.get(name=showname)
     if request.method == "POST":
@@ -221,7 +228,6 @@ def new_division(request, showname):
     else:
         form = DivisionForm()
     return render(request, 'new_division.html', {'form': form})
-
 
 def division_select(request, showname):
     if request.method == "POST":

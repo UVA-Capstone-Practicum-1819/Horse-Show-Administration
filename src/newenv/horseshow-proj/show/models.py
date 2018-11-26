@@ -63,7 +63,6 @@ class Rider (models.Model):
 
 class HorseRiderCombo(models.Model):
     num = models.IntegerField(primary_key=True, default=-1)
-    rider = models.ForeignKey(
-        Rider, on_delete=models.CASCADE)
-    horse = models.ForeignKey(
-        Horse, on_delete=models.CASCADE)
+    rider = models.ForeignKey(Rider, on_delete=models.CASCADE)
+    horse = models.ForeignKey(Horse, on_delete=models.CASCADE)
+    classes = models.ManyToManyField(Classes, blank=True)
