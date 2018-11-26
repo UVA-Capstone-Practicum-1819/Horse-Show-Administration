@@ -151,7 +151,15 @@ def viewshow(request, showname):
 
 
 def edit_show(request, showname):
-    return render(request, "edit_show.html")
+    shows = Show.objects.all()
+    for show in shows:
+        if showname == show.name:
+            context = {
+                "name": show.name,
+                "date": show.date,
+                "location": show.location,
+            }
+    return render(request, "edit_show.html", context)
 
 
 def billing(request):
@@ -205,22 +213,47 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
 
 def new_division(request, showname):
     show = Show.objects.get(name=showname)
+    date = show.date
     if request.method == "POST":
-        form = DivisionForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.save()
-            division = Division.objects.get(
-                name=form.cleaned_data['name'])
-            divisions = show.divisions
-            divisions.add(division)
-            show.save()
-            return redirect('/show')
+        if 'exit' in request.POST:
+            form = DivisionForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
+                post.published_date = timezone.now()
+                post.save()
+                division = Division.objects.get(
+                    name=form.cleaned_data['name'])
+                divisions = show.divisions
+                divisions.add(division)
+                show.save()
+                return redirect('showpage', date)
+        if 'another' in request.POST:
+            form = DivisionForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
+                post.published_date = timezone.now()
+                post.save()
+                division = Division.objects.get(
+                    name=form.cleaned_data['name'])
+                divisions = show.divisions
+                divisions.add(division)
+                show.save()
+                return redirect('divisions', showname)
     else:
         form = DivisionForm()
-    return render(request, 'new_division.html', {'form': form})
+        shows = Show.objects.all()
+        for show in shows:
+            if showname == show.name:
+                context = {
+                    "form": form,
+                    "name": show.name,
+                    "date": show.date,
+                    "location": show.location,
+                    "divisions": show.divisions.all,
+                }
+        return render(request, 'new_division.html', context)
 
 
 def division_select(request, showname):

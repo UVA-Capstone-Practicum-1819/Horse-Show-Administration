@@ -6,10 +6,12 @@
 <div class="content container">
     <div class="row">
         <div class="col-md-8">
-
-            <h1>Show: {{show_name}}</h1>
-            <p>Date: {{show_date}}</p>
-            <p>Location: {{show_location}}</p>
+          <form action="" method="post">
+            <p>Name<input type="text" name="Name" value="{{name}}"></p>
+            <p>Date<input type="text" name="Date" value="{{date}}"></p>
+            <p>Location<input type="text" name="Location" value="{{location}}"></p>
+            <input type="submit"/>
+          </form>
 
         </div>
     </div>
