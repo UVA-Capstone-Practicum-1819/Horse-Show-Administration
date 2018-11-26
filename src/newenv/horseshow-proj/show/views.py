@@ -171,21 +171,12 @@ class ComboAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
 
-
-
 def billing(request):
     if request.method == "POST":
         form = ComboSelectForm(request.POST)
         if form.is_valid():
             combo = form.cleaned_data['combo']
             combonum = combo.num
-            # if form.is_valid():
-                # show = form.cleaned_data['date']
-                # show.date = show.date[:-3]
-                # showdate = show.date
-                # return redirect('showpage', combonum)
-            # show.date = show.date[:-3]
-            # rr = rider.name
             return redirect('billinglist', combonum)
     else:
         form = ComboSelectForm()
@@ -193,14 +184,10 @@ def billing(request):
 
 def billinglist(request, combonum):
     form = RiderForm()
-    # return render(request, 'billinglist.html', {'form': form})
     template = loader.get_template('billinglist.html')
-    # form = ComboNumForm()
-    combos = HorseRiderCombo.objects.all()
-    context = {}
-    for c in combos:
-        if combonum == c.num:
-            context = {"name": c.rider,}
+    combo = HorseRiderCombo.objects.get(num = combonum)
+    class1 = combo.classes
+    context = {'name': combo.rider, 'classes1': class1}
     return HttpResponse(template.render(context, request))
 
 def new_class(request):

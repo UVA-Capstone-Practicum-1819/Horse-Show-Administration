@@ -1,14 +1,28 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
+
 {% block content %}
 <h3>Billing - {{name}}</h3>
 
-<div>
+<div class="row">
     <form action="" method="post">
         {% csrf_token %}
-        {{ form | crispy}}
+        <!-- {{ form | crispy}} -->
         <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
+        <h4>Classes</h4>
+        {% for c in class1 %}
+          <li>{{ c.name }}</li>
+          <!-- <h5>hello</h5> -->
+        {% endfor %}
+        <p>
+            <a href = "{% url 'edit_show' showname=name %}">Edit</a>
+            <a href = "{% url 'division_select' showname=name %}">Add</a>
+        </p>
+
+
+
     </form>
 </div>
-{{ form.media }}
+<!-- {{ form.media }} -->
 {% endblock %}
