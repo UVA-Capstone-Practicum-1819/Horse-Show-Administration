@@ -39,6 +39,12 @@ class AuthRequiredMiddleware(object):
 
 
 def index(request):
+    if 'navigation' in request.session:
+        del request.session['navigation']
+    if 'rider_pk' in request.session:
+        del request.session['rider_pk']
+    if 'horse_pk' in request.session:
+        del request.session['horse_pk']
     latest_show_list = Show.objects.all
     template = loader.get_template('index.html')
     context = {
@@ -50,6 +56,10 @@ def index(request):
 def showpage(request, showdate):
     if 'navigation' in request.session:
         del request.session['navigation']
+    if 'rider_pk' in request.session:
+        del request.session['rider_pk']
+    if 'horse_pk' in request.session:
+        del request.session['horse_pk']
     template = loader.get_template('showpage.html')
     form = ComboNumForm()
     shows = Show.objects.all()
@@ -328,7 +338,7 @@ def edit_combo(request):
         combo_num = combo_form.cleaned_data['num']
         try:
             horse_rider_combo = HorseRiderCombo.objects.get(num=combo_num)
-            if request.session['rider_pk'] is None and request.session['horse_pk'] is None:
+            if 'rider_pk' not in request.session and 'horse_pk' not in request.session:
                 rider = horse_rider_combo.rider
                 request.session['rider_pk'] = rider.pk
                 horse = horse_rider_combo.horse
@@ -367,6 +377,7 @@ def edit_combo(request):
                     # messages.warning(
                     #     request, 'The combo number is not in the database.')
                     return redirect('showpage', request.session["showdate"])
+
         return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
     else:
         return redirect(reverse('index'))
