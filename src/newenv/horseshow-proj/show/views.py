@@ -153,30 +153,55 @@ def viewshow(request, showname):
 def edit_show(request, showname):
     return render(request, "edit_show.html")
 
+# def combo_select(request):
+#     if request.method == "POST":
+#         form = ComboSelectForm(request.POST)
+#         if form.is_valid():
+#             # return render(request, 'horse_select.html', {'form': form})
+#             return redirect('/show/')
+#     else:
+#         form = ComboSelectForm()
+#     return render(request, 'class_select.html', {'form': form})
+
+
+class ComboAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = HorseRiderCombo.objects.all()
+        if self.q:
+            qs = qs.filter(class_name__istartswith=self.q)
+        return qs
+
+
 
 def billing(request):
     if request.method == "POST":
-        form = RiderSelectForm(request.POST)
+        form = ComboSelectForm(request.POST)
         if form.is_valid():
-            rider = form.cleaned_data['rider']
+            combo = form.cleaned_data['combo']
+            combonum = combo.num
+            # if form.is_valid():
+                # show = form.cleaned_data['date']
+                # show.date = show.date[:-3]
+                # showdate = show.date
+                # return redirect('showpage', combonum)
             # show.date = show.date[:-3]
-            rr = rider.name
-            return redirect('billinglist')
+            # rr = rider.name
+            return redirect('billinglist', combonum)
     else:
-        form = RiderSelectForm()
+        form = ComboSelectForm()
     return render(request, 'billing.html', {'form': form})
 
-def billinglist(request):
+def billinglist(request, combonum):
     form = RiderForm()
-    return render(request, 'billinglist.html', {'form': form})
-    # template = loader.get_template('billinglist.html')
+    # return render(request, 'billinglist.html', {'form': form})
+    template = loader.get_template('billinglist.html')
     # form = ComboNumForm()
-    # shows = Show.objects.all()
-    # context = {}
-    # for show in shows:
-        # if showdate == show.date:
-            # context = {"name": show.name, "date": show.date, "location": show.location, "divisions": show.divisions.all, 'form': form, }
-    # return HttpResponse(template.render(context, request))
+    combos = HorseRiderCombo.objects.all()
+    context = {}
+    for c in combos:
+        if combonum == c.num:
+            context = {"name": c.rider,}
+    return HttpResponse(template.render(context, request))
 
 def new_class(request):
     if request.method == "POST":

@@ -48,6 +48,18 @@ class HorseForm(forms.ModelForm):
         fields = ('name', 'barn_name', 'age',
                   'coggins', 'owner', 'size', 'type')
 
+class ComboSelectForm(forms.ModelForm):
+    #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
+        # rider_names =  [rider.name for rider in Rider.objects.all()]
+    combo = forms.ModelChoiceField(
+        queryset=HorseRiderCombo.objects.all(),
+        widget=autocomplete.ModelSelect2(url='combo_autocomplete')
+    )
+
+    class Meta:
+        model = HorseRiderCombo
+        fields = ('combo',)
+
 
 class ComboForm(forms.Form):
     combo = forms.CharField(max_length=100, widget=forms.TextInput(
