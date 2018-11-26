@@ -333,10 +333,10 @@ class AddDivFailures(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_addDivision_novalues(self):
-        form = ShowForm(data={'name':'hunter division', 'number':''})
+        form = ShowForm(data={'name':'hunter division', 'number':'hello'})
         self.assertFalse(form.is_valid())
 
-#tested Showselect form
+#tested Showselect for
 
 class ShowSelectFormTestCase(TestCase):
     def test_showSelectForm_invaliddatenomarks(self):
