@@ -321,6 +321,43 @@ class AddDivToShowTest(TestCase):
         show.divisions.add(division)
         self.assertTrue(len(show.divisions.all())==1)
 
+##added division failures
+
+class AddDivFailures(TestCase):
+    def test_addDivision_noname(self):
+        form = ShowForm(data={'name':'', 'number':'201'})
+        self.assertFalse(form.is_valid())
+
+    def test_addDivision_novalues(self):
+        form = ShowForm(data={'name':'', 'number':''})
+        self.assertFalse(form.is_valid())
+
+    def test_addDivision_novalues(self):
+        form = ShowForm(data={'name':'hunter division', 'number':'hello'})
+        self.assertFalse(form.is_valid())
+
+#tested Showselect for
+
+class ShowSelectFormTestCase(TestCase):
+    def test_showSelectForm_invaliddatenomarks(self):
+        form = ShowSelectForm(data={'date':'20191003'})
+        self.assertFalse(form.is_valid())
+
+    def test_showSelectForm_invalidorder(self):
+        form = ShowSelectForm(data={'date':'10-30-3029'})
+        self.assertFalse(form.is_valid())
+
+    def test_showSelectForm_invalidstring(self):
+        form = ShowSelectForm(data={'date':'30th of September'})
+        self.assertFalse(form.is_valid())
+
+    def test_showSelectForm_invalidemptyfields(self):
+        form = ShowForm(data={'date':''})
+        self.assertFalse(form.is_valid())
+
+    def test_ShowSelectForm_invalid(self):
+        form = ShowSelectForm(data={'date': ""})
+        self.assertFalse(form.is_valid())
 # class ComboTestCase(TestCase):
 #     def create_combo(self, title="test", body="test for add combo"):
 #         return Combo.objects.create(combo='234', ridername="Richard Lee", horsename = "Jenny", owner="John Doe")

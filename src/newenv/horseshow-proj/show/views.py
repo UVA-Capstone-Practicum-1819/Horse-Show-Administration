@@ -149,9 +149,48 @@ def viewshow(request, showname):
     except Exception as e:
         return HttpResponse(e)
 
-
+#
 def edit_show(request, showname):
-    return render(request, "edit_show.html")
+    # if
+    show = Show.objects.get(name=showname)
+    # shows = Show.objects.all()
+    # for show in shows:
+    #     if showname == show.name:
+    #         context = {
+    #             "name": show.name,
+    #             "date": show.date,
+    #             "location": show.location,
+    #         }
+    # if request.method == 'POST':
+    #     form = EditShowForm(request.POST)
+    #     if form.is_valid():
+    #         showname = request.POST.get('name')
+    #         showdate = request.POST.get('date')
+    #         showlocation = request.POST.get('location')
+    #         return redirect('showpage', show.date)
+    #
+    # else:
+    #     return render(request, "edit_show.html", context)
+
+    # show = Show.objects.get(name=showname)
+    # form = EditShowForm(request.POST or None)
+    # if request.method == 'POST':
+    #     if form.is_valid():
+    #         form.save()
+    #         date = form.cleaned_data['date']
+    #         return redirect('showpage', date)
+    # else:
+    #     shows = Show.objects.all()
+    #     for show in shows:
+    #         if showname == show.name:
+    #             oldshowname = show.name
+    #             context = {
+    #                 "name": show.name,
+    #                 "date": show.date,
+    #                 "location": show.location,
+    #             }
+    #     return render(request, "edit_show.html", context)
+
 
 
 def billing(request):
@@ -205,22 +244,47 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
 
 def new_division(request, showname):
     show = Show.objects.get(name=showname)
+    date = show.date
     if request.method == "POST":
-        form = DivisionForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.save()
-            division = Division.objects.get(
-                name=form.cleaned_data['name'])
-            divisions = show.divisions
-            divisions.add(division)
-            show.save()
-            return redirect('/show')
+        if 'exit' in request.POST:
+            form = DivisionForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
+                post.published_date = timezone.now()
+                post.save()
+                division = Division.objects.get(
+                    name=form.cleaned_data['name'])
+                divisions = show.divisions
+                divisions.add(division)
+                show.save()
+                return redirect('showpage', date)
+        if 'another' in request.POST:
+            form = DivisionForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
+                post.published_date = timezone.now()
+                post.save()
+                division = Division.objects.get(
+                    name=form.cleaned_data['name'])
+                divisions = show.divisions
+                divisions.add(division)
+                show.save()
+                return redirect('divisions', showname)
     else:
         form = DivisionForm()
-    return render(request, 'new_division.html', {'form': form})
+        shows = Show.objects.all()
+        for show in shows:
+            if showname == show.name:
+                context = {
+                    "form": form,
+                    "name": show.name,
+                    "date": show.date,
+                    "location": show.location,
+                    "divisions": show.divisions.all,
+                }
+        return render(request, 'new_division.html', context)
 
 
 def division_select(request, showname):

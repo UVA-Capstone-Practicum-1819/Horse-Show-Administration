@@ -60,6 +60,12 @@ class ComboForm(forms.Form):
         attrs={'autocomplete': 'off', }))
 
 
+class EditShowForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    date = forms.DateField()
+    location = forms.CharField(max_length=100)
+
+
 class ShowSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
 
