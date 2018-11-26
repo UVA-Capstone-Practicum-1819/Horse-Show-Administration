@@ -153,7 +153,7 @@ def viewshow(request, showname):
 def edit_show(request, showname):
     # if
     show = Show.objects.get(name=showname)
-    # shows = Show.objects.all()
+    shows = Show.objects.all()
     # for show in shows:
     #     if showname == show.name:
     #         context = {
