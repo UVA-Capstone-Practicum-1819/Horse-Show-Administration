@@ -337,15 +337,18 @@ def edit_combo(request):
         except(HorseRiderCombo.DoesNotExist):
             try:
                 number = HorseRiderCombo.objects.get(
-                    pk=request.session['num_pk'])
+                    num=request.session['num_pk']).num
                 rider = get_object_or_404(
                     Rider, pk=request.session['rider_pk'])
                 horse = get_object_or_404(
                     Horse, pk=request.session['horse_pk'])
-                hr_combo = HorseRiderCombo.objects.get(num=number)
-                hr_combo.num = combo_num
-                hr_combo.save()
-            except(HorseRiderCombo.DoesNotExist):
+                horse_rider_combo = HorseRiderCombo.objects.get(num=number)
+                horse_rider_combo.num = combo_num
+                horse_rider_combo.save()
+                print("IM NOOOOOT IN EXECEPTION HAHAHAH")
+                print(number)
+            except(KeyError):
+                print("IM HERE IN EXECEPTION HAHAHAH")
                 # add combo if it doesn't exist
                 rider = get_object_or_404(
                     Rider, pk=request.session['rider_pk'])
