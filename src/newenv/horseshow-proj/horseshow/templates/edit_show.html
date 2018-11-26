@@ -7,10 +7,11 @@
     <div class="row">
         <div class="col-md-8">
           <form action="" method="post">
-            <p>Name<input type="text" name="Name" value="{{name}}"></p>
-            <p>Date<input type="text" name="Date" value="{{date}}"></p>
-            <p>Location<input type="text" name="Location" value="{{location}}"></p>
-            <input type="submit"/>
+            {% csrf_token %}
+            <p><input type="text" name="name" value="{{name}}"></p>
+            <p>Date<input type="text" name="date" value="{{date}}"></p>
+            <p>Location<input type="text" name="location" value="{{location}}"></p>
+            <p><input type="submit" value="save"/></p>
           </form>
 
         </div>

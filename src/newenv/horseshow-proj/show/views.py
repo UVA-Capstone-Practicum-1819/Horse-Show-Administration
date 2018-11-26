@@ -151,6 +151,7 @@ def viewshow(request, showname):
 
 
 def edit_show(request, showname):
+    show = Show.objects.get(name=showname)
     shows = Show.objects.all()
     for show in shows:
         if showname == show.name:
@@ -159,7 +160,36 @@ def edit_show(request, showname):
                 "date": show.date,
                 "location": show.location,
             }
-    return render(request, "edit_show.html", context)
+    if request.method == 'POST':
+        form = EditShowForm(request.POST)
+        if form.is_valid():
+            showname = request.POST.get('name')
+            showdate = request.POST.get('date')
+            showlocation = request.POST.get('location')
+            return redirect('showpage', show.date)
+
+    else:
+        return render(request, "edit_show.html", context)
+
+    # show = Show.objects.get(name=showname)
+    # form = EditShowForm(request.POST or None)
+    # if request.method == 'POST':
+    #     if form.is_valid():
+    #         form.save()
+    #         date = form.cleaned_data['date']
+    #         return redirect('showpage', date)
+    # else:
+    #     shows = Show.objects.all()
+    #     for show in shows:
+    #         if showname == show.name:
+    #             oldshowname = show.name
+    #             context = {
+    #                 "name": show.name,
+    #                 "date": show.date,
+    #                 "location": show.location,
+    #             }
+    #     return render(request, "edit_show.html", context)
+
 
 
 def billing(request):
