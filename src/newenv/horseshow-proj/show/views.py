@@ -347,7 +347,7 @@ def edit_combo(request):
                 horse_rider_combo.save()
                 print("IM NOOOOOT IN EXECEPTION HAHAHAH")
                 print(number)
-            except(KeyError):
+            except(HorseRiderCombo.DoesNotExist):
                 print("IM HERE IN EXECEPTION HAHAHAH")
                 # add combo if it doesn't exist
                 rider = get_object_or_404(

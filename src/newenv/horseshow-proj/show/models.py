@@ -65,3 +65,6 @@ class HorseRiderCombo(models.Model):
         Rider, on_delete=models.CASCADE)
     horse = models.ForeignKey(
         Horse, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.num)
