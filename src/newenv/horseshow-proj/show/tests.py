@@ -427,3 +427,84 @@ class ComboHorseSessionTestCase(TestCase):
         session['horse_pk'] = horse.pk
         session.save()
         self.assertTrue(session['horse_pk']==None)
+
+
+class InvalidComboTestCase(TestCase):
+    def setup(self):
+        user = User.objects.create(username='user')
+        user.set_password('password')
+        user.save()
+
+    def test_combo_string(self):
+        c = Client()
+        logged_in = c.login(username='user', password='password')
+        data = {'num': "Not An Integer"}
+        response = self.client.post('show/edit-combo', data)
+        form = ComboNumForm(data)
+        self.assertFalse(form.is_valid())
+    
+    def test_combo_invalid_redirect(self):
+        data = {'num': "Not An Integer"}
+        response = self.client.post('show/edit-combo', data)
+        form = ComboNumForm(data) 
+        self.assertTrue(c.get('index'))
+
+class ValidComboTestCase(TestCase):
+    def setup(self):
+        user = User.objects.create(username='user')
+        user.set_password('password')
+        user.save()
+
+    def test_combo_isvalid(self):
+        data = {'num': 777}
+        response = self.client.post('show/edit-combo', data)
+        form = ComboNumForm(data)
+        self.assertTrue(form.is_valid())
+    
+class ComboDatabaseValidTestCase(TestCase):
+    def setup(self):
+        user = User.objects.create(username='user')
+        user.set_password('password')
+        user.save()
+    def test_valid_combo_in_database(self):
+        data_horse = {"name": "Misty", "barn_name": "Misty", "age":4, "coggins":12345, "owner":"Tina", "size":"pony", "type":"shetland"}
+        form_horse = HorseForm(data_horse)
+        horse = form_horse.save()
+        data_rider = {'name': "sarah", 'address': "address1", 'age': 9, 'email': "email@123.com"}
+        form_rider = RiderForm(data_rider)
+        rider = form_rider.save()
+        combo = HorseRiderCombo.objects.create(
+                        num=123, rider=rider, horse=horse)
+
+        data = {'num': 777}
+        response = self.client.post('show/edit-combo', data)
+        combo_form = ComboNumForm(data)
+        if combo_form.is_valid():
+            combo_num = combo_form.cleaned_data['num']
+        self.assertTrue(HorseRiderCombo.objects.get(num=combo_num))
+
+class ComboDatabaseInvalidTestCase(TestCase):  
+    def setup(self):
+        user = User.objects.create(username='user')
+        user.set_password('password')
+        user.save()
+    def test_valid_combo_not_in_database(self):
+        data_horse = {"name": "Misty", "barn_name": "Misty", "age":4, "coggins":12345, "owner":"Tina", "size":"pony", "type":"shetland"}
+        form_horse = HorseForm(data_horse)
+        horse = form_horse.save()
+        data_rider = {'name': "sarah", 'address': "address1", 'age': 9, 'email': "email@123.com"}
+        form_rider = RiderForm(data_rider)
+        rider = form_rider.save()
+        combo = HorseRiderCombo.objects.create(
+                        num=665, rider=rider, horse=horse)
+
+        data = {'num': 777}
+        response = self.client.post('show/edit-combo', data)
+        combo_form = ComboNumForm(data)
+        if combo_form.is_valid():
+            combo_num = combo_form.cleaned_data['num']
+        try:
+            HorseRiderCombo.objects.get(num=combo_num)
+        except(HorseRiderCombo.DoesNotExist):
+            self.assertTrue(HorseRiderCombo.DoesNotExist)
+        

@@ -17,6 +17,7 @@ from dal import autocomplete
 from .populatepdf import write_fillable_pdf
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
 
 
 class AuthRequiredMiddleware(object):
@@ -47,6 +48,8 @@ def index(request):
 
 
 def showpage(request, showdate):
+    if 'navigation' in request.session:
+        del request.session['navigation']
     template = loader.get_template('showpage.html')
     form = ComboNumForm()
     shows = Show.objects.all()
@@ -99,6 +102,7 @@ def show_select(request):
             show = form.cleaned_data['date']
             show.date = show.date[:-3]
             showdate = show.date
+            request.session["showdate"] = showdate
             return redirect('showpage', showdate)
     else:
         form = ShowSelectForm()
@@ -305,6 +309,7 @@ def add_combo(request):
         combo_form = ComboNumForm()
         rider_pk = request.session['rider_pk']
         horse_pk = request.session['horse_pk']
+        request.session['navigation'] = "add_combo"
         rider = get_object_or_404(Rider, pk=rider_pk)
         horse = get_object_or_404(Horse, pk=horse_pk)
         return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
@@ -349,13 +354,19 @@ def edit_combo(request):
                 print(number)
             except(HorseRiderCombo.DoesNotExist):
                 print("IM HERE IN EXECEPTION HAHAHAH")
-                # add combo if it doesn't exist
-                rider = get_object_or_404(
-                    Rider, pk=request.session['rider_pk'])
-                horse = get_object_or_404(
-                    Horse, pk=request.session['horse_pk'])
-                horse_rider_combo = HorseRiderCombo.objects.create(
-                    num=combo_num, rider=rider, horse=horse)
+                if 'navigation' in request.session:
+                    # add combo if it doesn't exist
+                    rider = get_object_or_404(
+                        Rider, pk=request.session['rider_pk'])
+                    horse = get_object_or_404(
+                        Horse, pk=request.session['horse_pk'])
+                    # if combo_num
+                    horse_rider_combo = HorseRiderCombo.objects.create(
+                        num=combo_num, rider=rider, horse=horse)
+                else:
+                    # messages.warning(
+                    #     request, 'The combo number is not in the database.')
+                    return redirect('showpage', request.session["showdate"])
         return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
     else:
         return redirect(reverse('index'))

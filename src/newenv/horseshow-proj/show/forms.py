@@ -61,7 +61,8 @@ class ComboNumForm(forms.Form):
     # class Meta:
     #     model = HorseRiderCombo
     #     fields = ('num',)
-    num = forms.IntegerField()
+    num = forms.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(999)])
 
 
 class ShowSelectForm(forms.ModelForm):

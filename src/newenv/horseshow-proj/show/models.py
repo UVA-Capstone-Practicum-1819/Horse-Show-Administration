@@ -60,7 +60,8 @@ class Rider (models.Model):
 
 
 class HorseRiderCombo(models.Model):
-    num = models.IntegerField()
+    num = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(999)])
     rider = models.ForeignKey(
         Rider, on_delete=models.CASCADE)
     horse = models.ForeignKey(
