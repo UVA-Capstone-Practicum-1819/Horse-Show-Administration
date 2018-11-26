@@ -321,10 +321,9 @@ def edit_combo(request):
 
     if combo_form.is_valid():
         combo_num = combo_form.cleaned_data['num']
-        horse_rider_combo = HorseRiderCombo.objects.filter(
-            combo_num=combo_num)
+        horse_rider_combo = HorseRiderCombo.objects.filter(num=combo_num)
         # add combo if it doesn't exist
-        if len(result) == 0:
+        if len(horse_rider_combo) == 0:
             rider = get_object_or_404(
                 Rider, pk=request.session['rider_pk'])
             horse = get_object_or_404(
