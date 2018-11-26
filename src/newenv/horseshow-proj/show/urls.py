@@ -22,6 +22,7 @@ urlpatterns = [
     path('<showname>/division', views.division_select, name="division_select"),
     path('billing', views.billing, name="billing"),
     path('<combonum>/billinglist', views.billinglist, name="billinglist"),
+    path('scratch', views.scratch, name="scratch"),
     path('show-autocomplete', views.ShowAutocomplete.as_view(), name="show_autocomplete"),
     path('rider', views.select_rider, name="select_rider"),
     path('rider-autocomplete', views.RiderAutocomplete.as_view(), name="rider_autocomplete"),

@@ -183,12 +183,29 @@ def billing(request):
     return render(request, 'billing.html', {'form': form})
 
 def billinglist(request, combonum):
-    form = RiderForm()
-    template = loader.get_template('billinglist.html')
     combo = HorseRiderCombo.objects.get(num = combonum)
-    classes = combo.classes.all
-    context = {'name': combo.rider, 'classes': classes}
-    return HttpResponse(template.render(context, request))
+    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num}
+    return render(request, 'billinglist.html', context)
+
+def scratch(request):
+    combonum = request.GET['combonum']
+    # print(combonum+1)
+    combo = HorseRiderCombo.objects.get(num = int(combonum))
+    cls = request.GET["cname"]
+    dcls = combo.classes.get(name=cls)
+    # dcls.delete()
+    combo.classes.remove(dcls)
+    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num}
+    return render(request, 'billinglist.html', context)
+
+def deleteReport(request):
+    name = request.GET["user"]
+    user = User.objects.get(username=name)
+    report = request.GET["reportname"]
+    report_todelete = inputReport.objects.get(report_name=report)
+    report_todelete.delete()
+    return render(request, 'viewReports.html', {'obj': inputReport.objects.all, 'user': user})
+
 
 def new_class(request):
     if request.method == "POST":

@@ -3,22 +3,39 @@
 {% load static %}
 
 {% block content %}
-<h3>Billing - {{name}}</h3>
+<h3>Bill for {{name}} in combo {{combo_num}}</h3>
 
 <div class="row">
     <form action="" method="post">
         {% csrf_token %}
         <!-- {{ form | crispy}} -->
         <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
-        <h4>Classes</h4>
-        {% for c in classes %}
-          <li>{{ c.name }}</li>
-          <!-- <h5>hello</h5> -->
-        {% endfor %}
-        <p>
-            <a href = "{% url 'edit_show' showname=name %}">Edit</a>
-            <a href = "{% url 'division_select' showname=name %}">Add</a>
-        </p>
+      <table class="table">
+        <thead>
+          <th>Class name</th>
+          <th>Class name</th>
+        </thead>
+
+        <tbody>
+          {% for c in classes %}
+            <tr>
+              <td>
+                {{ c.name }}
+              </td>
+                <td>
+                  <a class="btn btn-primary btn-sm" href="{% url 'scratch'%}?next={{request.path}}&cname={{c.name}}&combonum={{combo_num}}">Scratch?</a>
+              </td>
+
+            </tr>
+
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <p>
+          <!-- <a href = "{% url 'edit_show' showname=name %}">Edit</a> -->
+          <!-- <a href = "{% url 'division_select' showname=name %}">Add</a> -->
+      </p>
 
 
 
