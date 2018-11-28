@@ -206,20 +206,61 @@ def edit_show(request, showname):
     #     return render(request, "edit_show.html", context)
 
 
+# def combo_select(request):
+#     if request.method == "POST":
+#         form = ComboSelectForm(request.POST)
+#         if form.is_valid():
+#             # return render(request, 'horse_select.html', {'form': form})
+#             return redirect('/show/')
+#     else:
+#         form = ComboSelectForm()
+#     return render(request, 'class_select.html', {'form': form})
+
+
+class ComboAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = HorseRiderCombo.objects.all()
+        if self.q:
+            qs = qs.filter(class_name__istartswith=self.q)
+        return qs
 
 def billing(request):
     if request.method == "POST":
-        form = ClassSelectForm(request.POST)
+        form = ComboSelectForm(request.POST)
         if form.is_valid():
-            #post = form.save(commit=False)
-            #post.author = request.user
-            #post.published_date = timezone.now()
-            # post.save()
-            # return redirect('horse_detail', pk=post.pk)
-            return render(request, 'billing.html', {'form': form})
+            combo = form.cleaned_data['combo']
+            combonum = combo.num
+            return redirect('billinglist', combonum)
     else:
-        form = ClassSelectForm()
+        form = ComboSelectForm()
     return render(request, 'billing.html', {'form': form})
+
+def billinglist(request, combonum):
+    form = RegistrationBillForm()
+    combo = HorseRiderCombo.objects.get(num = combonum)
+    tot = combo.classes.count()
+    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
+    return render(request, 'billinglist.html', context)
+
+def scratch(request):
+    combonum = request.GET['combonum']
+    # print(combonum+1)
+    combo = HorseRiderCombo.objects.get(num = int(combonum))
+    cls = request.GET["cname"]
+    dcls = combo.classes.get(name=cls)
+    # dcls.delete()
+    combo.classes.remove(dcls)
+    tot = combo.classes.count()
+    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
+    return render(request, 'billinglist.html', context)
+
+def deleteReport(request):
+    name = request.GET["user"]
+    user = User.objects.get(username=name)
+    report = request.GET["reportname"]
+    report_todelete = inputReport.objects.get(report_name=report)
+    report_todelete.delete()
+    return render(request, 'viewReports.html', {'obj': inputReport.objects.all, 'user': user})
 
 
 def new_class(request):
@@ -235,7 +276,6 @@ def new_class(request):
     else:
         form = ClassForm()
     return render(request, 'new_class.html', {'form': form})
-
 
 def class_select(request):
     if request.method == "POST":
@@ -254,7 +294,6 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
         if self.q:
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
-
 
 def new_division(request, showname):
     show = Show.objects.get(name=showname)
@@ -299,7 +338,6 @@ def new_division(request, showname):
                     "divisions": show.divisions.all,
                 }
         return render(request, 'new_division.html', context)
-
 
 def division_select(request, showname):
     if request.method == "POST":

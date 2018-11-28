@@ -15,6 +15,10 @@ class ShowForm(forms.Form):
     dayOfPrice = forms.IntegerField()
     preRegistrationPrice = forms.IntegerField()
 
+class RegistrationBillForm(forms.Form):
+    typels = ['prereg', 'dayof']
+    registrationtype = forms.ChoiceField(choices=typels)
+
 
 class RiderForm(forms.ModelForm):
     name = forms.CharField(max_length=100, widget=forms.TextInput(
@@ -49,6 +53,18 @@ class HorseForm(forms.ModelForm):
         model = Horse
         fields = ('name', 'barn_name', 'age',
                   'coggins', 'owner', 'size', 'type')
+
+class ComboSelectForm(forms.ModelForm):
+    #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
+        # rider_names =  [rider.name for rider in Rider.objects.all()]
+    combo = forms.ModelChoiceField(
+        queryset=HorseRiderCombo.objects.all(),
+        widget=autocomplete.ModelSelect2(url='combo_autocomplete')
+    )
+
+    class Meta:
+        model = HorseRiderCombo
+        fields = ('combo',)
 
 
 class ComboForm(forms.ModelForm):

@@ -52,6 +52,28 @@ class ShowTestIntCase(TestCase):
         testshow = self.create_show()
         self.assertTrue(isinstance(testshow, Show))
 
+class BillTests(TestCase):
+    def test_billpagesetUp(self):
+        horse1 = Horse.objects.create(name = "Misty", barn_name="Misty", age=4, coggins=12345, owner="Tina", size="pony", type="shetland")
+        # horse2 = Horse.objects.create(name = "Brock", barn_name="Brock", age=5, coggins=73854, owner="Brock has no Owner!", size="unicorn", type="unicorn")
+        # horse3 = Horse.objects.create(name = "Ash", barn_name="Ash", age=5, coggins=747, owner="May", size="pony", type="pony")
+        # horse4 = Horse.objects.create(name = "Pikachu", barn_name="Pikachu", age=1, coggins=8736, owner="Ash", size="mouse", type="mouse")
+        rider1 = Rider.objects.create(name = "Tarun", address="116 Chelsea Dr", age=22, email="ts4pe@virginia.edu")
+        # rider2 = Rider.objects.create(name = "Yunzhe", address="idunno ln.", age=22, email="ts4pe@virginia.edu")
+        # rider3 = Rider.objects.create(name = "Shannon", address="sfds", age=22, email="t4pe@virginia.edu")
+        c = Classes.objects.create(name="Test", number="1")
+        c2 = Classes.objects.create(name="Test2", number="2")
+        hrc1 = HorseRiderCombo.objects.create(num = 12, rider = rider1, horse = horse1)
+        hrc1.classes.add(c)
+        hrc1.classes.add(c2)
+
+    # def test_numclasses(self):
+        self.assertEqual(hrc1.classes.count(), 2, "correct num classes")
+        hrc1.classes.remove(c)
+        self.assertEqual(hrc1.classes.count(), 1, "correct num classes after remove")
+
+
+
 class RiderTestCase(TestCase):
     def setup(self):
         user = User.objects.create(username='user')
@@ -118,10 +140,11 @@ class RiderFormsTest(TestCase):
     def test_RiderForm_invalidemailempty(self):
         form = RiderForm(data={'name': "x", 'address': "xx", 'age': 9, 'email': ""})
         self.assertFalse(form.is_valid())
-
-    # def test_RiderSelectForm_valid(self):
-    #     form = RiderSelectForm(data={'name': "shiv"})
-    #     self.assertTrue(form.is_valid())
+    def test_RiderSelectForm_valid(self):
+        rider2 = Rider.objects.create(name = "Test", address="idunno ln.", age=22, email="ts4pe@virginia.edu")
+        values = {'name': "Test"}
+        form = RiderSelectForm(data=values)
+        self.assertTrue(form.is_valid)
     def test_RiderSelectForm_invalid(self):
         form = RiderSelectForm(data={'name': ""})
         self.assertFalse(form.is_valid())
@@ -181,6 +204,12 @@ class HorseSelectCase(TestCase):
     #     logged_in = c.login(username='user', password='password')
     #     response = self.client.post('show/horse-autocomplete/', follow=True)
     #     self.assertEqual(response.status_code, 200)
+    def test_HorseSelectForm_valid(self):
+        # rider2 = Horse.objects.create(name = "Misty", barn_name="Misty", age=4, coggins=12345, owner="Tina", size="pony", type="shetland")
+        values = {'name': "Misty"}
+        form = HorseSelectForm(data=values)
+        self.assertTrue(form.is_valid)
+
     def test_horse_select_Invalidform2(self):
         form_vals= {}
         form= HorseSelectForm(data=form_vals)
@@ -290,6 +319,29 @@ class DivisionsTest(TestCase):
         form_vals = {'name': ''}
         form = DivisionSelectForm(data=form_vals)
         self.assertFalse(form.is_valid())
+
+class ComboSelect(TestCase):
+    def test_comboselectvalid(self):
+        horse1 = Horse.objects.create(name = "Misty", barn_name="Misty", age=4, coggins=12345, owner="Tina", size="pony", type="shetland")
+        rider1 = Rider.objects.create(name = "Tarun", address="116 Chelsea Dr", age=22, email="ts4pe@virginia.edu")
+        c = Classes.objects.create(name="Test", number="1")
+        c2 = Classes.objects.create(name="Test2", number="2")
+        hrc1 = HorseRiderCombo.objects.create(num = 12, rider = rider1, horse = horse1)
+        hrc1.classes.add(c)
+        values = {'num': 12}
+        form = ClassSelectForm(data=values)
+        self.assertTrue(form.is_valid)
+    def test_comboselectinvalid(self):
+        horse1 = Horse.objects.create(name = "Misty", barn_name="Misty", age=4, coggins=12345, owner="Tina", size="pony", type="shetland")
+        rider1 = Rider.objects.create(name = "Tarun", address="116 Chelsea Dr", age=22, email="ts4pe@virginia.edu")
+        c = Classes.objects.create(name="Test", number="1")
+        c2 = Classes.objects.create(name="Test2", number="2")
+        hrc1 = HorseRiderCombo.objects.create(num = 12, rider = rider1, horse = horse1)
+        hrc1.classes.add(c)
+        values = {'num': 12}
+        form = ClassSelectForm(data=values)
+        self.assertFalse(form.is_valid())
+
 
 class ClassesTest(TestCase):
     def test_create_class(self):
