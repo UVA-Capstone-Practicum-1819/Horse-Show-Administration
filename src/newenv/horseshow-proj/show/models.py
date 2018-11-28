@@ -47,7 +47,7 @@ class Rider (models.Model):
         return self.name
 
 class HorseRiderCombo(models.Model):
-    num = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(999)])
+    num = models.IntegerField(primary_key=True, validators=[MinValueValidator(0), MaxValueValidator(999)])
     rider = models.ForeignKey(Rider, on_delete=models.CASCADE)
     horse = models.ForeignKey(Horse, on_delete=models.CASCADE)
     classes = models.ManyToManyField(Classes)
