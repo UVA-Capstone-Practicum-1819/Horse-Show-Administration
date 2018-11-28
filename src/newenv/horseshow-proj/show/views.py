@@ -17,6 +17,7 @@ from dal import autocomplete
 from .populatepdf import write_fillable_pdf
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
 
 
 class AuthRequiredMiddleware(object):
@@ -38,6 +39,12 @@ class AuthRequiredMiddleware(object):
 
 
 def index(request):
+    if 'navigation' in request.session:
+        del request.session['navigation']
+    if 'rider_pk' in request.session:
+        del request.session['rider_pk']
+    if 'horse_pk' in request.session:
+        del request.session['horse_pk']
     latest_show_list = Show.objects.all
     template = loader.get_template('index.html')
     context = {
@@ -47,6 +54,12 @@ def index(request):
 
 
 def showpage(request, showdate):
+    if 'navigation' in request.session:
+        del request.session['navigation']
+    if 'rider_pk' in request.session:
+        del request.session['rider_pk']
+    if 'horse_pk' in request.session:
+        del request.session['horse_pk']
     template = loader.get_template('showpage.html')
     form = ComboNumForm()
     shows = Show.objects.all()
@@ -99,6 +112,7 @@ def show_select(request):
             show = form.cleaned_data['date']
             show.date = show.date[:-3]
             showdate = show.date
+            request.session["showdate"] = showdate
             return redirect('showpage', showdate)
     else:
         form = ShowSelectForm()
@@ -149,9 +163,48 @@ def viewshow(request, showname):
     except Exception as e:
         return HttpResponse(e)
 
-
+#
 def edit_show(request, showname):
-    return render(request, "edit_show.html")
+    # if
+    show = Show.objects.get(name=showname)
+    shows = Show.objects.all()
+    # for show in shows:
+    #     if showname == show.name:
+    #         context = {
+    #             "name": show.name,
+    #             "date": show.date,
+    #             "location": show.location,
+    #         }
+    # if request.method == 'POST':
+    #     form = EditShowForm(request.POST)
+    #     if form.is_valid():
+    #         showname = request.POST.get('name')
+    #         showdate = request.POST.get('date')
+    #         showlocation = request.POST.get('location')
+    #         return redirect('showpage', show.date)
+    #
+    # else:
+    #     return render(request, "edit_show.html", context)
+
+    # show = Show.objects.get(name=showname)
+    # form = EditShowForm(request.POST or None)
+    # if request.method == 'POST':
+    #     if form.is_valid():
+    #         form.save()
+    #         date = form.cleaned_data['date']
+    #         return redirect('showpage', date)
+    # else:
+    #     shows = Show.objects.all()
+    #     for show in shows:
+    #         if showname == show.name:
+    #             oldshowname = show.name
+    #             context = {
+    #                 "name": show.name,
+    #                 "date": show.date,
+    #                 "location": show.location,
+    #             }
+    #     return render(request, "edit_show.html", context)
+
 
 # def combo_select(request):
 #     if request.method == "POST":
@@ -244,22 +297,47 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
 
 def new_division(request, showname):
     show = Show.objects.get(name=showname)
+    date = show.date
     if request.method == "POST":
-        form = DivisionForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.save()
-            division = Division.objects.get(
-                name=form.cleaned_data['name'])
-            divisions = show.divisions
-            divisions.add(division)
-            show.save()
-            return redirect('/show')
+        if 'exit' in request.POST:
+            form = DivisionForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
+                post.published_date = timezone.now()
+                post.save()
+                division = Division.objects.get(
+                    name=form.cleaned_data['name'])
+                divisions = show.divisions
+                divisions.add(division)
+                show.save()
+                return redirect('showpage', date)
+        if 'another' in request.POST:
+            form = DivisionForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
+                post.published_date = timezone.now()
+                post.save()
+                division = Division.objects.get(
+                    name=form.cleaned_data['name'])
+                divisions = show.divisions
+                divisions.add(division)
+                show.save()
+                return redirect('divisions', showname)
     else:
         form = DivisionForm()
-    return render(request, 'new_division.html', {'form': form})
+        shows = Show.objects.all()
+        for show in shows:
+            if showname == show.name:
+                context = {
+                    "form": form,
+                    "name": show.name,
+                    "date": show.date,
+                    "location": show.location,
+                    "divisions": show.divisions.all,
+                }
+        return render(request, 'new_division.html', context)
 
 def division_select(request, showname):
     if request.method == "POST":
@@ -343,6 +421,7 @@ def add_combo(request):
         combo_form = ComboNumForm()
         rider_pk = request.session['rider_pk']
         horse_pk = request.session['horse_pk']
+        request.session['navigation'] = "add_combo"
         rider = get_object_or_404(Rider, pk=rider_pk)
         horse = get_object_or_404(Horse, pk=horse_pk)
         return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
@@ -359,19 +438,51 @@ def edit_combo(request):
 
     if combo_form.is_valid():
         combo_num = combo_form.cleaned_data['num']
-        horse_rider_combo = HorseRiderCombo.objects.filter(num=combo_num)
-        # add combo if it doesn't exist
-        if len(horse_rider_combo) == 0:
-            rider = get_object_or_404(
-                Rider, pk=request.session['rider_pk'])
-            horse = get_object_or_404(
-                Horse, pk=request.session['horse_pk'])
-            horse_rider_combo = HorseRiderCombo.objects.create(
-                num=combo_num, rider=rider, horse=horse)
+        try:
+            horse_rider_combo = HorseRiderCombo.objects.get(num=combo_num)
+            if 'rider_pk' not in request.session and 'horse_pk' not in request.session:
+                rider = horse_rider_combo.rider
+                request.session['rider_pk'] = rider.pk
+                horse = horse_rider_combo.horse
+                request.session['horse_pk'] = horse.pk
+            else:
+                rider = Rider.objects.get(pk=request.session['rider_pk'])
+                horse = Horse.objects.get(pk=request.session['horse_pk'])
+            number = horse_rider_combo.num
+            request.session['num_pk'] = number
+
+        except(HorseRiderCombo.DoesNotExist):
+            try:
+                number = HorseRiderCombo.objects.get(
+                    num=request.session['num_pk']).num
+                rider = get_object_or_404(
+                    Rider, pk=request.session['rider_pk'])
+                horse = get_object_or_404(
+                    Horse, pk=request.session['horse_pk'])
+                horse_rider_combo = HorseRiderCombo.objects.get(num=number)
+                horse_rider_combo.num = combo_num
+                horse_rider_combo.save()
+                print("IM NOOOOOT IN EXECEPTION HAHAHAH")
+                print(number)
+            except(HorseRiderCombo.DoesNotExist):
+                print("IM HERE IN EXECEPTION HAHAHAH")
+                if 'navigation' in request.session:
+                    # add combo if it doesn't exist
+                    rider = get_object_or_404(
+                        Rider, pk=request.session['rider_pk'])
+                    horse = get_object_or_404(
+                        Horse, pk=request.session['horse_pk'])
+                    # if combo_num
+                    horse_rider_combo = HorseRiderCombo.objects.create(
+                        num=combo_num, rider=rider, horse=horse)
+                else:
+                    # messages.warning(
+                    #     request, 'The combo number is not in the database.')
+                    return redirect('showpage', request.session["showdate"])
 
         return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
     else:
-        return redirect(reverse('show'))
+        return redirect(reverse('index'))
 
 
 class HorseAutocomplete(autocomplete.Select2QuerySetView):
