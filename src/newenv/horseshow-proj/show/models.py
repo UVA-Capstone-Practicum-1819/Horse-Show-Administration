@@ -33,8 +33,6 @@ class Show(models.Model):
         return self.date
 
 
-
-
 class Horse (models.Model):
     name = models.CharField(max_length=200)
     barn_name = models.CharField(max_length=200)
@@ -62,8 +60,12 @@ class Rider (models.Model):
 
 
 class HorseRiderCombo(models.Model):
-    num = models.IntegerField(primary_key=True, default=-1)
+    num = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(999)])
     rider = models.ForeignKey(
         Rider, on_delete=models.CASCADE)
     horse = models.ForeignKey(
         Horse, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.num)
