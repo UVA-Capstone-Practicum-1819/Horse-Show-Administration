@@ -1,0 +1,19 @@
+{% extends 'base.html' %} {% block content %}
+<h1>Edit Horse-Rider Combination</h1>
+
+<div>
+  <div>Rider: {{ rider.name }}</div>
+  <div>Horse: {{ horse.name }}</div>
+  <div>Combination Number: {{ num }}</div>
+  <form action="{% url 'check_combo' num=num %}" method="post">
+    {% csrf_token %} {{ combo_form.as_p }}
+    <input
+      type="submit"
+      href="{% url 'class_select' %}"
+      name="add_class"
+      value="Register For A Class"
+    />
+  </form>
+  <br />
+</div>
+{% endblock %}

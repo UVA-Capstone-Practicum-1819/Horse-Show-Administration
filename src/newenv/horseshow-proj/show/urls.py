@@ -40,8 +40,8 @@ urlpatterns = [
     path('genpdf', views.populate_pdf, name="populate_pdf"),
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
     path('add-combo', views.add_combo, name="add_combo"),
-    path('edit-combo', views.edit_combo, name="edit_combo"),
-    path('edit-combo/<combo_num>', views.edit_combo, name="edit_combo_get"),
+    path('combo', views.combo, name="combo"),
+    path('combo/<num>', views.check_combo, name="check_combo"),
     path('<showname>', views.viewshow, name="viewshow"),
     path('<showname>/edit', views.edit_show, name="edit_show"),
 ]

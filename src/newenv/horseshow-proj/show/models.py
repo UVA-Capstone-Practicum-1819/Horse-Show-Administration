@@ -7,6 +7,7 @@ import random
 class Classes(models.Model):
     name = models.CharField(max_length=100, default="")
     number = models.IntegerField(default=0)
+    # combo = models.ManyToManyField(HorseRiderCombo, blank=True, null=True)
 
     def __str__(self):
         return str(self.number) + ". " + self.name
@@ -64,7 +65,7 @@ class HorseRiderCombo(models.Model):
                               MinValueValidator(0), MaxValueValidator(999)])
     rider = models.ForeignKey(Rider, on_delete=models.CASCADE)
     horse = models.ForeignKey(Horse, on_delete=models.CASCADE)
-    classes = models.ManyToManyField(Classes)
+    classes = models.ManyToManyField(Classes, blank=True, null=True)
 
     def __str__(self):
         return str(self.num)
