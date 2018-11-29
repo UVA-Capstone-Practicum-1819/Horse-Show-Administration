@@ -15,6 +15,7 @@ class ShowForm(forms.Form):
     dayOfPrice = forms.IntegerField()
     preRegistrationPrice = forms.IntegerField()
 
+
 class RegistrationBillForm(forms.Form):
     typels = ['prereg', 'dayof']
     registrationtype = forms.ChoiceField(choices=typels)
@@ -63,6 +64,7 @@ class HorseForm(forms.ModelForm):
         model = Horse
         fields = ('name', 'barn_name', 'age',
                   'coggins', 'owner', 'size', 'type')
+
 
 class ComboSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))

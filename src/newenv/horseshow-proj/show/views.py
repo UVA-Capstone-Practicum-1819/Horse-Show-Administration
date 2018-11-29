@@ -145,14 +145,13 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
-
-
 class ComboAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = HorseRiderCombo.objects.all()
         if self.q:
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
+
 
 def billing(request):
     if request.method == "POST":
@@ -165,24 +164,29 @@ def billing(request):
         form = ComboSelectForm()
     return render(request, 'billing.html', {'form': form})
 
+
 def billinglist(request, combonum):
     form = RegistrationBillForm()
-    combo = HorseRiderCombo.objects.get(num = combonum)
+    combo = HorseRiderCombo.objects.get(num=combonum)
     tot = combo.classes.count()
-    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
+    context = {'name': combo.rider, 'classes': combo.classes.all,
+               'combo_num': combo.num, 'tot': tot}
     return render(request, 'billinglist.html', context)
+
 
 def scratch(request):
     combonum = request.GET['combonum']
     # print(combonum+1)
-    combo = HorseRiderCombo.objects.get(num = int(combonum))
+    combo = HorseRiderCombo.objects.get(num=int(combonum))
     cls = request.GET["cname"]
     dcls = combo.classes.get(name=cls)
     # dcls.delete()
     combo.classes.remove(dcls)
     tot = combo.classes.count()
-    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
+    context = {'name': combo.rider, 'classes': combo.classes.all,
+               'combo_num': combo.num, 'tot': tot}
     return render(request, 'billinglist.html', context)
+
 
 def deleteReport(request):
     name = request.GET["user"]
@@ -206,6 +210,7 @@ def new_class(request):
     else:
         form = ClassForm()
     return render(request, 'new_class.html', {'form': form})
+
 
 def class_select(request):
     #use this to navigate to ranking a class
@@ -247,6 +252,7 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
         if self.q:
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
+
 
 def new_division(request, showname):
     show = Show.objects.get(name=showname)
@@ -291,6 +297,7 @@ def new_division(request, showname):
                     "divisions": show.divisions.all,
                 }
         return render(request, 'new_division.html', context)
+
 
 def division_select(request, showname):
     if request.method == "POST":
@@ -374,68 +381,52 @@ def add_combo(request):
         combo_form = ComboNumForm()
         rider_pk = request.session['rider_pk']
         horse_pk = request.session['horse_pk']
-        request.session['navigation'] = "add_combo"
         rider = get_object_or_404(Rider, pk=rider_pk)
         horse = get_object_or_404(Horse, pk=horse_pk)
-        return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
+        return render(request, 'combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
     return redirect(reverse('show'))
 
 
-def edit_combo(request):
+def combo(request):
     if request.method == "POST":
         combo_form = ComboNumForm(request.POST)
-    elif request.method == "GET":
-        combo_form = ComboNumForm(request.GET)
-    else:
-        return redirect(reverse('viewshow'))
-
-    if combo_form.is_valid():
-        combo_num = combo_form.cleaned_data['num']
-        try:
-            horse_rider_combo = HorseRiderCombo.objects.get(num=combo_num)
-            if 'rider_pk' not in request.session and 'horse_pk' not in request.session:
-                rider = horse_rider_combo.rider
-                request.session['rider_pk'] = rider.pk
-                horse = horse_rider_combo.horse
-                request.session['horse_pk'] = horse.pk
-            else:
-                rider = Rider.objects.get(pk=request.session['rider_pk'])
-                horse = Horse.objects.get(pk=request.session['horse_pk'])
-            number = horse_rider_combo.num
-            request.session['num_pk'] = number
-
-        except(HorseRiderCombo.DoesNotExist):
+        if combo_form.is_valid():
+            combo_num = combo_form.cleaned_data['num']
             try:
-                number = HorseRiderCombo.objects.get(
-                    num=request.session['num_pk']).num
+                horse_rider_combo = HorseRiderCombo.objects.get(num=combo_num)
+                if 'rider_pk' not in request.session and 'horse_pk' not in request.session:
+                    rider = horse_rider_combo.rider
+                    request.session['rider_pk'] = rider.pk
+                    horse = horse_rider_combo.horse
+                    request.session['horse_pk'] = horse.pk
+                else:
+                    rider = Rider.objects.get(pk=request.session['rider_pk'])
+                    horse = Horse.objects.get(pk=request.session['horse_pk'])
+                num = horse_rider_combo.num
+                # request.session['num'] = number
+                return render(request, 'check_combo.html', {"num": num, 'rider': rider, 'horse': horse})
+            except(HorseRiderCombo.DoesNotExist):
                 rider = get_object_or_404(
                     Rider, pk=request.session['rider_pk'])
                 horse = get_object_or_404(
                     Horse, pk=request.session['horse_pk'])
-                horse_rider_combo = HorseRiderCombo.objects.get(num=number)
-                horse_rider_combo.num = combo_num
-                horse_rider_combo.save()
-                print("IM NOOOOOT IN EXECEPTION HAHAHAH")
-                print(number)
-            except(HorseRiderCombo.DoesNotExist):
-                print("IM HERE IN EXECEPTION HAHAHAH")
-                if 'navigation' in request.session:
-                    # add combo if it doesn't exist
-                    rider = get_object_or_404(
-                        Rider, pk=request.session['rider_pk'])
-                    horse = get_object_or_404(
-                        Horse, pk=request.session['horse_pk'])
-                    # if combo_num
-                    horse_rider_combo = HorseRiderCombo.objects.create(
-                        num=combo_num, rider=rider, horse=horse)
-                else:
-                    # messages.warning(
-                    #     request, 'The combo number is not in the database.')
-                    return redirect('showpage', request.session["showdate"])
+                print(rider)
+                print(horse)
+                horse_rider_combo = HorseRiderCombo.objects.create(
+                    num=combo_num, rider=rider, horse=horse)
+                return render(request, 'combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
+        else:
+            return redirect('showpage', request.session["showdate"])
+    return redirect(reverse('index'))
 
-        return render(request, 'edit_combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
-    else:
-        return redirect(reverse('index'))
+
+def check_combo(request, num):
+    if request.method == "POST":
+        rider = HorseRiderCombo.objects.get(pk=num).rider
+        horse = HorseRiderCombo.objects.get(pk=num).horse
+        return render(request, 'class_select.html')
+    return render(request, 'check_combo.html', {'num': num, 'rider': rider, 'horse': horse})
+    # return redirect(reverse('index'))
 
 
 class HorseAutocomplete(autocomplete.Select2QuerySetView):

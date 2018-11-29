@@ -1,19 +1,16 @@
-
-
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% load static %}
 <html>
-    <head>
-        <title>{{name}}</title>
-    </head>
-    <body>
-      {% block content %}
-        <div class="content container">
-            <div class="row">
-                <div class="col-md-8">
-                        <h1>Show: {{name}}</h1>
-                        <p>Date: {{date}}</p>
-                        <p>Location: {{location}}</p>
+  <head>
+    <title>{{ name }}</title>
+  </head>
+  <body>
+    {% block content %}
+    <div class="content container">
+      <div class="row">
+        <div class="col-md-8">
+          <h1>Show: {{ name }}</h1>
+          <p>Date: {{ date }}</p>
+          <p>Location: {{ location }}</p>
 
                         <p>Divisions:</p>
                         {% for division in divisions %}
@@ -37,3 +34,4 @@
             </div>
           </div>
   {% endblock %}
+
