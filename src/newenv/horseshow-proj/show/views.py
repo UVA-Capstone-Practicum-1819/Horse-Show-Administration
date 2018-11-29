@@ -17,6 +17,7 @@ from dal import autocomplete
 from .populatepdf import write_fillable_pdf
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
 
 
 class AuthRequiredMiddleware(object):
@@ -38,6 +39,12 @@ class AuthRequiredMiddleware(object):
 
 
 def index(request):
+    if 'navigation' in request.session:
+        del request.session['navigation']
+    if 'rider_pk' in request.session:
+        del request.session['rider_pk']
+    if 'horse_pk' in request.session:
+        del request.session['horse_pk']
     latest_show_list = Show.objects.all
     template = loader.get_template('index.html')
     context = {
@@ -47,6 +54,12 @@ def index(request):
 
 
 def showpage(request, showdate):
+    if 'navigation' in request.session:
+        del request.session['navigation']
+    if 'rider_pk' in request.session:
+        del request.session['rider_pk']
+    if 'horse_pk' in request.session:
+        del request.session['horse_pk']
     template = loader.get_template('showpage.html')
     form = ComboNumForm()
     shows = Show.objects.all()
@@ -99,6 +112,7 @@ def show_select(request):
             show = form.cleaned_data['date']
             show.date = show.date[:-3]
             showdate = show.date
+            request.session["showdate"] = showdate
             return redirect('showpage', showdate)
     else:
         form = ShowSelectForm()
@@ -149,24 +163,104 @@ def viewshow(request, showname):
     except Exception as e:
         return HttpResponse(e)
 
-
+#
 def edit_show(request, showname):
-    return render(request, "edit_show.html")
+    # if
+    show = Show.objects.get(name=showname)
+    shows = Show.objects.all()
+    # for show in shows:
+    #     if showname == show.name:
+    #         context = {
+    #             "name": show.name,
+    #             "date": show.date,
+    #             "location": show.location,
+    #         }
+    # if request.method == 'POST':
+    #     form = EditShowForm(request.POST)
+    #     if form.is_valid():
+    #         showname = request.POST.get('name')
+    #         showdate = request.POST.get('date')
+    #         showlocation = request.POST.get('location')
+    #         return redirect('showpage', show.date)
+    #
+    # else:
+    #     return render(request, "edit_show.html", context)
 
+    # show = Show.objects.get(name=showname)
+    # form = EditShowForm(request.POST or None)
+    # if request.method == 'POST':
+    #     if form.is_valid():
+    #         form.save()
+    #         date = form.cleaned_data['date']
+    #         return redirect('showpage', date)
+    # else:
+    #     shows = Show.objects.all()
+    #     for show in shows:
+    #         if showname == show.name:
+    #             oldshowname = show.name
+    #             context = {
+    #                 "name": show.name,
+    #                 "date": show.date,
+    #                 "location": show.location,
+    #             }
+    #     return render(request, "edit_show.html", context)
+
+
+# def combo_select(request):
+#     if request.method == "POST":
+#         form = ComboSelectForm(request.POST)
+#         if form.is_valid():
+#             # return render(request, 'horse_select.html', {'form': form})
+#             return redirect('/show/')
+#     else:
+#         form = ComboSelectForm()
+#     return render(request, 'class_select.html', {'form': form})
+
+
+class ComboAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = HorseRiderCombo.objects.all()
+        if self.q:
+            qs = qs.filter(class_name__istartswith=self.q)
+        return qs
 
 def billing(request):
     if request.method == "POST":
-        form = ClassSelectForm(request.POST)
+        form = ComboSelectForm(request.POST)
         if form.is_valid():
-            #post = form.save(commit=False)
-            #post.author = request.user
-            #post.published_date = timezone.now()
-            # post.save()
-            # return redirect('horse_detail', pk=post.pk)
-            return render(request, 'billing.html', {'form': form})
+            combo = form.cleaned_data['combo']
+            combonum = combo.num
+            return redirect('billinglist', combonum)
     else:
-        form = ClassSelectForm()
+        form = ComboSelectForm()
     return render(request, 'billing.html', {'form': form})
+
+def billinglist(request, combonum):
+    form = RegistrationBillForm()
+    combo = HorseRiderCombo.objects.get(num = combonum)
+    tot = combo.classes.count()
+    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
+    return render(request, 'billinglist.html', context)
+
+def scratch(request):
+    combonum = request.GET['combonum']
+    # print(combonum+1)
+    combo = HorseRiderCombo.objects.get(num = int(combonum))
+    cls = request.GET["cname"]
+    dcls = combo.classes.get(name=cls)
+    # dcls.delete()
+    combo.classes.remove(dcls)
+    tot = combo.classes.count()
+    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
+    return render(request, 'billinglist.html', context)
+
+def deleteReport(request):
+    name = request.GET["user"]
+    user = User.objects.get(username=name)
+    report = request.GET["reportname"]
+    report_todelete = inputReport.objects.get(report_name=report)
+    report_todelete.delete()
+    return render(request, 'viewReports.html', {'obj': inputReport.objects.all, 'user': user})
 
 
 def new_class(request):
@@ -182,7 +276,6 @@ def new_class(request):
     else:
         form = ClassForm()
     return render(request, 'new_class.html', {'form': form})
-
 
 def class_select(request):
     if request.method == "POST":
@@ -202,26 +295,49 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
 
-
 def new_division(request, showname):
     show = Show.objects.get(name=showname)
+    date = show.date
     if request.method == "POST":
-        form = DivisionForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.save()
-            division = Division.objects.get(
-                name=form.cleaned_data['name'])
-            divisions = show.divisions
-            divisions.add(division)
-            show.save()
-            return redirect('/show')
+        if 'exit' in request.POST:
+            form = DivisionForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
+                post.published_date = timezone.now()
+                post.save()
+                division = Division.objects.get(
+                    name=form.cleaned_data['name'])
+                divisions = show.divisions
+                divisions.add(division)
+                show.save()
+                return redirect('showpage', date)
+        if 'another' in request.POST:
+            form = DivisionForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
+                post.published_date = timezone.now()
+                post.save()
+                division = Division.objects.get(
+                    name=form.cleaned_data['name'])
+                divisions = show.divisions
+                divisions.add(division)
+                show.save()
+                return redirect('divisions', showname)
     else:
         form = DivisionForm()
-    return render(request, 'new_division.html', {'form': form})
-
+        shows = Show.objects.all()
+        for show in shows:
+            if showname == show.name:
+                context = {
+                    "form": form,
+                    "name": show.name,
+                    "date": show.date,
+                    "location": show.location,
+                    "divisions": show.divisions.all,
+                }
+        return render(request, 'new_division.html', context)
 
 def division_select(request, showname):
     if request.method == "POST":

@@ -7,11 +7,18 @@ from dal import autocomplete
 
 
 class ShowForm(forms.Form):
-    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
+    name = forms.CharField(max_length=100, widget=forms.TextInput(
+        attrs={'autocomplete': 'off', }))
     date = forms.DateField(initial=datetime.date.today)
-    location = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'autocomplete':'off',}))
+    location = forms.CharField(
+        max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
     dayOfPrice = forms.IntegerField()
     preRegistrationPrice = forms.IntegerField()
+
+
+class RegistrationBillForm(forms.Form):
+    typels = ['prereg', 'dayof']
+    registrationtype = forms.ChoiceField(choices=typels)
 
 
 class RiderForm(forms.ModelForm):
@@ -49,25 +56,46 @@ class HorseForm(forms.ModelForm):
                   'coggins', 'owner', 'size', 'type')
 
 
-class ComboForm(forms.Form):
-    combo = forms.CharField(max_length=100, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', }))
-    rider_name = forms.CharField(
-        max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
-    horse_name = forms.CharField(
-        max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
-    owner = forms.CharField(max_length=100, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', }))
+class ComboSelectForm(forms.ModelForm):
+    #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
+        # rider_names =  [rider.name for rider in Rider.objects.all()]
+    combo = forms.ModelChoiceField(
+        queryset=HorseRiderCombo.objects.all(),
+        widget=autocomplete.ModelSelect2(url='combo_autocomplete')
+    )
+
+    class Meta:
+        model = HorseRiderCombo
+        fields = ('combo',)
+
+
+class ComboForm(forms.ModelForm):
+    class Meta:
+        model = HorseRiderCombo
+        fields = ('num', 'rider', 'horse')
+
+
+class ComboNumForm(forms.Form):
+    # class Meta:
+    #     model = HorseRiderCombo
+    #     fields = ('num',)
+    num = forms.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(999)])
+
+
+class EditShowForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    date = forms.DateField()
+    location = forms.CharField(max_length=100)
 
 
 class ShowSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
 
-    date= forms.ModelChoiceField(
+    date = forms.ModelChoiceField(
         queryset=Show.objects.all(),
         widget=autocomplete.ModelSelect2(url='show_autocomplete')
-        )
-
+    )
 
     class Meta:
         model = Show
@@ -80,8 +108,7 @@ class ShowSelectForm(forms.ModelForm):
             showobj.date = showobj.date + 'foo'
             return showobj
 
-    #def clean(self):
-
+    # def clean(self):
 
         # widgets = {
         #    'name': autocomplete.ModelSelect2(nk
@@ -141,7 +168,3 @@ class DivisionSelectForm(forms.ModelForm):
     class Meta:
         model = Division
         fields = ('name',)
-
-
-class ComboNumForm(forms.Form):
-    num = forms.IntegerField()

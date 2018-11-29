@@ -16,22 +16,21 @@
                         <p>Location: {{location}}</p>
 
                         <p>Divisions:</p>
-                        {% for division in show_divisions %}
+                        {% for division in divisions %}
                             <li>{{ division }}</li>
                         {% endfor %}
-                        <p>
-                            <a href = "{% url 'edit_show' showname=name %}">Edit</a>
-                            <a href = "{% url 'division_select' showname=name %}">Add Division</a>
+                        <p><a href = "{% url 'edit_show' showname=name %}">Edit Show Info</a></p>
+                        <p><a href = "{% url 'divisions' showname=name %}">Add Division</a></p>
+                        <p><a href = "{% url 'division_select' showname=name %}">Edit Division</a></p>
 
-                        </p>
                         <h1> Check Combo </h1>
                         <form method="POST" class="post-form" action="{% url 'edit_combo' %}">
                             {% csrf_token %}
                             {{ form.as_p }}
                             <button type="submit">Search Combo Number</button>
                   </form>
+                  <a href = "{% url 'select_rider'%}">Add Horse Rider Combination</a>
                 </div>
             </div>
           </div>
-      </div>
   {% endblock %}
