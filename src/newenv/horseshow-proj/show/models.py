@@ -6,6 +6,12 @@ import random
 class Classes(models.Model):
     name = models.CharField(max_length=100, default="")
     number = models.IntegerField(default=0)
+    first = models.IntegerField(null=True, blank=True)
+    second = models.IntegerField(null=True, blank=True)
+    third = models.IntegerField(null=True, blank=True)
+    fourth = models.IntegerField(null=True, blank=True)
+    fifth = models.IntegerField(null=True, blank=True)
+    sixth = models.IntegerField(null=True, blank=True)
     def __str__(self):
         return str(self.number) + ". " + self.name
 

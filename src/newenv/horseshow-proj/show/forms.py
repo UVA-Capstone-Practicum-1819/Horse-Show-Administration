@@ -20,6 +20,16 @@ class RegistrationBillForm(forms.Form):
     registrationtype = forms.ChoiceField(choices=typels)
 
 
+class RankingForm(forms.ModelForm):
+    first=forms.IntegerField(max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
+    second=forms.IntegerField(max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
+    third=forms.IntegerField(max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
+    fourth=forms.IntegerField(max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
+    fifth=forms.IntegerField(max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
+    sixth=forms.IntegerField(max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
+
+
+
 class RiderForm(forms.ModelForm):
     name = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'placeholder': 'Name', 'required': True, }))
@@ -79,12 +89,6 @@ class ComboNumForm(forms.Form):
     #     fields = ('num',)
     num = forms.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(999)])
-
-
-class EditShowForm(forms.Form):
-    name = forms.CharField(max_length=100)
-    date = forms.DateField()
-    location = forms.CharField(max_length=100)
 
 
 class ShowSelectForm(forms.ModelForm):
