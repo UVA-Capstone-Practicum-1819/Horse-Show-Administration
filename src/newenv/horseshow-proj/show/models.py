@@ -46,10 +46,15 @@ class Rider (models.Model):
     def __str__(self):
         return self.name
 
+class ClassScore(models.Model):
+    participated_class = models.ForeignKey(Classes, on_delete=models.CASCADE)
+    score = models.IntegerField()
+
 class HorseRiderCombo(models.Model):
     num = models.IntegerField(primary_key=True, validators=[MinValueValidator(0), MaxValueValidator(999)])
     rider = models.ForeignKey(Rider, on_delete=models.CASCADE)
     horse = models.ForeignKey(Horse, on_delete=models.CASCADE)
     classes = models.ManyToManyField(Classes)
+    class_scores = models.ManyToManyField(ClassScore)
     def __str__(self):
         return str(self.num)
