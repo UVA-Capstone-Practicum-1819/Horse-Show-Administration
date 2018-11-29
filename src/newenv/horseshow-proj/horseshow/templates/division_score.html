@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+<h3>Division Score for {{name}}</h3>
+
+<div class="row">
+    <form action="" method="post">
+        {% csrf_token %}
+        <!-- {{ form | crispy}} -->
+        <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
+      <table class="table">
+        <thead>
+          <th>Class</th>
+          <th>First</th>
+          <th>Second</th>
+          <th>Third</th>
+          <th>Fourth</th>
+          <th>Fifth</th>
+          <th>Sixth</th>
+          <th>reg type</th
+        </thead>
+
+        <tbody>
+          {% for c in classes %}
+            <tr>
+              <td>
+                {{ c.name }}
+              </td>
+              <td>
+                {{ c.first }}
+              </td>
+              <td>
+                {{ c.second }}
+              </td>
+              <td>
+                {{ c.third }}
+              </td>
+              <td>
+                {{ c.fourth }}
+              </td>
+              <td>
+                {{ c.fifth }}
+              </td>
+              <td>
+                {{ c.sixth}}
+              </td>
+              <td>
+                {{ form | crispy}}
+
+              </td>
+            </tr>
+
+          {% endfor %}
+        </tbody>
+      </table>
+
+
+      <!--  <h1>Champion: {{champ}}</h1>
+        <h1>Champion Points: {{champ_pts}}</h1>
+        <h1>Champion Reserve: {{champ_reseve_pts}}</h1>
+        <h1>Champion Reserve Points: {{champ_reserve}}</h1>-->
+        
+          <!-- <a href = "{% url 'edit_show' showname=name %}">Edit</a> -->
+          <!-- <a href = "{% url 'division_select' showname=name %}">Add</a> -->
+
+
+
+
+    </form>
+</div>
+<!-- {{ form.media }} -->
+{% endblock %}

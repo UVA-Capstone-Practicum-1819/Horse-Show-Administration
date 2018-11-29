@@ -242,6 +242,14 @@ def billinglist(request, combonum):
     context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
     return render(request, 'billinglist.html', context)
 
+def divisionscore(request, classes):
+    # form = RegistrationBillForm()
+    # combo = HorseRiderCombo.objects.get(num = combonum)
+    # tot = combo.classes.count()
+    # context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
+    context = {'classes': classes,}
+    return render(request, 'division_score.html', context)
+
 def scratch(request):
     combonum = request.GET['combonum']
     # print(combonum+1)
