@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Rank Classes</h1>
+
+<div>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" />
+    </form>
+    <!-- <a href="{% url 'showpage' showname=name %}">Return to Show Page</a> -->
+</div>
+
+{{ form.media }}
+
+{% endblock %}

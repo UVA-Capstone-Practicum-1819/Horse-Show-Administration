@@ -10,7 +10,7 @@ from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
 from show.forms import *
 from django.forms.models import model_to_dict
-from show.models import Show, Rider, Horse, Classes, Division
+from show.models import *
 from django.utils import timezone
 from dal import autocomplete
 """ for authentication/signin/signup purposes """
@@ -145,80 +145,6 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
-
-def viewshow(request, showname):
-    try:
-        # find the show to be viewed
-        # store data in context to be accessible by html page
-        shows = Show.objects.all()
-        for show in shows:
-            if showname == show.name:
-                context = {
-                    "show_name": show.name,
-                    "show_date": show.date,
-                    "show_location": show.location,
-                    "show_divisions": show.divisions.all,
-                }
-                return render(request, 'viewshow.html', context=context)
-    except Exception as e:
-        return HttpResponse(e)
-
-#
-
-
-def edit_show(request, showname):
-    # if
-    show = Show.objects.get(name=showname)
-    shows = Show.objects.all()
-    # for show in shows:
-    #     if showname == show.name:
-    #         context = {
-    #             "name": show.name,
-    #             "date": show.date,
-    #             "location": show.location,
-    #         }
-    # if request.method == 'POST':
-    #     form = EditShowForm(request.POST)
-    #     if form.is_valid():
-    #         showname = request.POST.get('name')
-    #         showdate = request.POST.get('date')
-    #         showlocation = request.POST.get('location')
-    #         return redirect('showpage', show.date)
-    #
-    # else:
-    #     return render(request, "edit_show.html", context)
-
-    # show = Show.objects.get(name=showname)
-    # form = EditShowForm(request.POST or None)
-    # if request.method == 'POST':
-    #     if form.is_valid():
-    #         form.save()
-    #         date = form.cleaned_data['date']
-    #         return redirect('showpage', date)
-    # else:
-    #     shows = Show.objects.all()
-    #     for show in shows:
-    #         if showname == show.name:
-    #             oldshowname = show.name
-    #             context = {
-    #                 "name": show.name,
-    #                 "date": show.date,
-    #                 "location": show.location,
-    #             }
-    #     return render(request, "edit_show.html", context)
-
-
-# def combo_select(request):
-#     if request.method == "POST":
-#         form = ComboSelectForm(request.POST)
-#         if form.is_valid():
-#             # return render(request, 'horse_select.html', {'form': form})
-#             return redirect('/show/')
-#     else:
-#         form = ComboSelectForm()
-#     return render(request, 'class_select.html', {'form': form})
-
-
 class ComboAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = HorseRiderCombo.objects.all()
@@ -287,14 +213,37 @@ def new_class(request):
 
 
 def class_select(request):
+    #use this to navigate to ranking a class
+    #test/work on this tomorrow
     if request.method == "POST":
         form = ClassSelectForm(request.POST)
         if form.is_valid():
             # return render(request, 'horse_select.html', {'form': form})
-            return redirect('/show/')
+            return redirect('rank_class', classnum)
     else:
         form = ClassSelectForm()
     return render(request, 'class_select.html', {'form': form})
+
+
+def class_rank(request, classnum):
+    if request.method == "POST":
+        form = RankingForm(request.POST)
+        if form.is_valid():
+            first = form.cleaned_data['first']
+            second = form.cleaned_data['second']
+            third = form.cleaned_data['third']
+            fourth = form.cleaned_data['fourth']
+            fifth = form.cleaned_data['fifth']
+            sixth = form.cleaned_data['sixth']
+            showclass = Classes.objects.get(id=classnum)
+            showclass.first.add(first)
+            showclass.second.add(second)
+            showclass.third.add(third)
+            showclass.fourt.add(fourth)
+            showclass.fifth.add(fifth)
+            showclass.sixth.add(sixth)
+            #will redirect with a class rank page
+
 
 
 class ClassAutocomplete(autocomplete.Select2QuerySetView):

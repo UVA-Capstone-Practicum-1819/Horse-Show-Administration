@@ -10,6 +10,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('create_show', views.create_show, name='create_show'),
     path('<showdate>/showpage', views.showpage, name='showpage'),
+    path('<class>/rank_class', views.rank_class, name='rank_class'),
     path('signup', views.signup, name='signup'),
     path('login', auth_views.LoginView.as_view(
         template_name='login.html'), name='login'),
@@ -42,8 +43,6 @@ urlpatterns = [
     path('add-combo', views.add_combo, name="add_combo"),
     path('combo', views.combo, name="combo"),
     path('combo/<num>', views.check_combo, name="check_combo"),
-    path('<showname>', views.viewshow, name="viewshow"),
-    path('<showname>/edit', views.edit_show, name="edit_show"),
 ]
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
