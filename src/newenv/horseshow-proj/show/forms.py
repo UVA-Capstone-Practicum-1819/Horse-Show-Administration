@@ -21,6 +21,16 @@ class RegistrationBillForm(forms.Form):
     registrationtype = forms.ChoiceField(choices=typels)
 
 
+class RankingForm(forms.ModelForm):
+    first=forms.IntegerField()
+    second=forms.IntegerField()
+    third=forms.IntegerField()
+    fourth=forms.IntegerField()
+    fifth=forms.IntegerField()
+    sixth=forms.IntegerField()
+
+
+
 class RiderForm(forms.ModelForm):
     name = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'placeholder': 'Name', 'required': True, }))
@@ -81,12 +91,6 @@ class ComboNumForm(forms.Form):
     #     fields = ('num',)
     num = forms.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(999)])
-
-
-class EditShowForm(forms.Form):
-    name = forms.CharField(max_length=100)
-    date = forms.DateField()
-    location = forms.CharField(max_length=100)
 
 
 class ShowSelectForm(forms.ModelForm):
