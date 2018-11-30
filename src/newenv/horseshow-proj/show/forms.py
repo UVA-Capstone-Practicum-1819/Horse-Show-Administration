@@ -22,12 +22,12 @@ class RegistrationBillForm(forms.Form):
 
 
 class RankingForm(forms.ModelForm):
-    first=forms.IntegerField(max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
-    second=forms.IntegerField(max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
-    third=forms.IntegerField(max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
-    fourth=forms.IntegerField(max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
-    fifth=forms.IntegerField(max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
-    sixth=forms.IntegerField(max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
+    first=forms.IntegerField()
+    second=forms.IntegerField()
+    third=forms.IntegerField()
+    fourth=forms.IntegerField()
+    fifth=forms.IntegerField()
+    sixth=forms.IntegerField()
 
 
 
