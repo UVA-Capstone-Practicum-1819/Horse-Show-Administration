@@ -225,7 +225,7 @@ def class_select(request):
     return render(request, 'class_select.html', {'form': form})
 
 
-def class_rank(request, classnum):
+def rank_class(request, classnum):
     if request.method == "POST":
         form = RankingForm(request.POST)
         if form.is_valid():
