@@ -517,7 +517,6 @@ class ComboHorseSessionTestCase(TestCase):
         session.save()
         self.assertTrue(session['horse_pk']==None)
 
-
 class InvalidComboTestCase(TestCase):
     def setup(self):
         user = User.objects.create(username='user')
@@ -549,6 +548,7 @@ class ValidComboTestCase(TestCase):
         response = self.client.post('show/edit-combo', data)
         form = ComboNumForm(data)
         self.assertTrue(form.is_valid())
+
 
 class ComboDatabaseValidTestCase(TestCase):
     def setup(self):
