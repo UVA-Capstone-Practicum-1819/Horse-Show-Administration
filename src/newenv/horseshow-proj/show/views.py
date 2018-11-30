@@ -242,12 +242,9 @@ def billinglist(request, combonum):
     context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
     return render(request, 'billinglist.html', context)
 
-def divisionscore(request, classes):
-    # form = RegistrationBillForm()
-    # combo = HorseRiderCombo.objects.get(num = combonum)
-    # tot = combo.classes.count()
-    # context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
-    context = {'classes': classes,}
+def divisionscore(request,divisionname):
+    division = Division.objects.get(name= divisionname)
+    context = {'classes': division.classes.all, 'name': division.name}
     return render(request, 'division_score.html', context)
 
 def scratch(request):
@@ -349,20 +346,31 @@ def new_division(request, showname):
 
 def division_select(request, showname):
     if request.method == "POST":
-        form = DivisionSelectForm(request.POST)
-        if form.is_valid():
-            show = Show.objects.get(name=showname)
-            current_divisions = show.divisions
-            division = Division.objects.get(
-                name=form.cleaned_data['name'])
-            current_divisions.add(division)
-            show.save()
-            # return render(request, 'horse_select.html', {'form': form})
-            # return redirect('/')
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        if 'save' in request.POST:
+            form = DivisionSelectForm(request.POST)
+            if form.is_valid():
+                print("form valid ")
+                show = Show.objects.get(name=showname)
+                current_divisions = show.divisions
+                division = Division.objects.get(
+                    name=form.cleaned_data['name'])
+                current_divisions.add(division)
+                show.save()
+                # return render(request, 'horse_select.html', {'form': form})
+                # return redirect('/')
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        if 'score' in request.POST:
+            form = DivisionSelectForm(request.POST)
+            if form.is_valid():
+                division = Division.objects.get(
+                   name=form.cleaned_data['name'])
+                divisionname= division.name
+                return redirect('divisionscore', divisionname)
+
     else:
         form = DivisionSelectForm()
     return render(request, 'division_select.html', {'form': form, 'name': showname})
+
 
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):

@@ -17,11 +17,11 @@
 
                         <p>Divisions:</p>
                         {% for division in divisions %}
-                            <li><a href = "{% url 'divisionscore' classes= division.classes %}">{{ division }}</a></li>
+                            <li>{{ division }}</a></li>
                         {% endfor %}
                         <p><a href = "{% url 'edit_show' showname=name %}">Edit Show Info</a></p>
                         <p><a href = "{% url 'divisions' showname=name %}">Add Division</a></p>
-                        <p><a href = "{% url 'division_select' showname=name %}">Edit Division</a></p>
+                        <p><a href = "{% url 'division_select' showname=name %}">Edit Division/ View Division Score</a></p>
 
 
                         <h1> Check Combo </h1>

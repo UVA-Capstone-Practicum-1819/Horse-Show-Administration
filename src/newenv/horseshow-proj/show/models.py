@@ -3,15 +3,16 @@ import datetime
 from django.core.validators import MinValueValidator, MaxValueValidator, EmailValidator
 import random
 
+
 class Classes(models.Model):
     name = models.CharField(max_length=100, default="")
     number = models.IntegerField(default=0)
-    first = models.ForeignKey(HorseRiderCombo, on_delete=models.CASCADE)
-    second = models.ForeignKey(HorseRiderCombo, on_delete=models.CASCADE)
-    third = models.ForeignKey(HorseRiderCombo, on_delete=models.CASCADE)
-    fourth = models.ForeignKey(HorseRiderCombo, on_delete=models.CASCADE)
-    fifth = models.ForeignKey(HorseRiderCombo, on_delete=models.CASCADE)
-    sixth = models.ForeignKey(HorseRiderCombo, on_delete=models.CASCADE)
+    first = models.IntegerField(default=0)
+    second =models.IntegerField(default=0)
+    third = models.IntegerField(default=0)
+    fourth = models.IntegerField(default=0)
+    fifth = models.IntegerField(default=0)
+    sixth = models.IntegerField(default=0)
     def __str__(self):
         return str(self.number) + ". " + self.name
 
@@ -19,9 +20,9 @@ class Division(models.Model):
     name = models.CharField(max_length=100, default="")
     number = models.IntegerField(default=0)
     classes = models.ManyToManyField(Classes)
-    champion = models.ForeignKey(HorseRiderCombo, on_delete=models.CASCADE)
+    champion = models.IntegerField(default=0)
     champion_pts = models.IntegerField(default=0)
-    champion_reserve = models.ForeignKey(HorseRiderCombo, on_delete=models.CASCADE)
+    champion_reserve = models.IntegerField(default=0)
     champion_reserve_pts = models.IntegerField(default=0)
     def __str__(self):
         return self.name
@@ -64,7 +65,6 @@ class HorseRiderCombo(models.Model):
     num = models.IntegerField(primary_key=True, validators=[MinValueValidator(0), MaxValueValidator(999)])
     rider = models.ForeignKey(Rider, on_delete=models.CASCADE)
     horse = models.ForeignKey(Horse, on_delete=models.CASCADE)
-    classes = models.ManyToManyField(Classes)
     class_scores = models.ManyToManyField(ClassScore)
     def __str__(self):
         return str(self.num)
