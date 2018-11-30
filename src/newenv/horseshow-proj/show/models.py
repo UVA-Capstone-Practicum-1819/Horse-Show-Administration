@@ -31,7 +31,7 @@ class Show(models.Model):
     name = models.CharField(max_length=100)
     date = models.CharField(max_length=100, primary_key=True)
     location = models.CharField(max_length=100)
-    divisions = models.ManyToManyField(Division, blank=True)
+    divisions = models.ManyToManyField(Division)
     dayOfPrice = models.IntegerField(null=True, blank=True)
     preRegistrationPrice = models.IntegerField(null=True, blank=True)
 
@@ -63,7 +63,7 @@ class Rider (models.Model):
 
     def __str__(self):
         return self.name
-      
+
 class ClassScore(models.Model):
     participated_class = models.ForeignKey(Classes, on_delete=models.CASCADE)
     score = models.IntegerField()
