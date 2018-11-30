@@ -4,9 +4,8 @@
 <div>
   <div>Rider: {{ rider.name }}</div>
   <div>Horse: {{ horse.name }}</div>
-  <form action="{% url 'edit_combo_get' combo_num = number %}" method="post">
+  <form action="{% url 'combo' %}" method="post">
     {% csrf_token %} {{ combo_form.as_p }} <input type="submit" />
   </form>
-  <a href="{% url 'class_select' %}">Register For A Class</a>
 </div>
 {% endblock %}
