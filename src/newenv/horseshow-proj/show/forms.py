@@ -160,6 +160,13 @@ class ClassSelectForm(forms.ModelForm):
         model = Classes
         fields = ('name',)
 
+    def clean_date(self):
+        classobj = self.cleaned_data['name']
+        classes = Classes.objects.all()
+        if classobj in classes:
+            classobj.name = classobj.name + 'foo'
+            return classobj
+
 
 class DivisionForm(forms.ModelForm):
     class Meta:

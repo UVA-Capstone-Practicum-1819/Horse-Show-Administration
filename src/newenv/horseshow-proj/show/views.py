@@ -213,39 +213,46 @@ def new_class(request):
 
 
 def class_select(request):
-    form = ClassSelectForm()
+    if request.method == "POST":
+        form = ClassSelectForm(request.POST)
+        if form.is_valid():
+            classobj = form.cleaned_data['name']
+            classobj.name = classobj.name[:-3]
+            classstr = classobj.name
+            request.session['classobj'] = classstr
+            return redirect('rankclass')
+    else:
+        form = ClassSelectForm()
     return render(request, 'class_select.html', {'form': form})
 
 
 def rankclass(request):
-    form = RankingForm()
     if request.method == 'POST':
+        if 'classobj' in request.session:
+            classtoscore = request.session['classtoscore']
         #classtoscore = request.POST.get('name', None)
         form = RankingForm(request.POST)
-        response = {'ok': True, 'success_msg': "Show was successfully created",'form': form}
-        return render(request, 'rankclass.html', {'form':form})
-    #     if form.is_valid():
-    #         first = form.cleaned_data['first']
-    #         second = form.cleaned_data['second']
-    #         third = form.cleaned_data['third']
-    #         fourth = form.cleaned_data['fourth']
-    #         fifth = form.cleaned_data['fifth']
-    #         sixth = form.cleaned_data['sixth']
-    #         showclass = Classes.objects.get(classtoscore)
-    #         showclass.first.add(first)
-    #         showclass.second.add(second)
-    #         showclass.third.add(third)
-    #         showclass.fourt.add(fourth)
-    #         showclass.fifth.add(fifth)
-    #         showclass.sixth.add(sixth)
-    #        if 'showdate' in request.session:
-    #             showdate = request.session['showdate']
-    #             response = {'ok': True, 'success_msg': "Show was successfully created",
-    #                         'form': form, 'show': new_show}
-    #             return render(request, 'rankclass.html', {'form':form})
-                #return redirect('showpage', showdate)
+        if form.is_valid():
+            first = form.cleaned_data['first']
+            second = form.cleaned_data['second']
+            third = form.cleaned_data['third']
+            fourth = form.cleaned_data['fourth']
+            fifth = form.cleaned_data['fifth']
+            sixth = form.cleaned_data['sixth']
+            showclass = Classes.objects.get(classtoscore)
+            showclass.first.add(first)
+            showclass.second.add(second)
+            showclass.third.add(third)
+            showclass.fourt.add(fourth)
+            showclass.fifth.add(fifth)
+            showclass.sixth.add(sixth)
+            if 'showdate' in request.session:
+                showdate = request.session['showdate']
+                return redirect('showpage', showdate)
             #will redirect with a class rank page
-    return render(request, 'rankclass.html', {'form': form} )
+    else:
+        form = RankingForm()
+        return render(request, 'rankclass.html', {'form': form} )
 
 
 
