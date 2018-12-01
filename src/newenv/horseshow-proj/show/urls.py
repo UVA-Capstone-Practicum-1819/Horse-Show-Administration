@@ -10,7 +10,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('create_show', views.create_show, name='create_show'),
     path('<showdate>/showpage', views.showpage, name='showpage'),
-    path('rankclass', views.rankclass, name='rankclass'),
+    path('<classname>/rankclass', views.rankclass, name='rankclass'),
     path('signup', views.signup, name='signup'),
     path('login', auth_views.LoginView.as_view(
         template_name='login.html'), name='login'),

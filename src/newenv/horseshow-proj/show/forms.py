@@ -164,7 +164,7 @@ class ClassSelectForm(forms.ModelForm):
         classobj = self.cleaned_data['name']
         classes = Classes.objects.all()
         if classobj in classes:
-            classobj.name = classobj.name + 'foo'
+            classobj.name = classobj.name
             return classobj
 
 
