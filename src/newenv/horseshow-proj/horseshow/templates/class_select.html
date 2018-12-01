@@ -4,10 +4,10 @@
 <h1>Select Classes</h1>
 
 <div>
-    <form action="" method="post">
+    <form action="{% url 'rankclass' %}" method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" />
+        <input type="submit" class="btn btn-success" />
     </form>
     <a href="{% url 'classes' %}">Add a New Class</a>
 </div>

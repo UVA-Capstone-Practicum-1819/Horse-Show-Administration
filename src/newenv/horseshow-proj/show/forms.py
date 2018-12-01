@@ -29,6 +29,10 @@ class RankingForm(forms.ModelForm):
     fifth=forms.IntegerField()
     sixth=forms.IntegerField()
 
+    class Meta:
+        model = Classes
+        fields = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
+
 
 
 class RiderForm(forms.ModelForm):

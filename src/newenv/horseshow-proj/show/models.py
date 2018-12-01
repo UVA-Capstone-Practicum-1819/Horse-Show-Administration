@@ -7,12 +7,12 @@ import random
 class Classes(models.Model):
     name = models.CharField(max_length=100, default="")
     number = models.IntegerField(default=0)
-    first = models.IntegerField(null=True, blank=True)
-    second = models.IntegerField(null=True, blank=True)
-    third = models.IntegerField(null=True, blank=True)
-    fourth = models.IntegerField(null=True, blank=True)
-    fifth = models.IntegerField(null=True, blank=True)
-    sixth = models.IntegerField(null=True, blank=True)
+    first = models.IntegerField(default=0)
+    second = models.IntegerField(default=0)
+    third = models.IntegerField(default=0)
+    fourth = models.IntegerField(default=0)
+    fifth = models.IntegerField(default=0)
+    sixth = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.number) + ". " + self.name
@@ -31,7 +31,7 @@ class Show(models.Model):
     name = models.CharField(max_length=100)
     date = models.CharField(max_length=100, primary_key=True)
     location = models.CharField(max_length=100)
-    divisions = models.ManyToManyField(Division)
+    divisions = models.ManyToManyField(Division, blank=True)
     dayOfPrice = models.IntegerField(null=True, blank=True)
     preRegistrationPrice = models.IntegerField(null=True, blank=True)
 

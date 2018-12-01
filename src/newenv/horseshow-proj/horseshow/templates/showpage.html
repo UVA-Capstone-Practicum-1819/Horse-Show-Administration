@@ -25,7 +25,7 @@
 
 
                         <h1> Check Combo </h1>
-                        <form method="POST" class="post-form" action="{% url 'edit_combo' %}">
+                        <form method="POST" class="post-form" action="{% url 'combo' %}">
                             {% csrf_token %}
                             {{ form.as_p }}
                             <button type="submit">Search Combo Number</button>
@@ -34,4 +34,3 @@
             </div>
           </div>
   {% endblock %}
-
