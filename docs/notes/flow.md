@@ -6,8 +6,6 @@ sitewide: logout (if not logged in)
 
 sitewide: (on show) add/edit HRC & edit horse/rider
 
-
-
 ## Select Rider
 
 url: showdate/select_rider
