@@ -15,9 +15,24 @@ class ShowForm(forms.Form):
     dayOfPrice = forms.IntegerField()
     preRegistrationPrice = forms.IntegerField()
 
+
 class RegistrationBillForm(forms.Form):
     typels = ['prereg', 'dayof']
     registrationtype = forms.ChoiceField(choices=typels)
+
+
+class RankingForm(forms.ModelForm):
+    first=forms.IntegerField()
+    second=forms.IntegerField()
+    third=forms.IntegerField()
+    fourth=forms.IntegerField()
+    fifth=forms.IntegerField()
+    sixth=forms.IntegerField()
+
+    class Meta:
+        model = Classes
+        fields = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
+
 
 
 class RiderForm(forms.ModelForm):
@@ -54,6 +69,7 @@ class HorseForm(forms.ModelForm):
         fields = ('name', 'barn_name', 'age',
                   'coggins', 'owner', 'size', 'type')
 
+
 class ComboSelectForm(forms.ModelForm):
     #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
         # rider_names =  [rider.name for rider in Rider.objects.all()]
@@ -79,12 +95,6 @@ class ComboNumForm(forms.Form):
     #     fields = ('num',)
     num = forms.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(999)])
-
-
-class EditShowForm(forms.Form):
-    name = forms.CharField(max_length=100)
-    date = forms.DateField()
-    location = forms.CharField(max_length=100)
 
 
 class ShowSelectForm(forms.ModelForm):
@@ -149,6 +159,13 @@ class ClassSelectForm(forms.ModelForm):
     class Meta:
         model = Classes
         fields = ('name',)
+
+    def clean_date(self):
+        classobj = self.cleaned_data['name']
+        classes = Classes.objects.all()
+        if classobj in classes:
+            classobj.name = classobj.name
+            return classobj
 
 
 class DivisionForm(forms.ModelForm):

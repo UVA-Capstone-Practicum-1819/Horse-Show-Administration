@@ -3,9 +3,17 @@ import datetime
 from django.core.validators import MinValueValidator, MaxValueValidator, EmailValidator
 import random
 
+
 class Classes(models.Model):
     name = models.CharField(max_length=100, default="")
     number = models.IntegerField(default=0)
+    first = models.IntegerField(default=0)
+    second = models.IntegerField(default=0)
+    third = models.IntegerField(default=0)
+    fourth = models.IntegerField(default=0)
+    fifth = models.IntegerField(default=0)
+    sixth = models.IntegerField(default=0)
+
     def __str__(self):
         return str(self.number) + ". " + self.name
 
@@ -13,6 +21,10 @@ class Division(models.Model):
     name = models.CharField(max_length=100, default="")
     number = models.IntegerField(default=0)
     classes = models.ManyToManyField(Classes)
+    champion = models.IntegerField(default=0)
+    champion_pts = models.IntegerField(default=0)
+    champion_reserve = models.IntegerField(default=0)
+    champion_reserve_pts = models.IntegerField(default=0)
     def __str__(self):
         return self.name
 
@@ -46,10 +58,15 @@ class Rider (models.Model):
     def __str__(self):
         return self.name
 
+class ClassScore(models.Model):
+    participated_class = models.ForeignKey(Classes, on_delete=models.CASCADE)
+    score = models.IntegerField()
+
 class HorseRiderCombo(models.Model):
     num = models.IntegerField(primary_key=True, validators=[MinValueValidator(0), MaxValueValidator(999)])
     rider = models.ForeignKey(Rider, on_delete=models.CASCADE)
     horse = models.ForeignKey(Horse, on_delete=models.CASCADE)
     classes = models.ManyToManyField(Classes)
+    class_scores = models.ManyToManyField(ClassScore)
     def __str__(self):
         return str(self.num)
