@@ -22,6 +22,7 @@ urlpatterns = [
     path('show', views.show_select, name="show_select"),
     path('class', views.class_select, name="class_select"),
     path('<showname>/division', views.division_select, name="division_select"),
+    path('<divisionname>/divisionscore', views.divisionscore, name="divisionscore"),
     path('billing', views.billing, name="billing"),
     path('<combonum>/billinglist', views.billinglist, name="billinglist"),
     path('scratch', views.scratch, name="scratch"),
