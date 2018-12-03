@@ -112,7 +112,7 @@ def show_select(request):
             show = form.cleaned_data['date']
             show.date = show.date[:-3]
             showdate = show.date
-            request.session["showdate"] = showdate
+            request.session['showdate'] = showdate
             return redirect('showpage', showdate)
     else:
         form = ShowSelectForm()
@@ -217,20 +217,23 @@ def new_class(request):
 
 
 def class_select(request):
-    #use this to navigate to ranking a class
-    #test/work on this tomorrow
     if request.method == "POST":
         form = ClassSelectForm(request.POST)
         if form.is_valid():
-            # return render(request, 'horse_select.html', {'form': form})
-            return redirect('rank_class', classnum)
+            classobj = form.cleaned_data['name']
+            classname = classobj.name
+            request.session['classobj'] = classname
+            return redirect('rankclass', classname)
     else:
         form = ClassSelectForm()
     return render(request, 'class_select.html', {'form': form})
 
 
-def rank_class(request, classnum):
-    if request.method == "POST":
+def rankclass(request, classname):
+    if request.method == 'POST':
+        # if 'classobj' in request.session:
+        #     classtoscore = request.session['classobj']
+        #classtoscore = request.POST.get('name', None)
         form = RankingForm(request.POST)
         if form.is_valid():
             first = form.cleaned_data['first']
@@ -239,14 +242,45 @@ def rank_class(request, classnum):
             fourth = form.cleaned_data['fourth']
             fifth = form.cleaned_data['fifth']
             sixth = form.cleaned_data['sixth']
-            showclass = Classes.objects.get(id=classnum)
-            showclass.first.add(first)
-            showclass.second.add(second)
-            showclass.third.add(third)
-            showclass.fourt.add(fourth)
-            showclass.fifth.add(fifth)
-            showclass.sixth.add(sixth)
+            showclass = Classes.objects.get(name=classname)
+            showclass.first = first
+            showclass.second = second
+            showclass.third = third
+            showclass.fourth = fourth
+            showclass.fifth = fifth
+            showclass.sixth = sixth
+            showclass.save()
+            firstcombo = HorseRiderCombo.objects.get(num=first)
+            firstscore = Show.objects.create(participated_class=showclass, score=10)
+            firstcombo.class_scores = firstscore
+            firstcombo.save()
+            secondcombo = HorseRiderCombo.objects.get(num=second)
+            secondscore = Show.objects.create(participated_class=showclass, score=6)
+            secondcombo.class_scores = secondscore
+            secondcombo.save()
+            thirdcombo = HorseRiderCombo.objects.get(num=third)
+            thirdscore = Show.objects.create(participated_class=showclass, score=4)
+            thirdcombo.class_scores = thirdscore
+            thirdcombo.save()
+            fourthcombo = HorseRiderCombo.objects.get(num=fourth)
+            fourthscore = Show.objects.create(participated_class=showclass, score=2)
+            fourthcombo.class_scores = fourthscore
+            fourthcombo.save()
+            fifthcombo = HorseRiderCombo.objects.get(num=fifth)
+            fifthscore = Show.objects.create(participated_class=showclass, score=1)
+            fifthcombo.class_scores = fifthscore
+            fifthcombo.save()
+            sixthcombo = HorseRiderCombo.objects.get(num=sixth)
+            sixthscore = Show.objects.create(participated_class=showclass, score=0.5)
+            sixthcombo.class_scores = sixthscore
+            sixthcombo.save()
+            if 'showdate' in request.session:
+                showdate = request.session['showdate']
+                return redirect('showpage', showdate)
             #will redirect with a class rank page
+    else:
+        form = RankingForm()
+        return render(request, 'rankclass.html', {'form': form} )
 
 
 

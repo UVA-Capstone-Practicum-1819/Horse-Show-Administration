@@ -29,6 +29,10 @@ class RankingForm(forms.ModelForm):
     fifth=forms.IntegerField()
     sixth=forms.IntegerField()
 
+    class Meta:
+        model = Classes
+        fields = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
+
 
 
 class RiderForm(forms.ModelForm):
@@ -155,6 +159,13 @@ class ClassSelectForm(forms.ModelForm):
     class Meta:
         model = Classes
         fields = ('name',)
+
+    def clean_date(self):
+        classobj = self.cleaned_data['name']
+        classes = Classes.objects.all()
+        if classobj in classes:
+            classobj.name = classobj.name
+            return classobj
 
 
 class DivisionForm(forms.ModelForm):
