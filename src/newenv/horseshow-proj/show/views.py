@@ -339,6 +339,9 @@ def new_division(request, showname):
                 }
         return render(request, 'new_division.html', context)
 
+def division(request, showdate, divisionname):
+    return render(request, 'division.html')
+
 def division_select(request, showname):
     if request.method == "POST":
         form = DivisionSelectForm(request.POST)

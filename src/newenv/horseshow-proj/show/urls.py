@@ -15,6 +15,7 @@ urlpatterns = [
     path('horse/new', views.add_horse, name="add_horse"),
     path('rider/new', views.add_rider, name="add_rider"),
     path('class/new', views.new_class, name="classes"),
+    path('<showdate>/<divisionname>', views.division, name="division_info"),
     path('<showname>/division/new', views.new_division, name="divisions"),
     path('horse', views.select_horse, name="select_horse"),
     path('show', views.show_select, name="show_select"),
