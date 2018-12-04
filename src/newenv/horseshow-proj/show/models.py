@@ -1,8 +1,7 @@
 from django.db import models
-import datetime
 from django.core.validators import MinValueValidator, MaxValueValidator, EmailValidator
 import random
-
+import datetime
 
 class Classes(models.Model):
     name = models.CharField(max_length=100, default="")
@@ -13,7 +12,6 @@ class Classes(models.Model):
     fourth = models.IntegerField(default=0)
     fifth = models.IntegerField(default=0)
     sixth = models.IntegerField(default=0)
-
     def __str__(self):
         return str(self.number) + ". " + self.name
 
@@ -61,6 +59,8 @@ class Rider (models.Model):
 class ClassScore(models.Model):
     participated_class = models.ForeignKey(Classes, on_delete=models.CASCADE)
     score = models.IntegerField()
+    def __str__(self):
+        return str(self.score)
 
 class HorseRiderCombo(models.Model):
     num = models.IntegerField(primary_key=True, validators=[MinValueValidator(0), MaxValueValidator(999)])
