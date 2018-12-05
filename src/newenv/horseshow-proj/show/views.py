@@ -72,7 +72,7 @@ def showpage(request, showdate):
                 "name": show.name,
                 "date": show.date,
                 "location": show.location,
-                "divisions": show.divisions.all,
+                "divisions": Division.objects.filter(show=show),
                 'form': form,
             }
     # return HttpResponse(template.render(context, request))
@@ -146,6 +146,7 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
+
 class ComboAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = HorseRiderCombo.objects.all().order_by('num')
@@ -173,13 +174,16 @@ def billinglist(request, showname, combonum):
     tot = combo.classes.count()
     # print(show.preRegistrationPrice)
     price = show.preRegistrationPrice
-    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
+    context = {'name': combo.rider, 'classes': combo.classes.all,
+               'combo_num': combo.num, 'tot': tot}
     return render(request, 'billinglist.html', context)
 
-def divisionscore(request,divisionname):
-    division = Division.objects.get(name= divisionname)
+
+def divisionscore(request, divisionname):
+    division = Division.objects.get(name=divisionname)
     context = {'classes': division.classes.all, 'name': division.name}
     return render(request, 'division_score.html', context)
+
 
 def scratch(request):
     combonum = request.GET['combonum']
@@ -254,37 +258,42 @@ def rankclass(request, classname):
             showclass.sixth = sixth
             showclass.save()
             firstcombo = HorseRiderCombo.objects.get(num=first)
-            firstscore = Show.objects.create(participated_class=showclass, score=10)
+            firstscore = Show.objects.create(
+                participated_class=showclass, score=10)
             firstcombo.class_scores = firstscore
             firstcombo.save()
             secondcombo = HorseRiderCombo.objects.get(num=second)
-            secondscore = Show.objects.create(participated_class=showclass, score=6)
+            secondscore = Show.objects.create(
+                participated_class=showclass, score=6)
             secondcombo.class_scores = secondscore
             secondcombo.save()
             thirdcombo = HorseRiderCombo.objects.get(num=third)
-            thirdscore = Show.objects.create(participated_class=showclass, score=4)
+            thirdscore = Show.objects.create(
+                participated_class=showclass, score=4)
             thirdcombo.class_scores = thirdscore
             thirdcombo.save()
             fourthcombo = HorseRiderCombo.objects.get(num=fourth)
-            fourthscore = Show.objects.create(participated_class=showclass, score=2)
+            fourthscore = Show.objects.create(
+                participated_class=showclass, score=2)
             fourthcombo.class_scores = fourthscore
             fourthcombo.save()
             fifthcombo = HorseRiderCombo.objects.get(num=fifth)
-            fifthscore = Show.objects.create(participated_class=showclass, score=1)
+            fifthscore = Show.objects.create(
+                participated_class=showclass, score=1)
             fifthcombo.class_scores = fifthscore
             fifthcombo.save()
             sixthcombo = HorseRiderCombo.objects.get(num=sixth)
-            sixthscore = Show.objects.create(participated_class=showclass, score=0.5)
+            sixthscore = Show.objects.create(
+                participated_class=showclass, score=0.5)
             sixthcombo.class_scores = sixthscore
             sixthcombo.save()
             if 'showdate' in request.session:
                 showdate = request.session['showdate']
                 return redirect('showpage', showdate)
-            #will redirect with a class rank page
+            # will redirect with a class rank page
     else:
         form = RankingForm()
-        return render(request, 'rankclass.html', {'form': form} )
-
+        return render(request, 'rankclass.html', {'form': form})
 
 
 class ClassAutocomplete(autocomplete.Select2QuerySetView):
@@ -308,7 +317,6 @@ def new_division(request, showname):
                 post.save()
                 division = Division.objects.get(
                     name=form.cleaned_data['name'])
-                divisions = show.divisions
                 divisions.add(division)
                 show.save()
                 return redirect('showpage', date)
@@ -321,9 +329,10 @@ def new_division(request, showname):
                 post.save()
                 division = Division.objects.get(
                     name=form.cleaned_data['name'])
-                divisions = show.divisions
+                """ divisions = show.divisions
                 divisions.add(division)
-                show.save()
+                show.save() """
+
                 return redirect('divisions', showname)
     else:
         form = DivisionForm()
@@ -335,7 +344,7 @@ def new_division(request, showname):
                     "name": show.name,
                     "date": show.date,
                     "location": show.location,
-                    "divisions": show.divisions.all,
+                    "divisions": Division.objects.filter(show=show),
                 }
         return render(request, 'new_division.html', context)
 
@@ -359,14 +368,13 @@ def division_select(request, showname):
             form = DivisionSelectForm(request.POST)
             if form.is_valid():
                 division = Division.objects.get(
-                   name=form.cleaned_data['name'])
-                divisionname= division.name
+                    name=form.cleaned_data['name'])
+                divisionname = division.name
                 return redirect('divisionscore', divisionname)
 
     else:
         form = DivisionSelectForm()
     return render(request, 'division_select.html', {'form': form, 'name': showname})
-
 
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
