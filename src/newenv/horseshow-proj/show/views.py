@@ -168,31 +168,48 @@ def billing(request, showname):
 
 def billinglist(request, showname, combonum):
     show = Show.objects.get(name=showname)
-    form = RegistrationBillForm()
+    # form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num=combonum)
     tot = combo.classes.count()
     # print(show.preRegistrationPrice)
-    price = show.preRegistrationPrice
-    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
-    return render(request, 'billinglist.html', context)
+    price = show.preRegistrationPrice * tot
 
-def divisionscore(request,divisionname):
+    if request.method == "POST":
+        if 'scratch' in request.POST:
+            combonum = request.GET['combonum']
+            # print(combonum+1)
+            # combo = HorseRiderCombo.objects.get(num=int(combonum))
+            cls = request.GET["cname"]
+            dcls = combo.classes.get(name=cls)
+            # dcls.delete()
+            combo.classes.remove(dcls)
+            tot = combo.classes.count()
+            combo.save()
+            # context = {'name': combo.rider, 'show_name': showname, 'classes': combo.classes.all, 'combo_num': combonum, 'tot': tot}
+            context = {'name': combo.rider, 'show_name': showname, 'show_date': show.date,
+             'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
+            return render(request, 'billinglist.html', context)
+    else:
+        context = {'name': combo.rider, 'show_name': showname, 'show_date': show.date,
+         'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
+        return render(request, 'billinglist.html', context)
+
+def divisionscore(request, divisionname):
     division = Division.objects.get(name= divisionname)
     context = {'classes': division.classes.all, 'name': division.name}
     return render(request, 'division_score.html', context)
 
-def scratch(request):
-    combonum = request.GET['combonum']
-    # print(combonum+1)
-    combo = HorseRiderCombo.objects.get(num=int(combonum))
-    cls = request.GET["cname"]
-    dcls = combo.classes.get(name=cls)
-    # dcls.delete()
-    combo.classes.remove(dcls)
-    tot = combo.classes.count()
-    context = {'name': combo.rider, 'classes': combo.classes.all,
-               'combo_num': combo.num, 'tot': tot}
-    return render(request, 'billinglist.html', context)
+# def scratch(request):
+#     combonum = request.GET['combonum']
+#     # print(combonum+1)
+#     combo = HorseRiderCombo.objects.get(num=int(combonum))
+#     cls = request.GET["cname"]
+#     dcls = combo.classes.get(name=cls)
+#     # dcls.delete()
+#     combo.classes.remove(dcls)
+#     tot = combo.classes.count()
+#     context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, }
+#     return render(request, 'billinglist.html', context)
 
 
 def deleteReport(request):
