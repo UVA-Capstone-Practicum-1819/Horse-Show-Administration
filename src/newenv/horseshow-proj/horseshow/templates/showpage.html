@@ -1,35 +1,27 @@
 {% extends 'base.html' %} {% load static %}
 <html>
-  <head>
-    <title>{{ name }}</title>
-  </head>
+  <h3>{{ name }}</h3>
   <body>
     {% block content %}
-    <div class="content container">
-      <div class="row">
-        <div class="col-md-8">
-          <h1>Show: {{ name }}</h1>
-          <p>Date: {{ date }}</p>
-          <p>Location: {{ location }}</p>
+    <h1>Show: {{ name }}</h1>
+    <p>Date: {{ date }}</p>
+    <p>Location: {{ location }}</p>
 
-                        <p>Divisions:</p>
-                        {% for division in divisions %}
-                            <li>{{ division }}</a></li>
-                        {% endfor %}
-                        <p><a href = "{% url 'divisions' showname=name %}">Add Division</a></p>
-                        <p><a href = "{% url 'division_select' showname=name %}">Edit Division/ View Division Score</a></p>
-                        <p><a href="{% url 'select_rider' %}">Add Horse-Rider Combo to the Database</a></p>
-                        <p><a href="{% url 'classes' %}">Add Class</a></p>
-                        <p><a href="{% url 'class_select' %}">Rank Class</a></p>
+                  <p>Divisions:</p>
+                  {% for division in divisions %}
+                      <li>{{ division }}</a></li>
+                  {% endfor %}
+                  <p><a href = "{% url 'divisions' showname=name %}">Add Division</a></p>
+                  <p><a href = "{% url 'division_select' showname=name %}">Edit Division/ View Division Score</a></p>
+                  <p><a href="{% url 'select_rider' %}">Add Horse-Rider Combo to the Database</a></p>
+                  <p><a href="{% url 'classes' %}">Add Class</a></p>
+                  <p><a href="{% url 'class_select' %}">Rank Class</a></p>
+                  <p><a href="{% url 'billing' %}">Bill a Rider</a></p>
 
-
-                        <h1> Check Combo </h1>
-                        <form method="POST" class="post-form" action="{% url 'combo' %}">
-                            {% csrf_token %}
-                            {{ form.as_p }}
-                            <button type="submit">Search Combo Number</button>
-                  </form>
-                </div>
-            </div>
-          </div>
+                  <h1> Check Combo </h1>
+                  <form method="POST" class="post-form" action="{% url 'combo' %}">
+                      {% csrf_token %}
+                      {{ form.as_p }}
+                      <button type="submit">Search Combo Number</button>
+            </form>
   {% endblock %}
