@@ -8,11 +8,12 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('signup', views.signup, name='signup'),
+    path('login', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout', auth_views.LogoutView.as_view(), name='logout'),
     path('create_show', views.create_show, name='create_show'),
     path('<showdate>/showpage', views.showpage, name='showpage'),
     path('<classname>/rankclass', views.rankclass, name='rankclass'),
-    path('signup', views.signup, name='signup'),
-    path('login', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('horse/new', views.add_horse, name="add_horse"),
     path('rider/new', views.add_rider, name="add_rider"),
     path('class/new', views.new_class, name="classes"),
@@ -33,7 +34,6 @@ urlpatterns = [
     path('combo_autocomplete', views.ComboAutocomplete.as_view(), name="combo_autocomplete"),
     path('division_autocomplete', views.DivisionAutocomplete.as_view(), name="division_autocomplete"),
     path('genpdf', views.populate_pdf, name="populate_pdf"),
-    path('logout', auth_views.LogoutView.as_view(), name='logout'),
     path('add-combo', views.add_combo, name="add_combo"),
     path('combo', views.combo, name="combo"),
     path('combo/<num>', views.check_combo, name="check_combo"),
