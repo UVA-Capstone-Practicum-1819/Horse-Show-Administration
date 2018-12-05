@@ -1,10 +1,8 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
-
 {% block content %}
-<h3>Bill for {{name}} in combo {{combo_num}}</h3>
-
+<h2>Bill for {{name}} in combo {{combo_num}}</h2>
 <div class="row">
     <form action="" method="post">
         {% csrf_token %}
@@ -36,9 +34,8 @@
         </tbody>
       </table>
 
-
-        <h1>Total Classes: {{tot}}</h1>
-
+        <h4>Total Classes: {{ tot }}</h4>
+        <h4>Total Price: {{ price }}</h4>
 
 
 

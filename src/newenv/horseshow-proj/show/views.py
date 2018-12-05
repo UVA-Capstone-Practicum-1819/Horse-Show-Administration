@@ -62,7 +62,7 @@ def showpage(request, showdate):
         del request.session['horse_pk']
     # template = loader.get_template('showpage.html')
     form = ComboNumForm()
-    shows = Show.objects.all()
+    shows = Show.objects.all().order_by('date')
     context = {
         'form': form,
     }
@@ -124,7 +124,7 @@ class ShowAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # if not self.request.user.is_authenticated():
             # return Horse.objects.none()
-        qs = Show.objects.all()
+        qs = Show.objects.all().order_by('date')
         if self.q:
             qs = qs.filter(show_name__istartswith=self.q)
         return qs
@@ -148,23 +148,22 @@ def signup(request):
 
 class ComboAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = HorseRiderCombo.objects.all()
+        qs = HorseRiderCombo.objects.all().order_by('num')
         if self.q:
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
 
 
 def billing(request, showname):
-    show = Show.objects.get(name=showname)
     if request.method == "POST":
         form = ComboSelectForm(request.POST)
         if form.is_valid():
             combo = form.cleaned_data['combo']
             combonum = combo.num
-            return redirect('billinglist', combonum)
+            return redirect('billinglist', showname, combonum)
     else:
         form = ComboSelectForm()
-    return render(request, 'billing.html', {'form': form})
+    return render(request, 'billing.html', {'form': form,  'name': showname})
 
 
 def billinglist(request, showname, combonum):
@@ -172,8 +171,9 @@ def billinglist(request, showname, combonum):
     form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num=combonum)
     tot = combo.classes.count()
-    context = {'name': combo.rider, 'classes': combo.classes.all,
-               'combo_num': combo.num, 'tot': tot}
+    # print(show.preRegistrationPrice)
+    price = show.preRegistrationPrice
+    context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot}
     return render(request, 'billinglist.html', context)
 
 def divisionscore(request,divisionname):
@@ -289,7 +289,7 @@ def rankclass(request, classname):
 
 class ClassAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Classes.objects.all()
+        qs = Classes.objects.all().order_by('number')
         if self.q:
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
@@ -327,7 +327,7 @@ def new_division(request, showname):
                 return redirect('divisions', showname)
     else:
         form = DivisionForm()
-        shows = Show.objects.all()
+        shows = Show.objects.all().order_by('date')
         for show in shows:
             if showname == show.name:
                 context = {
@@ -371,7 +371,7 @@ def division_select(request, showname):
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Division.objects.all()
+        qs = Division.objects.all().order_by('number')
         if self.q:
             qs = qs.filter(division_name__istartswith=self.q)
         return qs
@@ -389,7 +389,7 @@ def add_rider(request):
 
 class RiderAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Rider.objects.all()
+        qs = Rider.objects.all().order_by('name')
         if self.q:
             qs = qs.filter(name__istartswith=self.q)
         return qs
@@ -487,7 +487,7 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
         # if not self.request.user.is_authenticated():
             # return Horse.objects.none()
 
-        qs = Horse.objects.all()
+        qs = Horse.objects.all().order_by('name')
 
         if self.q:
             qs = qs.filter(name__istartswith=self.q)
