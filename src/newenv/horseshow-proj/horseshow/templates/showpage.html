@@ -14,7 +14,7 @@
 
                         <p>Divisions:</p>
                         {% for division in divisions %}
-                            <li><a href = "{% url 'division_info' showdate=date divisionname=division %}" {{ division }}</li>
+                            <li><a href = "{% url 'division_info' showdate=date divisionname=division %}"> {{ division }}</li>
                         {% endfor %}
                         <p><a href = "{% url 'divisions' showname=name %}">Add Division</a></p>
                         <p><a href = "{% url 'division_select' showname=name %}">Edit Division/ View Division Score</a></p>
