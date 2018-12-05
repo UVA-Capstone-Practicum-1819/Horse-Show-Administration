@@ -22,17 +22,16 @@ class RegistrationBillForm(forms.Form):
 
 
 class RankingForm(forms.ModelForm):
-    first=forms.IntegerField()
-    second=forms.IntegerField()
-    third=forms.IntegerField()
-    fourth=forms.IntegerField()
-    fifth=forms.IntegerField()
-    sixth=forms.IntegerField()
+    first = forms.IntegerField()
+    second = forms.IntegerField()
+    third = forms.IntegerField()
+    fourth = forms.IntegerField()
+    fifth = forms.IntegerField()
+    sixth = forms.IntegerField()
 
     class Meta:
         model = Classes
         fields = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
-
 
 
 class RiderForm(forms.ModelForm):
@@ -40,14 +39,17 @@ class RiderForm(forms.ModelForm):
         attrs={'placeholder': 'Name', 'required': True, }))
     address = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'placeholder': 'Address', 'required': True, }))
-    age = forms.IntegerField(widget=forms.TextInput(
-        attrs={'placeholder': 'Age', 'required': True, }))
     email = forms.CharField(max_length=100, widget=forms.EmailInput(
         attrs={'placeholder': 'Email', 'required': True, }))
+    birth_date = forms.CharField(max_length=100, widget=forms.SelectDateWidget(years=[year for year in range(1900, 2010)],
+                                                                               attrs={'title': "Birth Date (if 18 or younger)", 'required': False, }))
+    member_VHSA = forms.BooleanField()
+    county = forms.CharField()
 
     class Meta:
         model = Rider
-        fields = ('name', 'address', 'age', 'email')
+        fields = ('name', 'address', 'email',
+                  'birth_date', 'member_VHSA', 'county')
 
 
 class RiderSelectForm(forms.ModelForm):
@@ -66,8 +68,8 @@ class RiderSelectForm(forms.ModelForm):
 class HorseForm(forms.ModelForm):
     class Meta:
         model = Horse
-        fields = ('name', 'barn_name', 'age',
-                  'coggins', 'owner', 'size', 'type')
+        fields = ('name',
+                  'coggins_date', 'accession_no', 'owner', 'size', 'type')
 
 
 class ComboSelectForm(forms.ModelForm):
@@ -147,7 +149,7 @@ class HorseSelectForm(forms.ModelForm):
 class ClassForm(forms.ModelForm):
     class Meta:
         model = Classes
-        fields = ('name', 'number')
+        fields = ('number', )
 
 
 class ClassSelectForm(forms.ModelForm):
