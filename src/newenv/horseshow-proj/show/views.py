@@ -154,20 +154,20 @@ class ComboAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def billing(request, showname):
+def billing(request, showdate):
     if request.method == "POST":
         form = ComboSelectForm(request.POST)
         if form.is_valid():
             combo = form.cleaned_data['combo']
             combonum = combo.num
-            return redirect('billinglist', showname, combonum)
+            return redirect('billinglist', showdate, combonum)
     else:
         form = ComboSelectForm()
-    return render(request, 'billing.html', {'form': form,  'name': showname})
+    return render(request, 'billing.html', {'form': form, 'date': showdate})
 
 
-def billinglist(request, showname, combonum):
-    show = Show.objects.get(name=showname)
+def billinglist(request, showdate, combonum):
+    show = Show.objects.get(date=showdate)
     # form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num=combonum)
     tot = combo.classes.count()
@@ -186,11 +186,11 @@ def billinglist(request, showname, combonum):
             tot = combo.classes.count()
             combo.save()
             # context = {'name': combo.rider, 'show_name': showname, 'classes': combo.classes.all, 'combo_num': combonum, 'tot': tot}
-            context = {'name': combo.rider, 'show_name': showname, 'show_date': show.date,
+            context = {'name': combo.rider, 'show_date': show.date,
              'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
             return render(request, 'billinglist.html', context)
     else:
-        context = {'name': combo.rider, 'show_name': showname, 'show_date': show.date,
+        context = {'name': combo.rider, 'show_date': show.date,
          'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
         return render(request, 'billinglist.html', context)
 
