@@ -60,7 +60,7 @@ def showpage(request, showdate):
         del request.session['rider_pk']
     if 'horse_pk' in request.session:
         del request.session['horse_pk']
-    template = loader.get_template('showpage.html')
+    # template = loader.get_template('showpage.html')
     form = ComboNumForm()
     shows = Show.objects.all()
     context = {
@@ -75,7 +75,8 @@ def showpage(request, showdate):
                 "divisions": show.divisions.all,
                 'form': form,
             }
-    return HttpResponse(template.render(context, request))
+    # return HttpResponse(template.render(context, request))
+    return render(request, 'showpage.html', context)
 
 
 def classpage(request):
@@ -153,7 +154,8 @@ class ComboAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def billing(request):
+def billing(request, showname):
+    show = Show.objects.get(name=showname)
     if request.method == "POST":
         form = ComboSelectForm(request.POST)
         if form.is_valid():
@@ -165,7 +167,8 @@ def billing(request):
     return render(request, 'billing.html', {'form': form})
 
 
-def billinglist(request, combonum):
+def billinglist(request, showname, combonum):
+    show = Show.objects.get(name=showname)
     form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num=combonum)
     tot = combo.classes.count()
@@ -177,7 +180,7 @@ def divisionscore(request,divisionname):
     division = Division.objects.get(name= divisionname)
     context = {'classes': division.classes.all, 'name': division.name}
     return render(request, 'division_score.html', context)
-  
+
 def scratch(request):
     combonum = request.GET['combonum']
     # print(combonum+1)
