@@ -171,28 +171,43 @@ def billinglist(request, showdate, combonum):
     # form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num=combonum)
     tot = combo.classes.count()
-    # print(show.preRegistrationPrice)
     price = show.preRegistrationPrice * tot
+    #
+    # if request.method == "POST":
+    #     print("posting")
+    #     if 'scratch' in request.POST:
+    #         # combonum = request.GET['combonum']
+    #         # combo = HorseRiderCombo.objects.get(num=int(combonum))
+    #         clsnm = request.POST.get("cname")
+    #         print(clsnm)
+    #         dcls = combo.classes.get(name=clsnm)
+    #         combo.classes.remove(dcls)
+    #         tot = combo.classes.count()
+    #         combo.save()
+    #         context = {'name': combo.rider, 'show_date': show.date,
+    #          'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
+    #         return render(request, 'billinglist.html', context)
+    # # else:
+    # print("not post")
+    context = {'name': combo.rider, 'show_date': show.date,
+     'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
+    return render(request, 'billinglist.html', context)
 
-    if request.method == "POST":
-        if 'scratch' in request.POST:
-            combonum = request.GET['combonum']
-            # print(combonum+1)
-            # combo = HorseRiderCombo.objects.get(num=int(combonum))
-            cls = request.GET["cname"]
-            dcls = combo.classes.get(name=cls)
-            # dcls.delete()
-            combo.classes.remove(dcls)
-            tot = combo.classes.count()
-            combo.save()
-            # context = {'name': combo.rider, 'show_name': showname, 'classes': combo.classes.all, 'combo_num': combonum, 'tot': tot}
-            context = {'name': combo.rider, 'show_date': show.date,
-             'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
-            return render(request, 'billinglist.html', context)
-    else:
-        context = {'name': combo.rider, 'show_date': show.date,
-         'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
-        return render(request, 'billinglist.html', context)
+def scratch(request, showdate, combonum):
+    # combonum = request.GET['combonum']
+    # showdate = request.GET['showdate']
+    # print(combonum+1)
+    show = Show.objects.get(date=showdate)
+    combo = HorseRiderCombo.objects.get(num=int(combonum))
+    cls = request.GET["cname"]
+    dcls = combo.classes.get(name=cls)
+    # dcls.delete()
+    combo.classes.remove(dcls)
+    tot = combo.classes.count()
+    price = show.preRegistrationPrice * tot
+    context = {'name': combo.rider, 'show_date': show.date,
+      'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
+    return render(request, 'billinglist.html', context)
 
 def divisionscore(request,divisionname):
     division = Division.objects.get(name= divisionname)
@@ -219,28 +234,6 @@ def divisionscore(request,divisionname):
         form = DivisionChampForm()
     context = {'classes': division.classes.all, 'name': division.name, 'form': form}
     return render(request, 'division_score.html', context)
-
-# def scratch(request):
-#     combonum = request.GET['combonum']
-#     # print(combonum+1)
-#     combo = HorseRiderCombo.objects.get(num=int(combonum))
-#     cls = request.GET["cname"]
-#     dcls = combo.classes.get(name=cls)
-#     # dcls.delete()
-#     combo.classes.remove(dcls)
-#     tot = combo.classes.count()
-#     context = {'name': combo.rider, 'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, }
-#     return render(request, 'billinglist.html', context)
-
-
-def deleteReport(request):
-    name = request.GET["user"]
-    user = User.objects.get(username=name)
-    report = request.GET["reportname"]
-    report_todelete = inputReport.objects.get(report_name=report)
-    report_todelete.delete()
-    return render(request, 'viewReports.html', {'obj': inputReport.objects.all, 'user': user})
-
 
 def new_class(request):
     if request.method == "POST":
