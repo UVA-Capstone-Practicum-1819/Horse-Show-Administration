@@ -166,31 +166,7 @@ def billing(request, showdate):
     return render(request, 'billing.html', {'form': form, 'date': showdate})
 
 
-def divisionscore(request,divisionname):
-    division = Division.objects.get(name= divisionname)
-    form = DivisionChampForm()
-    if request.method == "POST":
-        print("POST method")
-        form = DivisionChampForm(request.POST)
-        if form.is_valid():
-            print("valid")
-            champion= form.cleaned_data['champion']
-            print(champion)
-            champion_pts= form.cleaned_data['champion_pts']
-            print(champion_pts)
-            champion_reserve= form.cleaned_data['champion_reserve']
-            champion_reserve_pts= form.cleaned_data['champion_reserve_pts']
-            division = Division.objects.get(name= divisionname)
-            division.champion= champion
-            division.champion_pts= champion_pts
-            division.champion_reserve= champion_reserve
-            division.champion_reserve_pts= champion_reserve_pts
-            division.save()
-     else:
-        form = DivisionChampForm()
-    context = {'classes': division.classes.all, 'name': division.name, 'form': form}
-    return render(request, 'division_score.html', context)	    return render(request, 'division_score.html', context)
-def billinglist(request, showdate, combonum):
+  def billinglist(request, showdate, combonum):
     show = Show.objects.get(date=showdate)
     # form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num=combonum)
@@ -233,14 +209,31 @@ def scratch(request, showdate, combonum):
       'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
     return render(request, 'billinglist.html', context)
 
-# def deleteReport(request):
-#     name = request.GET["user"]
-#     user = User.objects.get(username=name)
-#     report = request.GET["reportname"]
-#     report_todelete = inputReport.objects.get(report_name=report)
-#     report_todelete.delete()
-#     return render(request, 'viewReports.html', {'obj': inputReport.objects.all, 'user': user})
+def divisionscore(request,divisionname):
+    division = Division.objects.get(name= divisionname)
+    form = DivisionChampForm()
+    if request.method == "POST":
+        print("POST method")
+        form = DivisionChampForm(request.POST)
+        if form.is_valid():
+            print("valid")
+            champion= form.cleaned_data['champion']
+            print(champion)
+            champion_pts= form.cleaned_data['champion_pts']
+            print(champion_pts)
+            champion_reserve= form.cleaned_data['champion_reserve']
+            champion_reserve_pts= form.cleaned_data['champion_reserve_pts']
+            division = Division.objects.get(name= divisionname)
+            division.champion= champion
+            division.champion_pts= champion_pts
+            division.champion_reserve= champion_reserve
+            division.champion_reserve_pts= champion_reserve_pts
+            division.save()
 
+    else:
+        form = DivisionChampForm()
+    context = {'classes': division.classes.all, 'name': division.name, 'form': form}
+    return render(request, 'division_score.html', context)
 
 def new_class(request):
     if request.method == "POST":
