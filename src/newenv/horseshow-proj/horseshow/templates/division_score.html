@@ -6,8 +6,6 @@
 <h3>Division Score for {{name}}</h3>
 
 <div class="row">
-    <form action="" method="post">
-        {% csrf_token %}
         <!-- {{ form | crispy}} -->
         <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
       <table class="table">
@@ -45,10 +43,6 @@
               <td>
                 {{ c.sixth}}
               </td>
-              <td>
-                {{ form | crispy}}
-
-              </td>
             </tr>
 
           {% endfor %}
@@ -64,6 +58,9 @@
 
 
 
+    <form  method="post">
+      {% csrf_token %} {{ form | crispy}}
+      <input type="submit" value="Submit">
     </form>
 </div>
 <!-- {{ form.media }} -->

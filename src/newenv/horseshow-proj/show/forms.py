@@ -173,7 +173,11 @@ class DivisionForm(forms.ModelForm):
         model = Division
         fields = ('name', 'number')
 
-
+class DivisionChampForm(forms.ModelForm):
+    class Meta:
+        model = Division
+        fields = ('champion', 'champion_pts', 'champion_reserve', 'champion_reserve_pts')
+        
 class DivisionSelectForm(forms.ModelForm):
     name = forms.ModelChoiceField(
         queryset=Division.objects.all(),
