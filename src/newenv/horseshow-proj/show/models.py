@@ -17,7 +17,7 @@ class Classes(models.Model):
     name = models.CharField(max_length=200)
 
     def __str__(self):
-        return self.name
+        return str(self.number) + ". " + self.name
 
 
 class Division(models.Model):
@@ -42,7 +42,7 @@ class Show(models.Model):
     dayOfPrice = models.IntegerField(null=True, blank=True)
     preRegistrationPrice = models.IntegerField(null=True, blank=True)
 
-    divisions = models.ManyToManyField(Division)
+    divisions = models.ManyToManyField(Division, blank=True)
 
     def __str__(self):
         return self.date
