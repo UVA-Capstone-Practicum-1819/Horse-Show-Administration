@@ -166,7 +166,7 @@ def billing(request, showdate):
     return render(request, 'billing.html', {'form': form, 'date': showdate})
 
 
-  def billinglist(request, showdate, combonum):
+def billinglist(request, showdate, combonum):
     show = Show.objects.get(date=showdate)
     # form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num=combonum)
