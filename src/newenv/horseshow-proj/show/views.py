@@ -146,6 +146,7 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
+
 class ComboAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = HorseRiderCombo.objects.all().order_by('num')
@@ -171,6 +172,7 @@ def billinglist(request, showdate, combonum):
     # form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num=combonum)
     tot = combo.classes.count()
+
     price = show.preRegistrationPrice * tot
     #
     # if request.method == "POST":
@@ -196,6 +198,7 @@ def billinglist(request, showdate, combonum):
 def scratch(request, showdate, combonum):
     # combonum = request.GET['combonum']
     # showdate = request.GET['showdate']
+
     # print(combonum+1)
     show = Show.objects.get(date=showdate)
     combo = HorseRiderCombo.objects.get(num=int(combonum))
@@ -303,37 +306,42 @@ def rankclass(request, classname):
             showclass.sixth = sixth
             showclass.save()
             firstcombo = HorseRiderCombo.objects.get(num=first)
-            firstscore = Show.objects.create(participated_class=showclass, score=10)
+            firstscore = Show.objects.create(
+                participated_class=showclass, score=10)
             firstcombo.class_scores = firstscore
             firstcombo.save()
             secondcombo = HorseRiderCombo.objects.get(num=second)
-            secondscore = Show.objects.create(participated_class=showclass, score=6)
+            secondscore = Show.objects.create(
+                participated_class=showclass, score=6)
             secondcombo.class_scores = secondscore
             secondcombo.save()
             thirdcombo = HorseRiderCombo.objects.get(num=third)
-            thirdscore = Show.objects.create(participated_class=showclass, score=4)
+            thirdscore = Show.objects.create(
+                participated_class=showclass, score=4)
             thirdcombo.class_scores = thirdscore
             thirdcombo.save()
             fourthcombo = HorseRiderCombo.objects.get(num=fourth)
-            fourthscore = Show.objects.create(participated_class=showclass, score=2)
+            fourthscore = Show.objects.create(
+                participated_class=showclass, score=2)
             fourthcombo.class_scores = fourthscore
             fourthcombo.save()
             fifthcombo = HorseRiderCombo.objects.get(num=fifth)
-            fifthscore = Show.objects.create(participated_class=showclass, score=1)
+            fifthscore = Show.objects.create(
+                participated_class=showclass, score=1)
             fifthcombo.class_scores = fifthscore
             fifthcombo.save()
             sixthcombo = HorseRiderCombo.objects.get(num=sixth)
-            sixthscore = Show.objects.create(participated_class=showclass, score=0.5)
+            sixthscore = Show.objects.create(
+                participated_class=showclass, score=0.5)
             sixthcombo.class_scores = sixthscore
             sixthcombo.save()
             if 'showdate' in request.session:
                 showdate = request.session['showdate']
                 return redirect('showpage', showdate)
-            #will redirect with a class rank page
+            # will redirect with a class rank page
     else:
         form = RankingForm()
-        return render(request, 'rankclass.html', {'form': form} )
-
+        return render(request, 'rankclass.html', {'form': form})
 
 
 class ClassAutocomplete(autocomplete.Select2QuerySetView):
@@ -373,6 +381,7 @@ def new_division(request, showname):
                 divisions = show.divisions
                 divisions.add(division)
                 show.save()
+
                 return redirect('divisions', showname)
     else:
         form = DivisionForm()
@@ -401,7 +410,9 @@ def division_select(request, showname):
                     name=form.cleaned_data['name'])
                 current_divisions.add(division)
                 show.save()
+
                 divisionname= division.name
+
                 # return render(request, 'horse_select.html', {'form': form})
                 # return redirect('/')
                 #return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -410,14 +421,13 @@ def division_select(request, showname):
             form = DivisionSelectForm(request.POST)
             if form.is_valid():
                 division = Division.objects.get(
-                   name=form.cleaned_data['name'])
-                divisionname= division.name
+                    name=form.cleaned_data['name'])
+                divisionname = division.name
                 return redirect('divisionscore', divisionname)
 
     else:
         form = DivisionSelectForm()
     return render(request, 'division_select.html', {'form': form, 'name': showname})
-
 
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
@@ -452,9 +462,8 @@ def select_horse(request):
         """ if rider doesn't exist yet, the request comes from add rider page, takes in the form information, save rider, save rider's primary key """
         if rider is None:
             form = RiderForm(request.POST)
-            if form.is_valid:
-                rider = form.save(commit=False)
-                rider.save()
+            if form.is_valid():
+                rider = form.save()
                 rider_pk = rider.pk
         else:
             rider_pk = request.POST['rider']
@@ -474,10 +483,8 @@ def add_combo(request):
         if horse is None:
             form = HorseForm(request.POST)
             if form.is_valid:
-                horse = form.save(commit=False)
-                horse.save()
+                horse = form.save()
                 horse_pk = horse.pk
-                print(horse)
         else:
             horse_pk = request.POST['horse']
         request.session['horse_pk'] = horse_pk

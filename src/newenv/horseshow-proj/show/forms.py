@@ -22,36 +22,31 @@ class RegistrationBillForm(forms.Form):
 
 
 class RankingForm(forms.ModelForm):
-    first=forms.IntegerField()
-    second=forms.IntegerField()
-    third=forms.IntegerField()
-    fourth=forms.IntegerField()
-    fifth=forms.IntegerField()
-    sixth=forms.IntegerField()
+    first = forms.IntegerField()
+    second = forms.IntegerField()
+    third = forms.IntegerField()
+    fourth = forms.IntegerField()
+    fifth = forms.IntegerField()
+    sixth = forms.IntegerField()
 
     class Meta:
         model = Classes
         fields = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
 
 
-
 class RiderForm(forms.ModelForm):
-    name = forms.CharField(max_length=100, widget=forms.TextInput(
-        attrs={'placeholder': 'Name', 'required': True, }))
-    address = forms.CharField(max_length=100, widget=forms.TextInput(
-        attrs={'placeholder': 'Address', 'required': True, }))
-    age = forms.IntegerField(widget=forms.TextInput(
-        attrs={'placeholder': 'Age', 'required': True, }))
-    email = forms.CharField(max_length=100, widget=forms.EmailInput(
-        attrs={'placeholder': 'Email', 'required': True, }))
+
+    birth_date = forms.CharField(max_length=100, widget=forms.SelectDateWidget(
+        years=[year for year in range(1900, 2010)]))
 
     class Meta:
         model = Rider
-        fields = ('name', 'address', 'age', 'email')
+        fields = ('name', 'address', 'email',
+                  'birth_date', 'member_VHSA', 'county',)
 
 
 class RiderSelectForm(forms.ModelForm):
-    #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
+    # horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
         # rider_names =  [rider.name for rider in Rider.objects.all()]
     rider = forms.ModelChoiceField(
         queryset=Rider.objects.all(),
@@ -66,12 +61,12 @@ class RiderSelectForm(forms.ModelForm):
 class HorseForm(forms.ModelForm):
     class Meta:
         model = Horse
-        fields = ('name', 'barn_name', 'age',
-                  'coggins', 'owner', 'size', 'type')
+        fields = ('name',
+                  'coggins_date', 'accession_no', 'owner', 'type', 'size', )
 
 
 class ComboSelectForm(forms.ModelForm):
-    #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
+    # horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
         # rider_names =  [rider.name for rider in Rider.objects.all()]
     combo = forms.ModelChoiceField(
         queryset=HorseRiderCombo.objects.all(),
@@ -98,7 +93,7 @@ class ComboNumForm(forms.Form):
 
 
 class ShowSelectForm(forms.ModelForm):
-    #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
+    # horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
 
     date = forms.ModelChoiceField(
         queryset=Show.objects.all(),
@@ -127,7 +122,7 @@ class ShowSelectForm(forms.ModelForm):
 
 
 class HorseSelectForm(forms.ModelForm):
-    #horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
+    # horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
     horse = forms.ModelChoiceField(
         queryset=Horse.objects.all(),
         widget=autocomplete.ModelSelect2(url='horse_autocomplete')
