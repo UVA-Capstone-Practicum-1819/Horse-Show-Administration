@@ -235,6 +235,24 @@ def divisionscore(request,divisionname):
     context = {'classes': division.classes.all, 'name': division.name, 'form': form}
     return render(request, 'division_score.html', context)
 
+def delete_class(request, divisionname, classname):
+    print("in delete class")
+    division = Division.objects.get(name=divisionname)
+    classObj = Classes.objects.get(name=classname)
+    division.classes.remove(classObj)
+    division.save()
+    context = {'classes': division.classes.all,'name': division.name}
+    return redirect('division_classes', divisionname=divisionname)
+    #return render(request, 'division_classes.html', context)
+
+
+
+def division_classes(request,divisionname):
+    print("in division classes")
+    division = Division.objects.get(name= divisionname)
+    context = {'classes': division.classes.all,'name': division.name}
+    return render(request, 'division_classes.html', context)
+
 def new_class(request):
     if request.method == "POST":
         form = ClassForm(request.POST)
@@ -383,9 +401,11 @@ def division_select(request, showname):
                     name=form.cleaned_data['name'])
                 current_divisions.add(division)
                 show.save()
+                divisionname= division.name
                 # return render(request, 'horse_select.html', {'form': form})
                 # return redirect('/')
-                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+                #return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+                return redirect('division_classes', divisionname)
         if 'score' in request.POST:
             form = DivisionSelectForm(request.POST)
             if form.is_valid():
