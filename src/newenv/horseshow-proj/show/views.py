@@ -72,7 +72,7 @@ def showpage(request, showdate):
                 "name": show.name,
                 "date": show.date,
                 "location": show.location,
-                "divisions": Division.objects.filter(show=show),
+                "divisions": show.divisions.all,
                 'form': form,
             }
     # return HttpResponse(template.render(context, request))
@@ -317,6 +317,7 @@ def new_division(request, showname):
                 post.save()
                 division = Division.objects.get(
                     name=form.cleaned_data['name'])
+                divisions = show.divisions
                 divisions.add(division)
                 show.save()
                 return redirect('showpage', date)
@@ -329,9 +330,9 @@ def new_division(request, showname):
                 post.save()
                 division = Division.objects.get(
                     name=form.cleaned_data['name'])
-                """ divisions = show.divisions
+                divisions = show.divisions
                 divisions.add(division)
-                show.save() """
+                show.save()
 
                 return redirect('divisions', showname)
     else:
@@ -344,7 +345,7 @@ def new_division(request, showname):
                     "name": show.name,
                     "date": show.date,
                     "location": show.location,
-                    "divisions": Division.objects.filter(show=show),
+                    "divisions": show.divisions.all,
                 }
         return render(request, 'new_division.html', context)
 
@@ -361,6 +362,7 @@ def division_select(request, showname):
                     name=form.cleaned_data['name'])
                 current_divisions.add(division)
                 show.save()
+                divisionname = division.name
                 # return render(request, 'horse_select.html', {'form': form})
                 # return redirect('/')
                 return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -409,9 +411,8 @@ def select_horse(request):
         """ if rider doesn't exist yet, the request comes from add rider page, takes in the form information, save rider, save rider's primary key """
         if rider is None:
             form = RiderForm(request.POST)
-            if form.is_valid:
-                rider = form.save(commit=False)
-                rider.save()
+            if form.is_valid():
+                rider = form.save()
                 rider_pk = rider.pk
         else:
             rider_pk = request.POST['rider']
@@ -431,10 +432,8 @@ def add_combo(request):
         if horse is None:
             form = HorseForm(request.POST)
             if form.is_valid:
-                horse = form.save(commit=False)
-                horse.save()
+                horse = form.save()
                 horse_pk = horse.pk
-                print(horse)
         else:
             horse_pk = request.POST['horse']
         request.session['horse_pk'] = horse_pk
