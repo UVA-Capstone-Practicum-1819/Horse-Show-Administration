@@ -1,10 +1,8 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
-
 {% block content %}
-<h3>Bill for {{name}} in combo {{combo_num}}</h3>
-
+<h2>Bill for {{name}} in combo {{combo_num}}</h2>
 <div class="row">
     <form action="" method="post">
         {% csrf_token %}
@@ -12,9 +10,9 @@
         <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
       <table class="table">
         <thead>
-          <th>Class name</th>
-          <th>Class name</th>
-          <th>reg type</th
+          <th>Class Name</th>
+          <th>Registration Type</th>
+          <th>Scratch</th>
         </thead>
 
         <tbody>
@@ -24,11 +22,12 @@
                 {{ c.name }}
               </td>
               <td>
-                <a class="btn btn-primary btn-sm" href="{% url 'scratch'%}?next={{request.path}}&cname={{c.name}}&combonum={{combo_num}}">Scratch?</a>
+                Pre-Registered
+                <!-- {{ form | crispy}} -->
               </td>
               <td>
-                {{ form | crispy}}
-
+                <a class="btn btn-primary btn-sm"
+                href="{% url 'billinglist' showdate=show_date combonum=combo_num%}">Scratch</a>
               </td>
             </tr>
 
@@ -36,13 +35,10 @@
         </tbody>
       </table>
 
-
-        <h1>Total Classes: {{tot}}</h1>
-
-
-
-
-
+        <h4>Total Classes: {{ tot }}</h4>
+        <h4>Total Price: ${{ price }}</h4>
+        <a class="btn btn-primary btn-sm"
+        href="{% url 'showpage' showdate=show_date%}">Return to Show Page</a>
     </form>
 </div>
 <!-- {{ form.media }} -->
