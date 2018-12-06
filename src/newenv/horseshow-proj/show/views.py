@@ -155,58 +155,106 @@ class ComboAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def billing(request, showname):
+def billing(request, showdate):
     if request.method == "POST":
         form = ComboSelectForm(request.POST)
         if form.is_valid():
             combo = form.cleaned_data['combo']
             combonum = combo.num
-            return redirect('billinglist', showname, combonum)
+            return redirect('billinglist', showdate, combonum)
     else:
         form = ComboSelectForm()
-    return render(request, 'billing.html', {'form': form,  'name': showname})
+    return render(request, 'billing.html', {'form': form, 'date': showdate})
 
 
-def billinglist(request, showname, combonum):
-    show = Show.objects.get(name=showname)
-    form = RegistrationBillForm()
+def billinglist(request, showdate, combonum):
+    show = Show.objects.get(date=showdate)
+    # form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num=combonum)
     tot = combo.classes.count()
-    # print(show.preRegistrationPrice)
-    price = show.preRegistrationPrice
-    context = {'name': combo.rider, 'classes': combo.classes.all,
-               'combo_num': combo.num, 'tot': tot}
+
+    price = show.preRegistrationPrice * tot
+    #
+    # if request.method == "POST":
+    #     print("posting")
+    #     if 'scratch' in request.POST:
+    #         # combonum = request.GET['combonum']
+    #         # combo = HorseRiderCombo.objects.get(num=int(combonum))
+    #         clsnm = request.POST.get("cname")
+    #         print(clsnm)
+    #         dcls = combo.classes.get(name=clsnm)
+    #         combo.classes.remove(dcls)
+    #         tot = combo.classes.count()
+    #         combo.save()
+    #         context = {'name': combo.rider, 'show_date': show.date,
+    #          'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
+    #         return render(request, 'billinglist.html', context)
+    # # else:
+    # print("not post")
+    context = {'name': combo.rider, 'show_date': show.date,
+     'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
     return render(request, 'billinglist.html', context)
 
+def scratch(request, showdate, combonum):
+    # combonum = request.GET['combonum']
+    # showdate = request.GET['showdate']
 
-def divisionscore(request, divisionname):
-    division = Division.objects.get(name=divisionname)
-    context = {'classes': division.classes.all, 'name': division.name}
-    return render(request, 'division_score.html', context)
-
-
-def scratch(request):
-    combonum = request.GET['combonum']
     # print(combonum+1)
+    show = Show.objects.get(date=showdate)
     combo = HorseRiderCombo.objects.get(num=int(combonum))
     cls = request.GET["cname"]
     dcls = combo.classes.get(name=cls)
     # dcls.delete()
     combo.classes.remove(dcls)
     tot = combo.classes.count()
-    context = {'name': combo.rider, 'classes': combo.classes.all,
-               'combo_num': combo.num, 'tot': tot}
+    price = show.preRegistrationPrice * tot
+    context = {'name': combo.rider, 'show_date': show.date,
+      'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
     return render(request, 'billinglist.html', context)
 
+def divisionscore(request,divisionname):
+    division = Division.objects.get(name= divisionname)
+    form = DivisionChampForm()
+    if request.method == "POST":
+        print("POST method")
+        form = DivisionChampForm(request.POST)
+        if form.is_valid():
+            print("valid")
+            champion= form.cleaned_data['champion']
+            print(champion)
+            champion_pts= form.cleaned_data['champion_pts']
+            print(champion_pts)
+            champion_reserve= form.cleaned_data['champion_reserve']
+            champion_reserve_pts= form.cleaned_data['champion_reserve_pts']
+            division = Division.objects.get(name= divisionname)
+            division.champion= champion
+            division.champion_pts= champion_pts
+            division.champion_reserve= champion_reserve
+            division.champion_reserve_pts= champion_reserve_pts
+            division.save()
 
-def deleteReport(request):
-    name = request.GET["user"]
-    user = User.objects.get(username=name)
-    report = request.GET["reportname"]
-    report_todelete = inputReport.objects.get(report_name=report)
-    report_todelete.delete()
-    return render(request, 'viewReports.html', {'obj': inputReport.objects.all, 'user': user})
+    else:
+        form = DivisionChampForm()
+    context = {'classes': division.classes.all, 'name': division.name, 'form': form}
+    return render(request, 'division_score.html', context)
 
+def delete_class(request, divisionname, classname):
+    print("in delete class")
+    division = Division.objects.get(name=divisionname)
+    classObj = Classes.objects.get(name=classname)
+    division.classes.remove(classObj)
+    division.save()
+    context = {'classes': division.classes.all,'name': division.name}
+    return redirect('division_classes', divisionname=divisionname)
+    #return render(request, 'division_classes.html', context)
+
+
+
+def division_classes(request,divisionname):
+    print("in division classes")
+    division = Division.objects.get(name= divisionname)
+    context = {'classes': division.classes.all,'name': division.name}
+    return render(request, 'division_classes.html', context)
 
 def new_class(request):
     if request.method == "POST":
@@ -362,10 +410,13 @@ def division_select(request, showname):
                     name=form.cleaned_data['name'])
                 current_divisions.add(division)
                 show.save()
-                divisionname = division.name
+
+                divisionname= division.name
+
                 # return render(request, 'horse_select.html', {'form': form})
                 # return redirect('/')
-                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+                #return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+                return redirect('division_classes', divisionname)
         if 'score' in request.POST:
             form = DivisionSelectForm(request.POST)
             if form.is_valid():
