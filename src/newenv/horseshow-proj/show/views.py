@@ -212,49 +212,41 @@ def scratch(request, showdate, combonum):
       'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
     return render(request, 'billinglist.html', context)
 
-def divisionscore(request,divisionname):
-    division = Division.objects.get(name= divisionname)
+def divisionscore(request,divisionname): #displays list of classes in division, hrc winners of each of those classes from 1st-6th places, and form to enter champion info
+    division = Division.objects.get(name= divisionname) # get the division object from the name of the divison that was passed in
     form = DivisionChampForm()
     if request.method == "POST":
-        print("POST method")
         form = DivisionChampForm(request.POST)
         if form.is_valid():
-            print("valid")
             champion= form.cleaned_data['champion']
-            print(champion)
             champion_pts= form.cleaned_data['champion_pts']
-            print(champion_pts)
             champion_reserve= form.cleaned_data['champion_reserve']
             champion_reserve_pts= form.cleaned_data['champion_reserve_pts']
-            division = Division.objects.get(name= divisionname)
-            division.champion= champion
-            division.champion_pts= champion_pts
-            division.champion_reserve= champion_reserve
-            division.champion_reserve_pts= champion_reserve_pts
-            division.save()
+            division.champion= champion #sets the division's champion field  equal to the value entered into the "champion" field of the DivisionChampForm
+            division.champion_pts= champion_pts #sets the division's champion_pts field equal to the value entered into the "champion_pts" field of DivisionChampForm
+            division.champion_reserve= champion_reserve #sets the division's champion_reserve field equal to the value entered into the "champion_reserve" field of DivisionChampForm
+            division.champion_reserve_pts= champion_reserve_pts #sets the division's champion_reserve_pts field equal to the value entered into the "champion_reserve_pts" field of DivisionChampForm
+            division.save() #saves the division object fields in the database
 
     else:
         form = DivisionChampForm()
     context = {'classes': division.classes.all, 'name': division.name, 'form': form}
-    return render(request, 'division_score.html', context)
+    return render(request, 'division_score.html', context) #passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
 
-def delete_class(request, divisionname, classname):
-    print("in delete class")
-    division = Division.objects.get(name=divisionname)
-    classObj = Classes.objects.get(name=classname)
-    division.classes.remove(classObj)
-    division.save()
+def delete_class(request, divisionname, classname): #deletes a class from a division
+    division = Division.objects.get(name=divisionname) #gets the division object from the division name that was passed in
+    classObj = Classes.objects.get(name=classname) #gets the class object from the class name that was passed in
+    division.classes.remove(classObj) #removes the class object from the division's many-to-many "classes" field
+    division.save() #saves the division object in the database
     context = {'classes': division.classes.all,'name': division.name}
-    return redirect('division_classes', divisionname=divisionname)
-    #return render(request, 'division_classes.html', context)
+    return redirect('division_classes', divisionname=divisionname)  #redirects to division_classes and passes in the division's name
 
 
 
-def division_classes(request,divisionname):
-    print("in division classes")
-    division = Division.objects.get(name= divisionname)
+def division_classes(request,divisionname): #lists the classes in a division
+    division = Division.objects.get(name= divisionname)  #gets the division object from the division name that was passed in
     context = {'classes': division.classes.all,'name': division.name}
-    return render(request, 'division_classes.html', context)
+    return render(request, 'division_classes.html', context) #passes the division's name and classes to the "division_classes.html" and renders that page
 
 def new_class(request):
     if request.method == "POST":
@@ -398,18 +390,17 @@ def new_division(request, showname):
         return render(request, 'new_division.html', context)
 
 
-def division_select(request, showname):
+def division_select(request, showname): #displays division select dropdown and ability to "Save" or "See Division Scores"
     if request.method == "POST":
-        if 'save' in request.POST:
+        if 'save' in request.POST: #if a division is selected and the "Save" button is clicked
             form = DivisionSelectForm(request.POST)
             if form.is_valid():
-                print("form valid ")
-                show = Show.objects.get(name=showname)
-                current_divisions = show.divisions
+                show = Show.objects.get(name=showname) #gets the show object from the showname that was passed in
+                current_divisions = show.divisions #gets the divisions of the show object
                 division = Division.objects.get(
                     name=form.cleaned_data['name'])
                 current_divisions.add(division)
-                show.save()
+                show.save() #saves the show ohject in the database
 
                 divisionname= division.name
 
@@ -417,17 +408,17 @@ def division_select(request, showname):
                 # return redirect('/')
                 #return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
                 return redirect('division_classes', divisionname)
-        if 'score' in request.POST:
+        if 'score' in request.POST: # if a division is selected and the "See Divison Scores" button is clicked
             form = DivisionSelectForm(request.POST)
             if form.is_valid():
                 division = Division.objects.get(
-                    name=form.cleaned_data['name'])
+                    name=form.cleaned_data['name']) # get the division object from the "name" field in the DivisionSelectFrom
                 divisionname = division.name
-                return redirect('divisionscore', divisionname)
+                return redirect('divisionscore', divisionname) #redirects to divisionscore and passes in the divisionname
 
     else:
         form = DivisionSelectForm()
-    return render(request, 'division_select.html', {'form': form, 'name': showname})
+    return render(request, 'division_select.html', {'form': form, 'name': showname}) #passes the DivisionSelectForm and show name to "division_select.html" and renders that page
 
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
@@ -474,7 +465,7 @@ def select_horse(request):
 
 def add_horse(request):
     horse_form = HorseForm()
-    return render(request, 'horse_edit.html', {'horse_form': horse_form})
+    return render(request, 'horse_edit.html', {'horse_form': horse_form}) #passes the HorseForm to "horse_edit.html" and renders that page
 
 
 def add_combo(request):
@@ -541,14 +532,10 @@ def check_combo(request, num):
 
 class HorseAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-
-        # if not self.request.user.is_authenticated():
-            # return Horse.objects.none()
-
-        qs = Horse.objects.all().order_by('name')
+        qs = Horse.objects.all().order_by('name') #orders horses in dropdown queryset by name
 
         if self.q:
-            qs = qs.filter(name__istartswith=self.q)
+            qs = qs.filter(name__istartswith=self.q) #filters horses in dropdown queryset by checking if horses' names start with the text entered into the field
 
         return qs
 
@@ -569,12 +556,12 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
 #     return render(request, 'classes.html', {'form': form})
 #
 
-def populate_pdf(request):
+def populate_pdf(request): #populates text fields of PDF
     data_dict = {
         'show': '11/7/2018',
         'judge': 'Bertha',
-    }
+    } #info to populate the pdf's "show" and "judge" text fields
     write_fillable_pdf("show/static/VHSA_Results_2015.pdf",
-                       "show/static/VHSA_Final_Results.pdf", data_dict)
+                       "show/static/VHSA_Final_Results.pdf", data_dict) #uses "VHSA_Results_2015.pdf" and populates it's fields with the info in data dict, then it saves this new populated pdf to "VHSA_Final_Results.pdf"
     print(os.getcwd())
-    return render(request, 'finalresults.html', {"filename": "show/static/VHSA_Final_Results.pdf"})
+    return render(request, 'finalresults.html', {"filename": "show/static/VHSA_Final_Results.pdf"}) #returns the populated pdf
