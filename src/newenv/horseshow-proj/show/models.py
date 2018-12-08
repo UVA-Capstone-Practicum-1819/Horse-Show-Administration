@@ -68,7 +68,7 @@ class Horse(models.Model):
     accession_no = models.IntegerField(verbose_name="Accession Number")
 
     coggins_date = models.DateField(
-        default=datetime.date.today, verbose_name="Coggins Date")
+        default=datetime.date.today, verbose_name="Coggins Date", )
 
     owner = models.CharField(max_length=200, verbose_name="Owner")
 
