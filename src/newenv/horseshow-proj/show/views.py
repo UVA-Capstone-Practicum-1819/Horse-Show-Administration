@@ -195,15 +195,10 @@ def billinglist(request, showdate, combonum):
      'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
     return render(request, 'billinglist.html', context)
 
-<<<<<<< HEAD
-def scratch(request):
-    combonum = request.GET['combonum']
-=======
+
 def scratch(request, showdate, combonum):
     # combonum = request.GET['combonum']
     # showdate = request.GET['showdate']
-
->>>>>>> 73b5fc5818b51007c4003db663b0e02fa07d793e
     # print(combonum+1)
     show = Show.objects.get(date=showdate)
     combo = HorseRiderCombo.objects.get(num=int(combonum))
@@ -303,7 +298,7 @@ def rankclass(request, classname):
             showclass.sixth = sixth
             showclass.save()
             firstcombo = HorseRiderCombo.objects.get(num=first)
-<<<<<<< HEAD
+
             firstscore = ClassScore.objects.create(participated_class=showclass, score=10)
             firstcombo.class_scores.add(firstscore)
             secondcombo = HorseRiderCombo.objects.get(num=second)
