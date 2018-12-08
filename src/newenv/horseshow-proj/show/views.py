@@ -177,7 +177,7 @@ def divisionscore(request,divisionname):
     division = Division.objects.get(name= divisionname)
     context = {'classes': division.classes.all, 'name': division.name}
     return render(request, 'division_score.html', context)
-  
+
 def scratch(request):
     combonum = request.GET['combonum']
     # print(combonum+1)
@@ -251,29 +251,23 @@ def rankclass(request, classname):
             showclass.sixth = sixth
             showclass.save()
             firstcombo = HorseRiderCombo.objects.get(num=first)
-            firstscore = Show.objects.create(participated_class=showclass, score=10)
-            firstcombo.class_scores = firstscore
-            firstcombo.save()
+            firstscore = ClassScore.objects.create(participated_class=showclass, score=10)
+            firstcombo.class_scores.add(firstscore)
             secondcombo = HorseRiderCombo.objects.get(num=second)
-            secondscore = Show.objects.create(participated_class=showclass, score=6)
-            secondcombo.class_scores = secondscore
-            secondcombo.save()
+            secondscore = ClassScore.objects.create(participated_class=showclass, score=6)
+            secondcombo.class_scores.add(secondscore)
             thirdcombo = HorseRiderCombo.objects.get(num=third)
-            thirdscore = Show.objects.create(participated_class=showclass, score=4)
-            thirdcombo.class_scores = thirdscore
-            thirdcombo.save()
+            thirdscore = ClassScore.objects.create(participated_class=showclass, score=4)
+            thirdcombo.class_scores.add(thirdscore)
             fourthcombo = HorseRiderCombo.objects.get(num=fourth)
-            fourthscore = Show.objects.create(participated_class=showclass, score=2)
-            fourthcombo.class_scores = fourthscore
-            fourthcombo.save()
+            fourthscore = ClassScore.objects.create(participated_class=showclass, score=2)
+            fourthcombo.class_scores.add(fourthscore)
             fifthcombo = HorseRiderCombo.objects.get(num=fifth)
-            fifthscore = Show.objects.create(participated_class=showclass, score=1)
-            fifthcombo.class_scores = fifthscore
-            fifthcombo.save()
+            fifthscore = ClassScore.objects.create(participated_class=showclass, score=1)
+            fifthcombo.class_scores.add(fifthscore)
             sixthcombo = HorseRiderCombo.objects.get(num=sixth)
-            sixthscore = Show.objects.create(participated_class=showclass, score=0.5)
-            sixthcombo.class_scores = sixthscore
-            sixthcombo.save()
+            sixthscore = ClassScore.objects.create(participated_class=showclass, score=0.5)
+            sixthcombo.class_scores.add(sixthscore)
             if 'showdate' in request.session:
                 showdate = request.session['showdate']
                 return redirect('showpage', showdate)
