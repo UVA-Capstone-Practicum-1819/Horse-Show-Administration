@@ -122,21 +122,14 @@ class ShowSelectForm(forms.ModelForm):
 
 
 class HorseSelectForm(forms.ModelForm):
-    # horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
     horse = forms.ModelChoiceField(
         queryset=Horse.objects.all(),
         widget=autocomplete.ModelSelect2(url='horse_autocomplete')
-    )
+    ) #form with horse autocomplete dropdown
 
     class Meta:
         model = Horse
         fields = ('horse',)
-        # widgets = {
-        #    'name': autocomplete.ModelSelect2(
-        #    url='horse-autocomplete',
-        #    attrs={'data-html': True}
-        #    )
-        #    }
 
 
 class ClassForm(forms.ModelForm):
@@ -172,7 +165,7 @@ class DivisionChampForm(forms.ModelForm):
     class Meta:
         model = Division
         fields = ('champion', 'champion_pts', 'champion_reserve', 'champion_reserve_pts')
-        
+
 class DivisionSelectForm(forms.ModelForm):
     name = forms.ModelChoiceField(
         queryset=Division.objects.all(),
