@@ -54,11 +54,11 @@ class ShowTestIntCase(TestCase):
 
 class BillTests(TestCase):
     def test_billpagesetUp(self):
-        horse1 = Horse.objects.create(name = "Misty", barn_name="Misty", age=4, coggins=12345, owner="Tina", size="pony", type="shetland")
+        horse1 = Horse.objects.create(name="Smokey Mountain", coggins_date="2011-10-11", accession_no=48, owner="Tina", size="large", type="pony")
         # horse2 = Horse.objects.create(name = "Brock", barn_name="Brock", age=5, coggins=73854, owner="Brock has no Owner!", size="unicorn", type="unicorn")
         # horse3 = Horse.objects.create(name = "Ash", barn_name="Ash", age=5, coggins=747, owner="May", size="pony", type="pony")
         # horse4 = Horse.objects.create(name = "Pikachu", barn_name="Pikachu", age=1, coggins=8736, owner="Ash", size="mouse", type="mouse")
-        rider1 = Rider.objects.create(name = "Tarun", address="116 Chelsea Dr", age=22, email="ts4pe@virginia.edu")
+        rider1 = Rider.objects.create(name = "Lauren", address="234 cotton lane", birth_date="1980-10-15", email="sdd3ee@virginia.edu", member_VHSA=True, county="")
         # rider2 = Rider.objects.create(name = "Yunzhe", address="idunno ln.", age=22, email="ts4pe@virginia.edu")
         # rider3 = Rider.objects.create(name = "Shannon", address="sfds", age=22, email="t4pe@virginia.edu")
         c = Classes.objects.create(name="Test", number="1")
@@ -81,7 +81,7 @@ class RiderTestCase(TestCase):
         user.save()
 
     def create_rider(self, title="test", body="test for rider"):
-        return Rider.objects.create(name = "Lauren", address="234 cotton lane", age=12, email="sdd3ee@virginia.edu")
+        return Rider.objects.create(name = "Lauren", address="234 cotton lane", birth_date="1980-10-15", email="sdd3ee@virginia.edu", member_VHSA=True, county="")
 
     def test_rider_creation(self):
         testrider = self.create_rider()
@@ -93,10 +93,10 @@ class RiderTestCase(TestCase):
         response = self.client.post('show/rider/new', follow=True)
         self.assertEqual(response.status_code, 200)
 
-class RiderTestFailCase(TestCase):
+""" class RiderTestFailCase(TestCase):
     def create_rider(self, title="test", body="test for rider"):
         try:
-            rider = Rider.objects.create(name = "Lauren", address="234 cotton lane", age="thirteen", email="sdd3ee@virginia.edu")
+            rider = Rider.objects.create(name = "Lauren", address="234 cotton lane", birth_date="2012-10-15", email="sdd3ee@virginia.edu", member_VHSA=True, county="")
         except:
             print("this is an invalid insert")
             return 0
@@ -104,7 +104,7 @@ class RiderTestFailCase(TestCase):
 
     def test_rider_creation(self):
         testrider = self.create_rider()
-        self.assertFalse(isinstance(testrider, Rider))
+        self.assertFalse(isinstance(testrider, Rider)) """
 
 # redirect from rider select to horse_select
 # redir from ridernew to HorseSelect
@@ -113,38 +113,42 @@ class RiderTestFailCase(TestCase):
 #  if ridernew fails
 class RiderFormsTest(TestCase):
     def test_RiderForm_valid(self):
-        form = RiderForm(data={'name': "x", 'address': "xx", 'age': 9, 'email': "x@x.com"})
+        form = RiderForm(data={'name': "x", 'address': "xx", 'birth_date': datetime.date(1981, 4, 5), 'member_VHSA': True,  'county': 'Fairfax', 'email': "x@gmail.com", })
         self.assertTrue(form.is_valid())
 
     def test_RiderForm_invalidname(self):
-        form = RiderForm(data={'name': "", 'address': "xx", 'age': 9, 'email': "x@x.com"})
+        form = RiderForm(data={'name': "", 'address': "xx", 'birth_date': datetime.date(1981, 4, 20), 'member_VHSA': True, 'county': 'Fairfax', 'email': "x@x.com",})
         self.assertFalse(form.is_valid())
+
     def test_RiderForm_invalidaddress(self):
-        form = RiderForm(data={'name': "x", 'address': "", 'age': 9, 'email': "x@x.com"})
+        form = RiderForm(data={'name': "x", 'address': "", 'birth_date': datetime.date(1981, 4, 20), 'member_VHSA': True, 'county': 'Fairfax', 'email': "x@x.com",})
         self.assertFalse(form.is_valid())
-    def test_RiderForm_invalidagetype(self):
-        form = RiderForm(data={'name': "x", 'address': "xx", 'age': "xxx", 'email': "x@x.com"})
+
+    def test_RiderForm_invalidbirthdate(self):
+        form = RiderForm(data={'name': "x", 'address': "xx", 'birth_date': datetime.date(1981, 4, 20), 'member_VHSA': True, 'county': 'Fairfax', 'email': "x@x.com",})
         self.assertFalse(form.is_valid())
-    def test_RiderForm_invalidageempty(self):
-        form = RiderForm(data={'name': "x", 'address': "xx", 'age': '', 'email': "x@x.com"})
+
+    def test_RiderForm_invalidbirthdate2(self):
+        form = RiderForm(data={'name': "x", 'address': "xx", 'birth_date': datetime.date(1981, 4, 20), 'member_VHSA': True,  'county': 'Fairfax', 'email': "x@x.com", })
         self.assertFalse(form.is_valid())
-    def test_RiderForm_invalidagerange(self):
-        form = RiderForm(data={'name': "x", 'address': "xx", 'age': -1, 'email': "x@x.com"})
-        self.assertFalse(form.is_valid())
+
     def test_RiderForm_invalidemail(self):
-        form = RiderForm(data={'name': "x", 'address': "xx", 'age': 9, 'email': "xx.com"})
+        form = RiderForm(data={'name': "x", 'address': "xx", 'birth_date': datetime.date(1981, 4, 20), 'member_VHSA': True,  'county': 'Fairfax', 'email': "xgmail.com", })
         self.assertFalse(form.is_valid())
+
     def test_RiderForm_invalidemailnodot(self):
-        form = RiderForm(data={'name': "x", 'address': "xx", 'age': 9, 'email': "xx@com"})
+        form = RiderForm(data={'name': "x", 'address': "xx", 'birth_date': datetime.date(1981, 4, 20), 'member_VHSA': True,  'county': 'Fairfax', 'email': "x@xcom", })
         self.assertFalse(form.is_valid())
+
     def test_RiderForm_invalidemailempty(self):
-        form = RiderForm(data={'name': "x", 'address': "xx", 'age': 9, 'email': ""})
+        form = RiderForm(data={'name': "x", 'address': "xx", 'birth_date': datetime.date(1981, 4, 20), 'member_VHSA': True,  'county': 'Fairfax', 'email': "", })
         self.assertFalse(form.is_valid())
+
     def test_RiderSelectForm_valid(self):
-        rider2 = Rider.objects.create(name = "Test", address="idunno ln.", age=22, email="ts4pe@virginia.edu")
-        values = {'name': "Test"}
+        values = {'name' : "Test", 'address':"idunno ln.",  'email':"ts4pe@virginia.edu", 'birth_date':datetime.date(1981, 4, 20), 'member_VHSA': False, 'county':"Fairfax"}
         form = RiderSelectForm(data=values)
         self.assertTrue(form.is_valid)
+
     def test_RiderSelectForm_invalid(self):
         form = RiderSelectForm(data={'name': ""})
         self.assertFalse(form.is_valid())
@@ -161,7 +165,7 @@ class HorseTestCase(TestCase):
     #     user.set_password('password')
     #     user.save()
     def create_horse(self, title="test", body="test for horse"):
-        return Horse.objects.create(name="Smokey Mountain", barn_name="Smokey", age=10, coggins=10102, owner="Tina", size="pony", type="shetland")
+        return Horse.objects.create(name="Smokey Mountain", coggins_date="2011-10-11", accession_no=48, owner="Tina", size="large", type="pony")
 
     def test_horse_creation(self):
         testhorse = self.create_horse()
@@ -174,21 +178,22 @@ class HorseTestCase(TestCase):
     #     self.assertEqual(response.status_code, 200)
 
     def test_horse_Invalidform(self):
-        form_vals= {'name': 'Misty', 'barn_name': 'Misty', 'age': '4', 'coggins': '12345', 'owner':'Al', 'size':'pony'}
+        form_vals= {'name': 'Misty', 'coggins_date': '2008-06-15', 'accession_no': 100, 'owner':'Al', 'size':'medium', 'type':'pony'}
         form= HorseForm(data=form_vals)
         self.assertFalse(form.is_valid())
+
     def test_horse_Invalidform2(self):
-            form_vals= {'name': '', 'barn_name': 'Misty', 'age': '4', 'coggins': '12345', 'owner':'Al', 'size':'pony'}
-            form= HorseForm(data=form_vals)
-            self.assertFalse(form.is_valid())
+        form_vals= {'name': 'Musty', 'coggins_date': datetime.date(1981, 4, 20), 'accession_no': 12, 'owner':'Al', 'type':'pony2', 'size':'small'}
+        form= HorseForm(data=form_vals)
+        self.assertFalse(form.is_valid())
 
     def test_horse_Validform(self):
-        form_vals= {'name': 'Misty', 'barn_name': 'Misty', 'age': '4', 'coggins': '12345', 'owner':'Al', 'size':'pony', 'type':'shetland'}
+        form_vals= {'name': 'Misty', 'coggins_date': datetime.date(1981, 4, 20), 'accession_no': 100, 'owner':'Al', 'size':'medium', 'type':'pony'}
         form= HorseForm(data=form_vals)
         self.assertTrue(form.is_valid())
 
     def test_horse_ValidformInt(self):
-        values= {'name': 'Boi', 'barn_name': 'Boiiii', 'age': 5, 'coggins': 12345, 'owner':'Joe', 'size':'horse', 'type':'Thoroughbred'}
+        form_vals= {'name': 'Musty', 'coggins_date': '2018-10-05', 'accession_no': 18, 'owner':'Al', 'type':'pony', 'size':'small'}
         form= HorseForm(data=values)
         self.assertTrue(form.is_valid())
 
@@ -198,7 +203,7 @@ class HorseSelectCase(TestCase):
     #     user.set_password('password')
     #     user.save()
     def create_horse(self, title="test", body="test for horse"):
-        return Horse.objects.create(name = "Misty", barn_name="Misty", age=4, coggins=12345, owner="Tina", size="pony", type="shetland")
+        return Horse.objects.create(name = "Misty", coggins_date="2008-08-12", accession_no=35, owner="Tina", size="small", type="small")
     # def test_horse_select_page(self):
     #     c = Client()
     #     logged_in = c.login(username='user', password='password')
@@ -283,15 +288,15 @@ class LoginTestCase(TestCase):
         self.client.get(reverse('logout'))
         self.assertFalse(response.context['user'].is_active)
 
-class HorseRiderComboTest(TestCase):
+""" class HorseRiderComboTest(TestCase):
     def setUp(self):
-        horse1 = Horse.objects.create(name = "Misty", barn_name="Misty", age=4, coggins=12345, owner="Tina", size="pony", type="shetland")
+        horse1 = Horse.objects.create(name="Smokey Mountain", coggins_date="2011-10-11", accession_no=48, owner="Tina", size="large", type="pony")
         horse2 = Horse.objects.create(name = "Brock", barn_name="Brock", age=5, coggins=73854, owner="Brock has no Owner!", size="unicorn", type="unicorn")
         horse3 = Horse.objects.create(name = "Ash", barn_name="Ash", age=5, coggins=747, owner="May", size="pony", type="pony")
         horse4 = Horse.objects.create(name = "Pikachu", barn_name="Pikachu", age=1, coggins=8736, owner="Ash", size="mouse", type="mouse")
         rider1 = Rider.objects.create(name = "Tarun", address="116 Chelsea Dr", age=22, email="ts4pe@virginia.edu")
         rider2 = Rider.objects.create(name = "Yunzhe", address="idunno ln.", age=22, email="ts4pe@virginia.edu")
-        rider3 = Rider.objects.create(name = "Shannon", address="sfds", age=22, email="ts4pe@virginia.edu")
+        rider3 = Rider.objects.create(name = "Shannon", address="sfds", age=22, email="ts4pe@virginia.edu") """
 
 
 class DivisionsTest(TestCase):
@@ -322,18 +327,19 @@ class DivisionsTest(TestCase):
 
 class ComboSelect(TestCase):
     def test_comboselectvalid(self):
-        horse1 = Horse.objects.create(name = "Misty", barn_name="Misty", age=4, coggins=12345, owner="Tina", size="pony", type="shetland")
-        rider1 = Rider.objects.create(name = "Tarun", address="116 Chelsea Dr", age=22, email="ts4pe@virginia.edu")
+        horse1 = Horse.objects.create(name="Smokey Mountain", coggins_date="2011-10-11", accession_no=48, owner="Tina", size="large", type="pony")
+        rider1 = Rider.objects.create(name = "Lauren", address="234 cotton lane", birth_date="1980-10-15", email="sdd3ee@virginia.edu", member_VHSA=True, county="")
         c = Classes.objects.create(name="Test", number="1")
         c2 = Classes.objects.create(name="Test2", number="2")
-        hrc1 = HorseRiderCombo.objects.create(num = 12, rider = rider1, horse = horse1)
+        hrc1 = HorseRiderCombo.objects.create(num=12, rider=rider1, horse=horse1)
+        
         hrc1.classes.add(c)
         values = {'num': 12}
         form = ClassSelectForm(data=values)
         self.assertTrue(form.is_valid)
     def test_comboselectinvalid(self):
-        horse1 = Horse.objects.create(name = "Misty", barn_name="Misty", age=4, coggins=12345, owner="Tina", size="pony", type="shetland")
-        rider1 = Rider.objects.create(name = "Tarun", address="116 Chelsea Dr", age=22, email="ts4pe@virginia.edu")
+        horse1 = Horse.objects.create(name="Smokey Mountain", coggins_date="2011-10-11", accession_no=48, owner="Tina", size="large", type="pony")
+        rider1 = Rider.objects.create(name = "Lauren", address="234 cotton lane", birth_date="1980-10-15", email="sdd3ee@virginia.edu", member_VHSA=True, county="")
         c = Classes.objects.create(name="Test", number="1")
         c2 = Classes.objects.create(name="Test2", number="2")
         hrc1 = HorseRiderCombo.objects.create(num = 12, rider = rider1, horse = horse1)
@@ -469,7 +475,7 @@ class ComboRiderTestCase(TestCase):
     def test_rider_pk(self):
         c = Client()
         logged_in = c.login(username='user', password='password')
-        data = {'name': "sarah", 'address': "address1", 'age': 9, 'email': "email@123.com"}
+        data = {'name' : "Test", 'address':"idunno ln.",  'email':"ts4pe@virginia.edu", 'birth_date':"1996-10-15", 'member_VHSA': False, 'county':"Fairfax"}
         response = self.client.post('show/horse', data)
         form = RiderForm(data)
         rider = form.save(commit=False)
@@ -485,7 +491,7 @@ class ComboHorseTestCase(TestCase):
     def test_rider_pk(self):
         c = Client()
         logged_in = c.login(username='user', password='password')
-        data = {"name": "Misty", "barn_name": "Misty", "age":4, "coggins":12345, "owner":"Tina", "size":"pony", "type":"shetland"}
+        data = {'name':"Smokey Mountain", 'coggins_date':'2011-10-11', 'accession_no':48, 'owner':"Tina", 'size':"large", 'type':"pony"}
         response = self.client.post('show/add-combo', data)
         form = HorseForm(data)
         horse = form.save(commit=False)
@@ -501,7 +507,7 @@ class ComboRiderSessionTestCase(TestCase):
     def test_rider_pk(self):
         c = Client()
         logged_in = c.login(username='user', password='password')
-        data = {'name': "sarah", 'address': "address1", 'age': 9, 'email': "email@123.com"}
+        data = {'name' : "Test", 'address':"idunno ln.",  'email':"ts4pe@virginia.edu", 'birth_date':"1996-10-15", 'member_VHSA': False, 'county':"Fairfax"}
         form = RiderForm(data)
         rider = form.save(commit=False)
         session = self.client.session
@@ -518,7 +524,7 @@ class ComboHorseSessionTestCase(TestCase):
     def test_rider_pk(self):
         c = Client()
         logged_in = c.login(username='user', password='password')
-        data = {"name": "Misty", "barn_name": "Misty", "age":4, "coggins":12345, "owner":"Tina", "size":"pony", "type":"shetland"}
+        data = {'name':"Smokey Mountain", 'coggins_date':'2011-10-11', 'accession_no':48, 'owner':"Tina", 'size':"large", 'type':"pony"}
         form = HorseForm(data)
         horse = form.save(commit=False)
         session = self.client.session
@@ -585,10 +591,10 @@ class ComboDatabaseInvalidTestCase(TestCase):
         user.set_password('password')
         user.save()
     def test_valid_combo_not_in_database(self):
-        data_horse = {"name": "Misty", "barn_name": "Misty", "age":4, "coggins":12345, "owner":"Tina", "size":"pony", "type":"shetland"}
+        data_horse = {'name':"Smokey Mountain", 'coggins_date':'2011-10-11', 'accession_no':48, 'owner':"Tina", 'size':"large", 'type':"pony"}
         form_horse = HorseForm(data_horse)
         horse = form_horse.save()
-        data_rider = {'name': "sarah", 'address': "address1", 'age': 9, 'email': "email@123.com"}
+        data_rider = {'name' : "Test", 'address':"idunno ln.",  'email':"ts4pe@virginia.edu", 'birth_date':"1996-10-15", 'member_VHSA': False, 'county':"Fairfax"}
         form_rider = RiderForm(data_rider)
         rider = form_rider.save()
         combo = HorseRiderCombo.objects.create(

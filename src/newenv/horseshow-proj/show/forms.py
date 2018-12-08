@@ -36,8 +36,8 @@ class RankingForm(forms.ModelForm):
 
 class RiderForm(forms.ModelForm):
 
-    birth_date = forms.CharField(max_length=100, widget=forms.SelectDateWidget(
-        years=[year for year in range(1900, 2010)]))
+    birth_date = forms.DateField(widget=forms.SelectDateWidget(
+        years=range(1900, 2016)))
 
     class Meta:
         model = Rider
@@ -59,10 +59,13 @@ class RiderSelectForm(forms.ModelForm):
 
 
 class HorseForm(forms.ModelForm):
+    coggins_date = forms.DateField(widget=forms.SelectDateWidget(
+        years=range(2010, 2019)))
+
     class Meta:
         model = Horse
-        fields = ('name',
-                  'coggins_date', 'accession_no', 'owner', 'type', 'size', )
+        fields = ('name', 'coggins_date', 'accession_no',
+                  'owner', 'type', 'size', )
 
 
 class ComboSelectForm(forms.ModelForm):
@@ -161,10 +164,13 @@ class DivisionForm(forms.ModelForm):
         model = Division
         fields = ('name', 'number')
 
+
 class DivisionChampForm(forms.ModelForm):
     class Meta:
         model = Division
+
         fields = ('champion', 'champion_pts', 'champion_reserve', 'champion_reserve_pts')
+
 
 class DivisionSelectForm(forms.ModelForm):
     name = forms.ModelChoiceField(
