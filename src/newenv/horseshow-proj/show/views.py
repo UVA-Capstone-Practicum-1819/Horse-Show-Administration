@@ -196,11 +196,6 @@ def billinglist(request, showdate, combonum):
     return render(request, 'billinglist.html', context)
 
 <<<<<<< HEAD
-def divisionscore(request,divisionname):
-    division = Division.objects.get(name= divisionname)
-    context = {'classes': division.classes.all, 'name': division.name}
-    return render(request, 'division_score.html', context)
-
 def scratch(request):
     combonum = request.GET['combonum']
 =======
