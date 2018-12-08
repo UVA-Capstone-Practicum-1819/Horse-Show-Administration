@@ -390,6 +390,15 @@ class AddDivFailures(TestCase):
 
 #tested Showselect for
 
+class DivisionChampTestCase(TestCase):
+    def test_divisionchampform_textinintegerfields(self):
+        form = DivisionChampForm(data={'champion':'henry', 'champion_pts':'8', 'champion_reserve':'jen','champion_reserve_pts':'89'})
+        self.assertFalse(form.is_valid())
+
+    def test_divisionchampform_textinintegerfields(self):
+        form = DivisionChampForm(data={'champion':'212', 'champion_pts':'8', 'champion_reserve':'312','champion_reserve_pts':'89'})
+        self.assertTrue(form.is_valid())
+
 class ShowSelectFormTestCase(TestCase):
     def test_showSelectForm_invaliddatenomarks(self):
         form = ShowSelectForm(data={'date':'20191003'})
