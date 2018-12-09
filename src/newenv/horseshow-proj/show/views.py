@@ -102,13 +102,18 @@ def create_show(request):
         return render(request, 'create_show.html', {'form': f})
     showname = f.cleaned_data['name']
     showdate = f.cleaned_data['date']
+    if Show.objects.filter(date=showdate).count() is 1:
+        response = {'ok': True, 'success_msg': "Cannot have Shows with same date",
+                    'form': form}
+        return render(request, 'create_show.html', response, {'form': f})
     showdatestring = str(showdate)
     showlocation = f.cleaned_data['location']
     new_show = Show.objects.create(
         name=showname, date=showdatestring, location=showlocation)
     response = {'ok': True, 'success_msg': "Show was successfully created",
                 'form': form, 'show': new_show}
-    return render(request, 'create_show.html', response)
+    # return render(request, 'create_show.html', response)
+    return redirect('showpage', showdate)
 
 
 def show_select(request):
@@ -426,7 +431,7 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
 def select_rider(request):
     if request.method == "POST":
         request.session['rider_pk'] = request.POST['rider']
-        return redirect('select_horse')            
+        return redirect('select_horse')
     form = RiderSelectForm()
     return render(request, 'rider_select.html', {'form': form})
 
@@ -512,8 +517,8 @@ def edit_combo(request, num):
 
         elif request.POST['edit']:
             edit_form = HorseRiderEditForm(request.POST)
-            
-            if edit_form.is_valid():    
+
+            if edit_form.is_valid():
                 combo.email = edit_form.cleaned_data['email']
                 combo.cell = edit_form.cleaned_data['cell']
                 combo.contact = edit_form.cleaned_data['contact']
@@ -521,9 +526,9 @@ def edit_combo(request, num):
             else:
                 print("INVALID")
     edit_form = HorseRiderEditForm({'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
-    
+
     class_selection_form = ClassSelectForm()
-    
+
     registered_classes = combo.classes.all()
     """ remove_class_forms = [] """
     """ for registered_class in registered_classes:
