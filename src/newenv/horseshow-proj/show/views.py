@@ -172,7 +172,7 @@ def billinglist(request, showdate, combonum):
     # form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num=combonum)
     tot = combo.classes.count()
-
+    # price = 0
     price = show.preRegistrationPrice * tot
     #
     # if request.method == "POST":
@@ -471,6 +471,7 @@ def add_combo(request):
         combo_form = ComboNumForm()
         rider_pk = request.session['rider_pk']
         horse_pk = request.session['horse_pk']
+        request.session['navigation'] = "addcombo"
         rider = get_object_or_404(Rider, pk=rider_pk)
         horse = get_object_or_404(Horse, pk=horse_pk)
         return render(request, 'combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
@@ -496,15 +497,19 @@ def combo(request):
                 # request.session['num'] = number
                 return render(request, 'check_combo.html', {"num": num, 'rider': rider, 'horse': horse})
             except(HorseRiderCombo.DoesNotExist):
-                rider = get_object_or_404(
-                    Rider, pk=request.session['rider_pk'])
-                horse = get_object_or_404(
-                    Horse, pk=request.session['horse_pk'])
-                print(rider)
-                print(horse)
-                horse_rider_combo = HorseRiderCombo.objects.create(
-                    num=combo_num, rider=rider, horse=horse)
-                return render(request, 'combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
+                if 'navigation' in request.session:
+                    if request.session['navigation'] == "addcombo":
+                        rider = get_object_or_404(
+                            Rider, pk=request.session['rider_pk'])
+                        horse = get_object_or_404(
+                            Horse, pk=request.session['horse_pk'])
+                        print(rider)
+                        print(horse)
+                        horse_rider_combo = HorseRiderCombo.objects.create(
+                            num=combo_num, rider=rider, horse=horse)
+                        return render(request, 'combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
+                else:
+                    return redirect('showpage', request.session["showdate"])
         else:
             return redirect('showpage', request.session["showdate"])
     return redirect(reverse('index'))
