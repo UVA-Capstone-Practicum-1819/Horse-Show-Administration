@@ -58,7 +58,7 @@
 
 
 
-    <form  method="post">
+    <form  class="form" method="post">
       {% csrf_token %} {{ form | crispy}}
       <input type="submit" value="Submit">
     </form>
