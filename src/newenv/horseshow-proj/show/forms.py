@@ -148,15 +148,20 @@ class ClassForm(forms.ModelForm):
         fields = ('name', 'number')
 
 
+class RemoveClassForm(forms.Form):
+    num = models.IntegerField()
+
+
 class ClassSelectForm(forms.ModelForm):
-    name = forms.ModelChoiceField(
+    selected_class = forms.ModelChoiceField(
         queryset=Classes.objects.all(),
-        widget=autocomplete.ModelSelect2(url='classes_autocomplete')
+        widget=autocomplete.ModelSelect2(
+            url='classes_autocomplete'),
     )
 
     class Meta:
         model = Classes
-        fields = ('name',)
+        fields = ('selected_class',)
 
     def clean_date(self):
         classobj = self.cleaned_data['name']
