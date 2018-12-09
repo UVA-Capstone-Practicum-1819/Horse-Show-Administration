@@ -129,7 +129,7 @@ class HorseRiderCombo(models.Model):
     horse = models.ForeignKey(
         Horse, on_delete=models.CASCADE, verbose_name="Horse")
 
-    classes = models.ManyToManyField(Classes, verbose_name="Classes")
+    classes = models.ManyToManyField(Classes, verbose_name="Classes", blank=True)
 
     class_scores = models.ManyToManyField(
         ClassScore, verbose_name="Class Scores", blank=True, null=True)
