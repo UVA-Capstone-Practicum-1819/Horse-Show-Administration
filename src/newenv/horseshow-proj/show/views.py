@@ -177,7 +177,7 @@ def billinglist(request, showdate, combonum):
     # form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num=combonum)
     tot = combo.classes.count()
-
+    # price = 0
     price = show.preRegistrationPrice * tot
     #
     # if request.method == "POST":
@@ -510,37 +510,7 @@ def edit_combo(request, num):
     
     return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form})
 
-""" def combo(request, num):
-    if request.method == "POST":
-        combo_form = ComboNumForm(request.POST)
-        if combo_form.is_valid():
-            combo_num = combo_form.cleaned_data['num']
-            try:
-                horse_rider_combo = HorseRiderCombo.objects.get(num=combo_num)
-                if 'rider_pk' not in request.session and 'horse_pk' not in request.session:
-                    rider = horse_rider_combo.rider
-                    request.session['rider_pk'] = rider.pk
-                    horse = horse_rider_combo.horse
-                    request.session['horse_pk'] = horse.pk
-                else:
-                    rider = Rider.objects.get(pk=request.session['rider_pk'])
-                    horse = Horse.objects.get(pk=request.session['horse_pk'])
-                num = horse_rider_combo.num
-                # request.session['num'] = number
-                return render(request, 'check_combo.html', {"num": num, 'rider': rider, 'horse': horse})
-            except(HorseRiderCombo.DoesNotExist):
-                rider = get_object_or_404(
-                    Rider, pk=request.session['rider_pk'])
-                horse = get_object_or_404(
-                    Horse, pk=request.session['horse_pk'])
-                print(rider)
-                print(horse)
-                horse_rider_combo = HorseRiderCombo.objects.create(
-                    num=combo_num, rider=rider, horse=horse)
-                return render(request, 'combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
-        else:
-            return redirect('showpage', request.session["showdate"])
-    return redirect(reverse('index')) """
+
 
 
 def check_combo(request, num):
