@@ -68,7 +68,7 @@ class Horse(models.Model):
     accession_no = models.IntegerField(verbose_name="Accession Number")
 
     coggins_date = models.DateField(
-        default=datetime.date.today, verbose_name="Coggins Date", )
+        default=datetime.date.today,  verbose_name="Coggins Date", )
 
     owner = models.CharField(max_length=200, verbose_name="Owner")
 
@@ -91,7 +91,7 @@ class Rider (models.Model):
         primary_key=True, max_length=200, validators=[EmailValidator()], verbose_name="Email")
 
     birth_date = models.DateField(
-        blank=True, null=True, verbose_name="Birth Date")
+        blank=True, null=True, verbose_name="Birth Date", )
 
     member_VHSA = models.BooleanField(
         default=False, blank=True, verbose_name="Member of the VHSA")
@@ -121,7 +121,7 @@ class HorseRiderCombo(models.Model):
         ("trainer", "Trainer")
     )
     num = models.IntegerField(primary_key=True, validators=[
-        MinValueValidator(0), MaxValueValidator(999)], verbose_name="Combination Number")
+        MinValueValidator(100), MaxValueValidator(999)], verbose_name="Combination Number")
 
     rider = models.ForeignKey(
         Rider, on_delete=models.CASCADE, verbose_name="Rider")
@@ -134,14 +134,14 @@ class HorseRiderCombo(models.Model):
     class_scores = models.ManyToManyField(
         ClassScore, verbose_name="Class Scores")
 
-    contact = models.CharField(max_length=2,
-                               choices=contact_choices, default="Rider", verbose_name="Contact")
+    contact = models.CharField(max_length=100,
+                               choices=contact_choices, default="rider", verbose_name="Contact")
 
-    email = models.EmailField(unique=True, blank=True,
-                              null=True, verbose_name="Email")
+    email = models.EmailField(blank=True,
+                              null=True, verbose_name="Contact Email")
 
-    cell = models.CharField(max_length=200, unique=True,
-                            blank=True, null=True, verbose_name="Cell #")
+    cell = models.CharField(max_length=12,
+                            blank=True, verbose_name="Contact Cell Phone Number")
 
     def __str__(self):
         return str(self.num)
