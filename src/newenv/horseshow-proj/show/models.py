@@ -39,8 +39,8 @@ class Show(models.Model):
     name = models.CharField(max_length=100)
     date = models.CharField(max_length=100, primary_key=True)
     location = models.CharField(max_length=100)
-    dayOfPrice = models.IntegerField(default=0)
-    preRegistrationPrice = models.IntegerField()
+    dayOfPrice = models.IntegerField(blank=True, null=True, default=0)
+    preRegistrationPrice = models.IntegerField(blank=True, null=True, default=0)
     divisions = models.ManyToManyField(Division, blank=True)
     def __str__(self):
         return self.date
