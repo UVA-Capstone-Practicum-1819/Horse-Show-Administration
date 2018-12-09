@@ -272,7 +272,7 @@ def class_select(request):
     if request.method == "POST":
         form = ClassSelectForm(request.POST)
         if form.is_valid():
-            classobj = form.cleaned_data['name']
+            classobj = form.cleaned_data['selected_class']
             classname = classobj.name
             request.session['classobj'] = classname
             return redirect('rankclass', classname)
