@@ -132,9 +132,9 @@ class HorseRiderCombo(models.Model):
     classes = models.ManyToManyField(Classes, verbose_name="Classes")
 
     class_scores = models.ManyToManyField(
-        ClassScore, verbose_name="Class Scores")
+        ClassScore, verbose_name="Class Scores", blank=True, null=True)
 
-    contact = models.CharField(max_length=2,
+    contact = models.CharField(max_length=10,
                                choices=contact_choices, default="Rider", verbose_name="Contact")
 
     email = models.EmailField(unique=True, blank=True,
