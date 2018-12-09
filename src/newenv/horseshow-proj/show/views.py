@@ -527,12 +527,13 @@ def add_combo(request):
 def edit_combo(request, num):
     combo = HorseRiderCombo.objects.get(pk=num)
     if request.method == "POST":
-        """ if request.POST['remove_class']:
+        if request.POST.get('remove_class'):
             num = request.POST['remove_class']
             selected_class = Classes.objects.get(pk=num)
             combo.classes.remove(selected_class)
-        """
-        if request.POST['add_class']:
+            combo.save()
+        
+        if request.POST.get('add_class'):
             class_selection_form = ClassSelectForm(request.POST)
 
             if class_selection_form.is_valid():
@@ -540,7 +541,7 @@ def edit_combo(request, num):
                 combo.classes.add(selected_class)
                 combo.save()
 
-        elif request.POST['edit']:
+        elif request.POST.get('edit'):
             edit_form = HorseRiderEditForm(request.POST)
 
             if edit_form.is_valid():
@@ -550,6 +551,7 @@ def edit_combo(request, num):
                 combo.save()
             else:
                 print("INVALID")
+                
     edit_form = HorseRiderEditForm({'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
 
     class_selection_form = ClassSelectForm()
