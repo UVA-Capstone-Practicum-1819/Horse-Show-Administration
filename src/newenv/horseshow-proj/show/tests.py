@@ -9,7 +9,7 @@ from show import models
 class ClassesScoreTestCase(TestCase):
     def RankForm_Valid(self):
         def test_showForm_validsdashes(self):
-            form = RankingForm(data={'first':'201', 'second':'203','third':'332','fourth':'883','fifth':'902','sixth':'234'})
+            form = RankingForm(data={'first':'231', 'second':'203','third':'332','fourth':'883','fifth':'902','sixth':'234'})
             self.assertTrue(form.is_valid())
 
     def RankForm_Invalid(self):
