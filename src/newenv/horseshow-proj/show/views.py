@@ -54,6 +54,11 @@ def index(request):
 
 
 def showpage(request, showdate):
+    if request.method == "POST":
+        form = ComboNumForm(request.POST)
+        if form.is_valid():
+            num = form.cleaned_data['num']
+            return redirect('edit_combo', num=num)
     if 'navigation' in request.session:
         del request.session['navigation']
     if 'rider_pk' in request.session:
@@ -419,14 +424,31 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
 
 
 def select_rider(request):
+    if request.method == "POST":
+        request.session['rider_pk'] = request.POST['rider']
+        return redirect('select_horse')            
     form = RiderSelectForm()
     return render(request, 'rider_select.html', {'form': form})
 
-
 def add_rider(request):
+    if request.method == "POST":
+        form = RiderForm(request.POST)
+        if form.is_valid():
+            rider = form.save()
+            request.session['rider_pk'] = rider.pk
+            return redirect('select_horse')
     form = RiderForm()
     return render(request, 'editrider.html', {'form': form})
 
+def add_horse(request):
+    if request.method == "POST":
+        form = HorseForm(request.POST)
+        if form.is_valid():
+            horse = form.save()
+            request.session['horse_pk'] = horse.pk
+            return redirect('add_combo')
+    form = HorseForm()
+    return render(request, 'horse_edit.html', {'form': form})
 
 class RiderAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -438,46 +460,57 @@ class RiderAutocomplete(autocomplete.Select2QuerySetView):
 
 def select_horse(request):
     if request.method == 'POST':
-        rider = request.POST.get('rider', None)
-        """ if rider doesn't exist yet, the request comes from add rider page, takes in the form information, save rider, save rider's primary key """
-        if rider is None:
-            form = RiderForm(request.POST)
-            if form.is_valid():
-                rider = form.save()
-                rider_pk = rider.pk
-        else:
-            rider_pk = request.POST['rider']
-    request.session['rider_pk'] = rider_pk
+        horse = request.POST['horse']
+        request.session['horse_pk'] = request.POST['horse']
+        return redirect('add_combo')
     form = HorseSelectForm()
     return render(request, 'horse_select.html', {'form': form})
 
 
-def add_horse(request):
-    horse_form = HorseForm()
-    return render(request, 'horse_edit.html', {'horse_form': horse_form}) #passes the HorseForm to "horse_edit.html" and renders that page
-
-
 def add_combo(request):
     if request.method == 'POST':
-        horse = request.POST.get('horse', None)
-        if horse is None:
-            form = HorseForm(request.POST)
-            if form.is_valid:
-                horse = form.save()
-                horse_pk = horse.pk
+        form = HorseRiderComboCreateForm(request.POST)
+        if form.is_valid():
+            num = form.cleaned_data['num']
+            email = form.cleaned_data['email']
+            cell = form.cleaned_data['cell']
+            contact = form.cleaned_data['contact']
+            rider_pk = request.session['rider_pk']
+            horse_pk = request.session['horse_pk']
+            rider = get_object_or_404(Rider, pk=rider_pk)
+            horse = get_object_or_404(Horse, pk=horse_pk)
+            HorseRiderCombo.objects.create(num=num, rider=rider, horse=horse, cell=cell, email=email)
+            return redirect('edit_combo', num=num)
         else:
-            horse_pk = request.POST['horse']
-        request.session['horse_pk'] = horse_pk
-        combo_form = ComboNumForm()
-        rider_pk = request.session['rider_pk']
-        horse_pk = request.session['horse_pk']
-        rider = get_object_or_404(Rider, pk=rider_pk)
-        horse = get_object_or_404(Horse, pk=horse_pk)
-        return render(request, 'combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
-    return redirect(reverse('show'))
+            return redirect('index')
+    rider_pk = request.session['rider_pk']
+    if rider_pk is None:
+        return redirect('index')
+    horse_pk = request.session['horse_pk']
+    if horse_pk is None:
+        return redirect('index')
+    rider = get_object_or_404(Rider, pk=rider_pk)
+    horse = get_object_or_404(Horse, pk=horse_pk)
+    form = HorseRiderComboCreateForm()
+    return render(request, 'add_combo.html', {'form': form, 'rider': rider, 'horse': horse})
 
+def edit_combo(request, num):
+    combo = HorseRiderCombo.objects.get(pk=num)
+    if request.method == "POST":
+        form = HorseRiderEditForm(request.POST)
+        print(request.POST)
+        if form.is_valid():    
+            combo.email = form.cleaned_data['email']
+            combo.cell = form.cleaned_data['cell']
+            combo.contact = form.cleaned_data['contact']
+            combo.save()
+        else:
+            print("INVALID")
+    edit_form = HorseRiderEditForm({'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
+    
+    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form})
 
-def combo(request):
+""" def combo(request, num):
     if request.method == "POST":
         combo_form = ComboNumForm(request.POST)
         if combo_form.is_valid():
@@ -507,7 +540,7 @@ def combo(request):
                 return render(request, 'combo.html', {'combo_form': combo_form, 'rider': rider, 'horse': horse})
         else:
             return redirect('showpage', request.session["showdate"])
-    return redirect(reverse('index'))
+    return redirect(reverse('index')) """
 
 
 def check_combo(request, num):
