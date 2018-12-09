@@ -6,10 +6,23 @@
     <div class="row">
         <div class="col-md-8">
 
-            <h1>Show:</h1>
-
+            <h2>Show: {{showname}}</h1>
+            <h4>Division: {{division}}</h2>
+            <h5>Classes:</h5>
+                {% for class in classes %}
+                <li><a href = "">{{class}}</li>
+                {% endfor %}</a>
+            {% if form %}
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Submit</button>
+            </form>
+            {% else %}
+            <p>Division contains maximum of 3 classes</p>
+            {% endif %}
         </div>
     </div>
 </div>
-</div>
 {% endblock %}
+

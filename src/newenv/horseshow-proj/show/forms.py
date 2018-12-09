@@ -2,7 +2,7 @@ from django import forms
 from show.models import *
 from .models import *
 import datetime
-from django.forms import HiddenInput
+from django.forms import HiddenInput, formset_factory
 from dal import autocomplete
 
 
@@ -143,12 +143,21 @@ class HorseSelectForm(forms.ModelForm):
         #    )
         #    }
 
+class AddClassForm(forms.Form):
+    class Meta: 
+        model = Classes
+        fields = ('name', 'number')
+
 
 class ClassForm(forms.ModelForm):
     class Meta:
         model = Classes
         fields = ('name', 'number')
 
+class AddClassForm(forms.ModelForm):
+    class Meta:
+        model = Classes
+        fields = ('name', 'number')
 
 class ClassSelectForm(forms.ModelForm):
     name = forms.ModelChoiceField(
