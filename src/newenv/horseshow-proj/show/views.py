@@ -497,18 +497,41 @@ def add_combo(request):
 def edit_combo(request, num):
     combo = HorseRiderCombo.objects.get(pk=num)
     if request.method == "POST":
-        form = HorseRiderEditForm(request.POST)
-        print(request.POST)
-        if form.is_valid():    
-            combo.email = form.cleaned_data['email']
-            combo.cell = form.cleaned_data['cell']
-            combo.contact = form.cleaned_data['contact']
-            combo.save()
-        else:
-            print("INVALID")
+        """ if request.POST['remove_class']:
+            num = request.POST['remove_class']
+            selected_class = Classes.objects.get(pk=num)
+            combo.classes.remove(selected_class)
+        """
+        if request.POST['add_class']:
+            class_selection_form = ClassSelectForm(request.POST)
+
+            if class_selection_form.is_valid():
+                selected_class = class_selection_form.cleaned_data['selected_class']
+                combo.classes.add(selected_class)
+                combo.save()
+
+        elif request.POST['edit']:
+            edit_form = HorseRiderEditForm(request.POST)
+            
+            if edit_form.is_valid():    
+                combo.email = edit_form.cleaned_data['email']
+                combo.cell = edit_form.cleaned_data['cell']
+                combo.contact = edit_form.cleaned_data['contact']
+                combo.save()
+            else:
+                print("INVALID")
     edit_form = HorseRiderEditForm({'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
     
-    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form})
+    class_selection_form = ClassSelectForm()
+    
+    registered_classes = combo.classes.all()
+    """ remove_class_forms = [] """
+    """ for registered_class in registered_classes:
+        remove_class_forms.add(RemoveClassForm()) """
+
+    price = len(registered_classes) * 10
+
+    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_selection_form': class_selection_form, 'classes': registered_classes, 'price': price})
 
 
 
