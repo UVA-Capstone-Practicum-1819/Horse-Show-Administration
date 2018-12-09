@@ -63,7 +63,7 @@ class Horse(models.Model):
     )
 
     name = models.CharField(
-        primary_key=True, max_length=200, verbose_name="Name")
+        primary_key=True, max_length=200, verbose_name="Name (Barn Name)")
 
     accession_no = models.IntegerField(verbose_name="Accession Number")
 
