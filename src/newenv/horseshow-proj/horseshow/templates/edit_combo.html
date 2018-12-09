@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-<h3>Horse Rider Combination {{ combo.num }} </h3>
+<h3>Horse Rider Combination </h3>
 
 <div class="container=fluid">
     <div class="row">
@@ -26,17 +26,37 @@
                 
             </form>
 
-            
-            <form class="form" action="{% url 'edit_combo' combo.num %}" method="POST">
-                {% csrf_token %}    
-                {% for class in classes %}
-                    <p>{{ class.number }} {{class.name}}</p>
-                    <button name="remove_class" value="{{class.number}}" class="btn btn-delete",type="warning">Remove</button> 
-                {% endfor %}
-            </form>
+            <table class="table">
+                <tr>
+                    <thead>
+                        <th scope="col">Class #</th>
+                        <th scope="col">Class Name</th>
+                        <th scope="col">Preregistered?</th>
+                        <th scope="col">Remove</th>
+                    </thead>
+                </tr>
+                <tbody>
+                    {% for class in classes %}
+                        <tr scope="row">
+                            <td>{{class.number}}</td>
+                            <td>{{class.name}}</td>
+                            <td>N/A</td>
+                            <td>
+                            <form method="post" class="form" action="">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger" name="remove_class" value="{{class.number}}">X</button>
+                            </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
-            <p> <b>Price:</b> {{price}} </p>
-            
+            <h4>Total Classes: {{ tot }}</h4>
+            <h4>Total Price: ${{ price }}</h4>
+
+            <a class="btn btn-primary btn-sm"
+            href="{% url 'show_select' %}">Return to Show Select Page</a>
         </div>
     </div>
 </div>
