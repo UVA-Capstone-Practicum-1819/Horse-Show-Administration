@@ -504,7 +504,7 @@ def edit_combo(request, num):
     if request.method == "POST":
         if request.POST.get('remove_class'):
             num = request.POST['remove_class']
-            selected_class = Classes.objects.get(pk=num)
+            selected_class = Classes.objects.get(number=num)
             combo.classes.remove(selected_class)
             combo.save()
         
@@ -532,13 +532,10 @@ def edit_combo(request, num):
     class_selection_form = ClassSelectForm()
 
     registered_classes = combo.classes.all()
-    """ remove_class_forms = [] """
-    """ for registered_class in registered_classes:
-        remove_class_forms.add(RemoveClassForm()) """
+    number_registered_classes = len(registered_classes)
+    price = number_registered_classes * 10
 
-    price = len(registered_classes) * 10
-
-    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_selection_form': class_selection_form, 'classes': registered_classes, 'price': price})
+    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_selection_form': class_selection_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes})
 
 
 
