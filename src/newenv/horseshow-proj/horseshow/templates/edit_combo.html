@@ -3,15 +3,41 @@
 {% block content %}
 <h3>Horse Rider Combination {{ combo.num }} </h3>
 
-<div>
-    <p> <b>Number:</b> {{ combo.num }} </p>
-    <p> <b>Rider Name:</b> {{ combo.rider.name }} </p>
-    <p> <b>Horse Name:</b> {{ combo.horse.name }} </p>
-    <form class="form" action="{% url 'edit_combo' combo.num %}" method="post">
-        {% csrf_token %}    
-        {{ edit_form | crispy }}
-        <button type="submit" class="btn btn-success">Edit Information</button>
-    </form>
-</div>
+<div class="container=fluid">
+    <div class="row">
+        <div style="col-lg-6">
+            <p> <b>Number:</b> {{ combo.num }} </p>
+            <p> <b>Rider Name:</b> {{ combo.rider.name }} </p>
+            <p> <b>Horse Name:</b> {{ combo.horse.name }} </p>
+            <form class="form" action="{% url 'edit_combo' combo.num %}" method="post">
+                {% csrf_token %}    
+                {{ edit_form | crispy }}
+                <button type="submit" name="edit" value="Edit" class="btn btn-success">Edit Information</button>
+            </form>
+        </div>
 
+        <div class="col-lg-6">
+            
+            <form class="form" action="{% url 'edit_combo' combo.num %}" method="post">
+                {% csrf_token %}    
+                {{ class_selection_form | crispy }}
+                {{ class_selection_form.media}}
+                <button class="btn bn-default" name="add_class" value="Add" type="submit">Add Class</button>
+                
+            </form>
+
+            
+            <form class="form" action="{% url 'edit_combo' combo.num %}" method="POST">
+                {% csrf_token %}    
+                {% for class in classes %}
+                    <p>{{ class.number }} {{class.name}}</p>
+                    <button name="remove_class" value="{{class.number}}" class="btn btn-delete",type="warning">Remove</button> 
+                {% endfor %}
+            </form>
+
+            <p> <b>Price:</b> {{price}} </p>
+            
+        </div>
+    </div>
+</div>
 {% endblock %}
