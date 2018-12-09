@@ -39,24 +39,20 @@ class Show(models.Model):
     name = models.CharField(max_length=100)
     date = models.CharField(max_length=100, primary_key=True)
     location = models.CharField(max_length=100)
-    dayOfPrice = models.IntegerField(null=True, blank=True)
-    preRegistrationPrice = models.IntegerField(null=True, blank=True)
-
+    dayOfPrice = models.IntegerField(default=0)
+    preRegistrationPrice = models.IntegerField()
     divisions = models.ManyToManyField(Division, blank=True)
-
     def __str__(self):
         return self.date
 
 
 class Horse(models.Model):
-
     size_choices = (
         ("NA", "N/A"),
         ("small", "SM"),
         ("medium", "MED"),
         ("large", "LG"),
     )
-
     type_choices = (
         ("horse", "Horse"),
         ("pony", "Pony"),
