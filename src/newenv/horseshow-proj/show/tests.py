@@ -1,11 +1,22 @@
 from django.test import TestCase, Client
-from show.models import Show, Rider, Horse, Classes
 from show.models import *
 from show.forms import *
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from show import models
 # Create your tests here.
+
+class ClassesScoreTestCase(TestCase):
+    def RankForm_Valid(self):
+        def test_showForm_validsdashes(self):
+            form = RankingForm(data={'first':'201', 'second':'203','third':'332','fourth':'883','fifth':'902','sixth':'234'})
+            self.assertTrue(form.is_valid())
+
+    def RankForm_Invalid(self):
+        def test_showForm_validsdashes(self):
+            form = RankingForm(data={'first':'', 'second':'','third':'','fourth':'','fifth':'','sixth':''})
+            self.assertFalse(form.is_valid())
+
 
 class ShowTestCase(TestCase):
     def create_show(self, title="test", body="test for a show"):
@@ -332,7 +343,7 @@ class ComboSelect(TestCase):
         c = Classes.objects.create(name="Test", number="1")
         c2 = Classes.objects.create(name="Test2", number="2")
         hrc1 = HorseRiderCombo.objects.create(num=12, rider=rider1, horse=horse1)
-        
+
         hrc1.classes.add(c)
         values = {'num': 12}
         form = ClassSelectForm(data=values)
