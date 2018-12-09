@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<h3>Horse Rider Combination {{ combo.num }} </h3>
+
+<div>
+    <p> <b>Number:</b> {{ combo.num }} </p>
+    <p> <b>Rider Name:</b> {{ combo.rider.name }} </p>
+    <p> <b>Horse Name:</b> {{ combo.horse.name }} </p>
+    <form class="form" action="{% url 'edit_combo' combo.num %}" method="post">
+        {% csrf_token %}    
+        {{ edit_form | crispy }}
+        <button type="submit" class="btn btn-success">Edit Information</button>
+    </form>
+</div>
+
+{% endblock %}

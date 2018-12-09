@@ -36,7 +36,7 @@ class RankingForm(forms.ModelForm):
 
 class RiderForm(forms.ModelForm):
 
-    birth_date = forms.DateField(widget=forms.SelectDateWidget(
+    birth_date = forms.DateField(help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(
         years=range(1900, 2016)))
 
     class Meta:
@@ -50,7 +50,8 @@ class RiderSelectForm(forms.ModelForm):
         # rider_names =  [rider.name for rider in Rider.objects.all()]
     rider = forms.ModelChoiceField(
         queryset=Rider.objects.all(),
-        widget=autocomplete.ModelSelect2(url='rider_autocomplete')
+        widget=autocomplete.ModelSelect2(
+            url='rider_autocomplete')
     )
 
     class Meta:
@@ -81,18 +82,24 @@ class ComboSelectForm(forms.ModelForm):
         fields = ('combo',)
 
 
-class ComboForm(forms.ModelForm):
-    class Meta:
-        model = HorseRiderCombo
-        fields = ('num', 'rider', 'horse')
-
-
 class ComboNumForm(forms.Form):
     # class Meta:
     #     model = HorseRiderCombo
     #     fields = ('num',)
     num = forms.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(999)])
+        validators=[MinValueValidator(100), MaxValueValidator(999)])
+
+
+class HorseRiderComboCreateForm(forms.ModelForm):
+    class Meta:
+        model = HorseRiderCombo
+        fields = ('num', 'contact', 'email', 'cell')
+
+
+class HorseRiderEditForm(forms.ModelForm):
+    class Meta:
+        model = HorseRiderCombo
+        fields = ('contact', 'email', 'cell')
 
 
 class ShowSelectForm(forms.ModelForm):
@@ -128,7 +135,7 @@ class HorseSelectForm(forms.ModelForm):
     horse = forms.ModelChoiceField(
         queryset=Horse.objects.all(),
         widget=autocomplete.ModelSelect2(url='horse_autocomplete')
-    ) #form with horse autocomplete dropdown
+    )  # form with horse autocomplete dropdown
 
     class Meta:
         model = Horse
@@ -169,7 +176,8 @@ class DivisionChampForm(forms.ModelForm):
     class Meta:
         model = Division
 
-        fields = ('champion', 'champion_pts', 'champion_reserve', 'champion_reserve_pts')
+        fields = ('champion', 'champion_pts',
+                  'champion_reserve', 'champion_reserve_pts')
 
 
 class DivisionSelectForm(forms.ModelForm):
