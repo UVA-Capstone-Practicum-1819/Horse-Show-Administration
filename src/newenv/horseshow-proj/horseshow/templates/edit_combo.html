@@ -10,21 +10,23 @@
             <p> <b>Rider Name:</b> {{ combo.rider.name }} </p>
             <p> <b>Horse Name:</b> {{ combo.horse.name }} </p>
             <form class="form" action="{% url 'edit_combo' combo.num %}" method="post">
-                {% csrf_token %}    
+                {% csrf_token %}
                 {{ edit_form | crispy }}
+                <a class="btn btn-success" href="{% url 'show_select' %}">Return to Show select</a>
                 <button type="submit" name="edit" value="Edit" class="btn btn-success">Edit Information</button>
             </form>
         </div>
 
         <div class="col-lg-6">
-            
+
             <form class="form" action="{% url 'edit_combo' combo.num %}" method="post">
-                {% csrf_token %}    
+                {% csrf_token %}
                 {{ class_selection_form | crispy }}
                 {{ class_selection_form.media}}
                 <button class="btn bn-default" name="add_class" value="Add" type="submit">Add Class</button>
-                
+
             </form>
+
 
             <table class="table">
                 <tr>
@@ -57,6 +59,7 @@
 
             <a class="btn btn-primary btn-sm"
             href="{% url 'show_select' %}">Return to Show Select Page</a>
+
         </div>
     </div>
 </div>

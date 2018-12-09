@@ -8,6 +8,8 @@
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" class="btn btn-success" />
+        <a class="btn btn-success" href="{% url 'show_select' %}">Return to Show select</a>
+        
     </form>
     <a href="{% url 'classes' %}">Add a New Class</a>
 </div>
