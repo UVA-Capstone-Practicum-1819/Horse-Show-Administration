@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+ {% block content %}
+<h3>Division {{name}}</h3>
+ <div class="row">
+    <form class="form" action="" method="post">
+        {% csrf_token %}
+        <!-- {{ form | crispy}} -->
+        <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
+      <table class="table">
+        <thead>
+          <th>Class</th>
+          <th>Remove</th>
+          <th>Edit</th>
+        </thead>
+         <tbody>
+          {% for c in classes %}
+            <tr>
+              <td>
+                {{ c.name }}
+              </td>
+              <td>
+                <button><a href="{% url 'delete_class' divisionname=name classname=c.name %}">Remove</a></button>
+              </td>
+              <td>
+                <button><a href="">Edit Class</a></button>
+              </td>
+               <td>
+                {{ form | crispy}}
+               </td>
+            </tr>
+           {% endfor %}
+        </tbody>
+      </table>
+       <a href="">Add a Class</a>
+       <!--  <h1>Champion: {{champ}}</h1>
+        <h1>Champion Points: {{champ_pts}}</h1>
+        <h1>Champion Reserve: {{champ_reseve_pts}}</h1>
+        <h1>Champion Reserve Points: {{champ_reserve}}</h1>-->
+     </form>
+</div>
+<!-- {{ form.media }} -->
+{% endblock %}

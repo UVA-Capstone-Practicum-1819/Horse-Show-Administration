@@ -1,18 +1,21 @@
-{% extends 'base.html' %} {% block content %}
-<h1>Edit Horse-Rider Combination</h1>
+{% extends 'base.html' %} 
+{% load crispy_forms_tags %}
+{% block content %}
+<h3>Edit Horse-Rider Combination</h3>
 
 <div>
-  <div>Rider: {{ rider.name }}</div>
-  <div>Horse: {{ horse.name }}</div>
-  <div>Combination Number: {{ num }}</div>
-  <form action="{% url 'check_combo' num=num %}" method="post">
-    {% csrf_token %} {{ combo_form.as_p }}
-    <input
+  <div><b>Rider:</b> {{ rider.name }}</div>
+  <div><b>Horse:</b> {{ horse.name }}</div>
+  <div><b>Number:</b> {{ num }}</div>
+
+  <form class="form" action="{% url 'check_combo' num=num %}" method="post">
+    {% csrf_token %} {{ combo_form | crispy }}
+    <button
       type="submit"
+      class="btn btn-success"
       href="{% url 'class_select' %}"
       name="add_class"
-      value="Register For A Class"
-    />
+    >Register for a Class</button>
   </form>
   <br />
 </div>

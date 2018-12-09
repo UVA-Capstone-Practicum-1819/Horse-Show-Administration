@@ -4,11 +4,11 @@
 <h1>Select Division</h1>
 
 <div>
-    <form action="" method="post">
+    <form class="form" action="" method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" href="" name="save" value="Save"/>
-        <input type="submit" href="" name="score" value="See Divsion Scores"/>
+        <input type="submit" href="" name="score" value="See Division Scores"/>
     </form>
     <a href="{% url 'divisions' showdate=date%}">Add a New Division</a>
 </div>

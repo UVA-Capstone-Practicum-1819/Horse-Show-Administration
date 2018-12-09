@@ -2,7 +2,8 @@
 
 {% block content %}
 <h3>Create Account</h3>
-<form method="post">
+
+<form class="form" method="post">
     {% csrf_token %}
     {% for field in form %}
     <p>
@@ -18,4 +19,5 @@
     {% endfor %}
     <button type="submit" class="btn btn-success">Submit</button>
 </form>
+
 {% endblock %}
