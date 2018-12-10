@@ -344,7 +344,6 @@ def rankclass(request, classname):
 
 #This is the autocomplete functionality for selecting a class
 class ClassAutocomplete(autocomplete.Select2QuerySetView):
->>>>>>> d1311f04a6da9b162a359f00280c5c0b82db0a57
     def get_queryset(self):
         qs = Classes.objects.all().order_by('number')
         if self.q:
@@ -359,6 +358,10 @@ def new_division(request, showdate):
         if 'exit' in request.POST:
             form = DivisionForm(request.POST)
             if form.is_valid():
+                divisions = Division.objects.filter(number=form.cleaned_data['number'])
+                if(len(divisions) > 0):
+                    messages.error(request, "division number in use") #prepare error message, will display on submit.
+                    return redirect('divisions', showdate)
                 post = form.save(commit=False)
                 post.author = request.user
                 post.published_date = timezone.now()
@@ -372,6 +375,10 @@ def new_division(request, showdate):
         if 'another' in request.POST:
             form = DivisionForm(request.POST)
             if form.is_valid():
+                divisions = Division.objects.filter(number=form.cleaned_data['number'])
+                if(len(divisions) > 0):
+                    messages.error(request, "division number in use") #prepare error message, will display on submit.
+                    return redirect('divisions', showdate)
                 post = form.save(commit=False)
                 post.author = request.user
                 post.published_date = timezone.now()
@@ -624,7 +631,7 @@ def add_combo(request):
             HorseRiderCombo.objects.create(num=num, rider=rider, horse=horse, cell=cell, email=email)
             return redirect('edit_combo', num=num)
         else:
-            return redirect('index')
+            return redirect('show_select')
     rider_pk = request.session['rider_pk']
     if rider_pk is None:
         return redirect('show_select')
