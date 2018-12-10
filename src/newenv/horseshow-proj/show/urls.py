@@ -6,6 +6,30 @@ from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
+"""horseshow URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/2.1/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+
+
+
+    Most of our url templates show how certain subdivisions exist in the organization of the horse show, so the information
+    can be passed between different templatesself
+    Obsolete URLs were commented out or removed
+    Autocomplete pages are only used for autocomplete functionality- will not be a functional page for the purpose
+    of organizing a Horse Show
+"""
+
 urlpatterns = [
     path('', views.show_select, name="show_select"),
     path('signup', views.signup, name='signup'),
@@ -19,7 +43,7 @@ urlpatterns = [
     path('rider/new', views.add_rider, name="add_rider"),
     path('class/new', views.new_class, name="classes"),
     path('<showdate>/division/<divisionname>', views.division, name="division_info"),
-    # path('<showdate>/<divisionname>/classes', views.division, name="division_info"),    
+    # path('<showdate>/<divisionname>/classes', views.division, name="division_info"),
     path('<showdate>/newdivision', views.new_division, name="divisions"),
     path('horse', views.select_horse, name="select_horse"),
 
@@ -59,18 +83,3 @@ urlpatterns = [
 ]
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-"""horseshow URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/2.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""

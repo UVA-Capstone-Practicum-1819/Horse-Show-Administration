@@ -4,7 +4,9 @@ import random
 
 import datetime
 
-
+#Model for a single class. Because class is recognized in coding, we changed the name of a
+#single class to classes. Includes rankings from 1st through 6th and a number for the class as
+#well as a name
 class Classes(models.Model):
     number = models.IntegerField(default=0)
     first = models.IntegerField(default=0)
@@ -19,7 +21,8 @@ class Classes(models.Model):
     def __str__(self):
         return str(self.number) + ". " + self.name
 
-
+#Model for a single division. Includes a name, number for the division, and a
+# champion and champion reserve for the division as well as the points they earned in that division
 class Division(models.Model):
     name = models.CharField(max_length=100, default="")
     number = models.IntegerField(default=0)
@@ -34,7 +37,8 @@ class Division(models.Model):
     def __str__(self):
         return self.name
 
-
+#Model for a Show, includes basic information such as name/date/location and a preRegistrationPrice
+#for riders who sign up for classes early. There is a dayof price for riders who sign up the day of the show.
 class Show(models.Model):
     name = models.CharField(max_length=100)
     date = models.CharField(max_length=100, primary_key=True)
@@ -45,7 +49,8 @@ class Show(models.Model):
     def __str__(self):
         return self.date
 
-
+#Model for a horse, includes possible sizes of the horse and the choice to refer to it as a horse or a Pony
+#coggins date is important for health consideration and the owner is not necessarily the riders
 class Horse(models.Model):
     size_choices = (
         ("NA", "N/A"),
@@ -77,7 +82,7 @@ class Horse(models.Model):
     def __str__(self):
         return self.name
 
-
+#Model for a rider. Birth date only needs to be recorded if they are 18 or younger
 class Rider (models.Model):
     name = models.CharField(max_length=200, verbose_name="Name")
 
@@ -100,7 +105,7 @@ class Rider (models.Model):
     def __str__(self):
         return self.name
 
-
+#Model for a ClassScore. Includes a participating class and a score for that class to be placed under a HorseRider Combo
 class ClassScore(models.Model):
     participated_class = models.ForeignKey(Classes, on_delete=models.CASCADE)
     score = models.IntegerField()
@@ -108,7 +113,9 @@ class ClassScore(models.Model):
     def __str__(self):
         return str(self.score)
 
-
+#Model that contains information about the Horse Rider Combo. Used to describe the
+#relationship between a specific horse and specific rider for the day of the show
+#Class scores are recorded for each class they compete in
 class HorseRiderCombo(models.Model):
     contact_choices = (
         ("rider", "Rider"),
