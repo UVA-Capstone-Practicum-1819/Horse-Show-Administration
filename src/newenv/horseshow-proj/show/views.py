@@ -145,7 +145,7 @@ def signup(request):
     """ signs user up via form """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
-        print(request.POST)
+        
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
@@ -422,29 +422,25 @@ def select_rider(request):
 
 def select_rider2(request):
     if request.method == "POST":
-        request.session['rider_pk'] = request.POST['rider']
-        return redirect('rider_edit')
+        rider_pk = request.POST['rider']
+        return redirect('edit_rider', rider_pk=rider_pk)
     form = RiderSelectForm()
     return render(request, 'rider_select2.html', {'form': form})
 
-def edit_rider(request, email):
-    rider = Rider.objects.get(pk=email)
-    if request.POST.get('edit_rider'):
+def edit_rider(request, rider_pk):
+    rider = Rider.objects.get(pk=rider_pk)
+    if request.method == "POST":
         edit_form = RiderEditForm(request.POST)
-
         if edit_form.is_valid():
             rider.name = edit_form.cleaned_data['name']
             rider.address = edit_form.cleaned_data['address']
-            rider.email = edit_form.cleaned_data['email']
             rider.birth_date = edit_form.cleaned_data['birth_date']
             rider.member_VHSA = edit_form.cleaned_data['member_VHSA']
             rider.county = edit_form.cleaned_data['county']
             rider.save()
-        else:
-            print("INVALID")
 
     edit_rider_form = RiderEditForm(
-        {'name': rider.name, 'address': rider.address, 'email': rider.email,
+        {'name': rider.name, 'address': rider.address, 
          'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'county': rider.county},
         instance=rider)
     return render(request, 'rider_edit.html', {'rider': rider, 'edit_rider_form': edit_rider_form})
@@ -459,6 +455,32 @@ def add_rider(request):
             return redirect('select_horse')
     form = RiderForm()
     return render(request, 'editrider.html', {'form': form})
+
+def select_horse2(request):
+    if request.method == "POST":
+        horse_pk = request.POST['horse']
+        return redirect('edit_horse', horse_pk=horse_pk)
+    form = HorseSelectForm()
+    return render(request, 'horse_select2.html', {'form': form})
+
+def edit_horse(request, horse_pk):
+    horse = Horse.objects.get(pk=horse_pk)
+    if request.method == "POST":
+        edit_form = HorseEditForm(request.POST)
+        if edit_form.is_valid():
+            horse.accession_no = edit_form.cleaned_data['accession_no']
+            horse.coggins_date = edit_form.cleaned_data['coggins_date']
+            horse.owner = edit_form.cleaned_data['owner']
+            horse.type = edit_form.cleaned_data['type']
+            horse.size = edit_form.cleaned_data['size']
+            horse.save()
+
+    edit_horse_form = HorseEditForm(
+        {'accession_no': horse.accession_no, 'coggins_date': horse.coggins_date, 
+         'owner': horse.owner, 'type': horse.type, 'size': horse.size},
+        instance=horse)
+    return render(request, 'horse_edit.html', {'horse': horse, 'edit_horse_form': edit_horse_form})
+
 
 def add_horse(request):
     if request.method == "POST":
@@ -485,6 +507,8 @@ def select_horse(request):
         return redirect('add_combo')
     form = HorseSelectForm()
     return render(request, 'horse_select.html', {'form': form})
+
+
 
 
 def add_combo(request):
@@ -539,8 +563,7 @@ def edit_combo(request, num):
                 combo.cell = edit_form.cleaned_data['cell']
                 combo.contact = edit_form.cleaned_data['contact']
                 combo.save()
-            else:
-                print("INVALID")
+            
 
     edit_form = HorseRiderEditForm({'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
 
@@ -597,5 +620,5 @@ def populate_pdf(request): #populates text fields of PDF
     } #info to populate the pdf's "show" and "judge" text fields
     write_fillable_pdf("show/static/VHSA_Results_2015.pdf",
                        "show/static/VHSA_Final_Results.pdf", data_dict) #uses "VHSA_Results_2015.pdf" and populates it's fields with the info in data dict, then it saves this new populated pdf to "VHSA_Final_Results.pdf"
-    print(os.getcwd())
+    
     return render(request, 'finalresults.html', {"filename": "show/static/VHSA_Final_Results.pdf"}) #returns the populated pdf
