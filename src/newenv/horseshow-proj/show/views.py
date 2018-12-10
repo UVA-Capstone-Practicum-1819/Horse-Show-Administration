@@ -236,15 +236,14 @@ def divisionscore(request,divisionname): #displays list of classes in division, 
     context = {'classes': division.classes.all, 'name': division.name, 'form': form}
     return render(request, 'division_score.html', context) #passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
 
-def delete_class(request, showdate, divisionname, classname): #deletes a class from a division
+def delete_class(request, showdate, divisionname, classnumber): #deletes a class from a division
     division = Division.objects.get(name=divisionname) #gets the division object from the division name that was passed in
-    classObj = Classes.objects.get(name=classname) #gets the class object from the class name that was passed in
+    classObj = Classes.objects.get(number=classnumber) 
     division.classes.remove(classObj)
     classObj.delete() #removes the class object from the division's many-to-many "classes" field
     division.save() #saves the division object in the database
     context = {'classes': division.classes.all,'name': division.name}
     return redirect('division_info', showdate=showdate, divisionname=divisionname)  #redirects to division_classes and passes in the division's name
-
 
 
 def division_classes(request,divisionname): #lists the classes in a division
@@ -256,6 +255,11 @@ def new_class(request):
     if request.method == "POST":
         form = ClassForm(request.POST)
         if form.is_valid():
+            existing_classes = Classes.objects.all()
+            for cl in existing_classes:
+                if cl.number == form.cleaned_data['number']:
+                    messages.error(request, "class number in use")
+                    return redirect('classes')
             post = form.save(commit=False)
             post.author = request.user
             post.published_date = timezone.now()
@@ -380,17 +384,26 @@ def new_division(request, showdate):
         return render(request, 'new_division.html', context)
 
 def division(request, showdate, divisionname):
+    show = Show.objects.get(date=showdate)
+    division = Division.objects.get(name=divisionname)
     if request.method == 'POST':
         form = AddClassForm(request.POST)
         if form.is_valid():
-            c = form.save()
+            existing_classes = Classes.objects.all()
+            for cl in existing_classes:
+                if cl.number == form.cleaned_data['number']:
+                    messages.error(request, "class number in use")
+                    return redirect('division_info', showdate, divisionname)
+            c = Classes(name=form.cleaned_data['name'], number=form.cleaned_data['number'])
+            c.save()
             division = Division.objects.get(name=divisionname)
+            # division_classes = division.classes.all()
+            # division_classes.add(c)
             division.classes.add(c)
+            # division.classes = division_classes
             division.save()
             return redirect('division_info', showdate, divisionname)
     else:
-        show = Show.objects.get(date=showdate)
-        division = Division.objects.get(name=divisionname)
         if(len(division.classes.all()) < 3):
             form = AddClassForm() 
             context = {
@@ -398,16 +411,43 @@ def division(request, showdate, divisionname):
                 "showdate" : showdate,
                 "showname": show.name,
                 "division": division.name,
-                "classes": division.classes.all,
+                "classes": division.classes.all(),
             } 
         else:
             context = {
                 "showdate":show.date,
                 "showname": show.name,
                 "division": division.name,
-                "classes": division.classes.all,
+                "classes": division.classes.all(),
             } 
         return render(request, 'division.html', context)
+
+def class_info(request, showdate, divisionname, classnumber):
+    show = Show.objects.get(date=showdate)
+    division = Division.objects.get(name=divisionname)
+    this_class = Classes.objects.get(number = classnumber)
+    this_combos = []
+    combos = HorseRiderCombo.objects.all()
+    for combo in combos:
+        classes = combo.classes.all()
+        for c in classes:
+            if c == this_class:
+                this_combos.append(combo)
+    context = {
+        "combos":this_combos,
+        "number":this_class.number,
+        "date":showdate,
+        "name":divisionname,
+        "showname":show.name,
+    }
+    return render(request, "classpage.html", context)
+
+def delete_combo(request, showdate, divisionname, classnumber, combo): 
+    combo = HorseRiderCombo.objects.get(num=combo) 
+    classObj = Classes.objects.get(number=classnumber)
+    combo.classes.remove(classObj)
+    # combo = {'classes': division.classes.all,'name': division.name}
+    return redirect('edit_class', showdate=showdate, divisionname=divisionname, classnumber=classnumber)
 
 def division_select(request, showdate): #displays division select dropdown and ability to "Save" or "See Division Scores"
     if request.method == "POST":

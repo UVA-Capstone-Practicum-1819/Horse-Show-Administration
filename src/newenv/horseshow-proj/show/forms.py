@@ -166,7 +166,7 @@ class HorseSelectForm(forms.ModelForm):
 class AddClassForm(forms.Form):
     class Meta:
         model = Classes
-        fields = ('name', 'number')
+        fields = ('name', 'number',)
 
 
 class ClassForm(forms.ModelForm):

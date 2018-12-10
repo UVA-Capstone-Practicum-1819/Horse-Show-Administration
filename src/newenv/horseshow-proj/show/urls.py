@@ -23,9 +23,11 @@ urlpatterns = [
     path('horse/new', views.add_horse, name="add_horse"),
     path('rider/new', views.add_rider, name="add_rider"),
     path('class/new', views.new_class, name="classes"),
-    path('<showdate>/division/<divisionname>',
-         views.division, name="division_info"),
-    # path('<showdate>/<divisionname>/classes', views.division, name="division_info"),
+
+    path('<showdate>/division/<divisionname>', views.division, name="division_info"),
+    path('<showdate>/<divisionname>/classes/<classnumber>', views.class_info, name="edit_class"),    
+    path('<showdate>/<divisionname>/classes/<classnumber>/scratch/<combo>', views.delete_combo, name="delete_combo"),    
+
     path('<showdate>/newdivision', views.new_division, name="divisions"),
     path('horse', views.select_horse, name="select_horse"),
 
@@ -35,7 +37,7 @@ urlpatterns = [
          views.divisionscore, name="divisionscore"),
     path('<divisionname>/division_classes',
          views.division_classes, name="division_classes"),
-    path('<showdate>/<divisionname>/<classname>/delete_class',
+    path('<showdate>/<divisionname>/<classnumber>/delete_class',
          views.delete_class, name="delete_class"),
     path('<showdate>/billing', views.billing, name="billing"),
     path('<showdate>/<combonum>/billinglist',
