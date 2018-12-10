@@ -164,18 +164,14 @@ class HorseSelectForm(forms.ModelForm):
 
 
 class AddClassForm(forms.Form):
+    #create a new class
     class Meta:
         model = Classes
         fields = ('name', 'number',)
 
 
 class ClassForm(forms.ModelForm):
-    class Meta:
-        model = Classes
-        fields = ('name', 'number')
-
-
-class AddClassForm(forms.ModelForm):
+    #duplicate of above but is being used somewhere
     class Meta:
         model = Classes
         fields = ('name', 'number')
@@ -205,6 +201,7 @@ class ClassSelectForm(forms.ModelForm):
 
 
 class DivisionForm(forms.ModelForm):
+    #create new division
     class Meta:
         model = Division
         fields = ('name', 'number')
