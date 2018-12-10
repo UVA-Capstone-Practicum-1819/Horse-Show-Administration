@@ -148,7 +148,6 @@ class ShowAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-
 def signup(request):
     """ signs up the user (creates an account) """
     if request.method == 'POST':
@@ -196,7 +195,7 @@ def billinglist(request, showdate, combonum):
     # for minimum requirements, only calculates price based on pre-registration price
     context = {'name': combo.rider, 'show_date': show.date,
      'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
-     # the context will help create the table for the list of classes a user is currently in
+    # the context will help create the table for the list of classes a user is currently in
     return render(request, 'billinglist.html', context)
 
 #This view allows you to scratch from a show
