@@ -9,7 +9,7 @@
   <br><b>Location:</b> {{ location }}</h5>
   <h5><b>Divisions:</b></h5>
     {% for division in divisions %}
-        <li>{{ division }}</li>
+        <li><a href = "{% url 'division_info' showdate=date divisionname=division %}">{{division}}</a></li>
     {% endfor %}
   <p>
     <p><a class="btn btn-primary" href = "{% url 'divisions' showname=name %}">Add Division</a></p>
@@ -24,6 +24,7 @@
     <p><a class="btn btn-primary" href="{% url 'classes' %}">Add Class</a></p>
     <p><a class="btn btn-primary" href="{% url 'class_select' %}">Rank Class</a></p>
     <p><a class="btn btn-primary" href="{% url 'billing' showdate=date %}">Bill a Rider</a></p>
+
   </p>
 
 </body>
