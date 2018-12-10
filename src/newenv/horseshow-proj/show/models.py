@@ -39,24 +39,20 @@ class Show(models.Model):
     name = models.CharField(max_length=100)
     date = models.CharField(max_length=100, primary_key=True)
     location = models.CharField(max_length=100)
-    dayOfPrice = models.IntegerField(null=True, blank=True)
-    preRegistrationPrice = models.IntegerField(null=True, blank=True)
-
+    dayOfPrice = models.IntegerField(blank=True, null=True, default=0)
+    preRegistrationPrice = models.IntegerField(blank=True, null=True, default=0)
     divisions = models.ManyToManyField(Division, blank=True)
-
     def __str__(self):
         return self.date
 
 
 class Horse(models.Model):
-
     size_choices = (
         ("NA", "N/A"),
         ("small", "SM"),
         ("medium", "MED"),
         ("large", "LG"),
     )
-
     type_choices = (
         ("horse", "Horse"),
         ("pony", "Pony"),
@@ -129,7 +125,7 @@ class HorseRiderCombo(models.Model):
     horse = models.ForeignKey(
         Horse, on_delete=models.CASCADE, verbose_name="Horse")
 
-    classes = models.ManyToManyField(Classes, verbose_name="Classes")
+    classes = models.ManyToManyField(Classes, verbose_name="Classes", blank=True)
 
     class_scores = models.ManyToManyField(
         ClassScore, verbose_name="Class Scores", blank=True, null=True)

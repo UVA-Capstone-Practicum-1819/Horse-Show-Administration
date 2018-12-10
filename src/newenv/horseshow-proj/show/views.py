@@ -109,7 +109,8 @@ def create_show(request):
     showdatestring = str(showdate)
     showlocation = f.cleaned_data['location']
     new_show = Show.objects.create(
-        name=showname, date=showdatestring, location=showlocation)
+        name=showname, date=showdatestring, location=showlocation,
+        dayOfPrice=f.cleaned_data['dayOfPrice'], preRegistrationPrice=f.cleaned_data['preRegistrationPrice'])
     response = {'ok': True, 'success_msg': "Show was successfully created",
                 'form': form, 'show': new_show}
     # return render(request, 'create_show.html', response)
@@ -184,23 +185,7 @@ def billinglist(request, showdate, combonum):
     tot = combo.classes.count()
     # price = 0
     price = show.preRegistrationPrice * tot
-    #
-    # if request.method == "POST":
-    #     print("posting")
-    #     if 'scratch' in request.POST:
-    #         # combonum = request.GET['combonum']
-    #         # combo = HorseRiderCombo.objects.get(num=int(combonum))
-    #         clsnm = request.POST.get("cname")
-    #         print(clsnm)
-    #         dcls = combo.classes.get(name=clsnm)
-    #         combo.classes.remove(dcls)
-    #         tot = combo.classes.count()
-    #         combo.save()
-    #         context = {'name': combo.rider, 'show_date': show.date,
-    #          'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
-    #         return render(request, 'billinglist.html', context)
-    # # else:
-    # print("not post")
+
     context = {'name': combo.rider, 'show_date': show.date,
      'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
     return render(request, 'billinglist.html', context)
@@ -532,10 +517,10 @@ def edit_combo(request, num):
     if request.method == "POST":
         if request.POST.get('remove_class'):
             num = request.POST['remove_class']
-            selected_class = Classes.objects.get(pk=num)
+            selected_class = Classes.objects.get(number=num)
             combo.classes.remove(selected_class)
             combo.save()
-        
+
         if request.POST.get('add_class'):
             class_selection_form = ClassSelectForm(request.POST)
 
@@ -554,19 +539,16 @@ def edit_combo(request, num):
                 combo.save()
             else:
                 print("INVALID")
-                
+
     edit_form = HorseRiderEditForm({'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
 
     class_selection_form = ClassSelectForm()
 
     registered_classes = combo.classes.all()
-    """ remove_class_forms = [] """
-    """ for registered_class in registered_classes:
-        remove_class_forms.add(RemoveClassForm()) """
+    number_registered_classes = len(registered_classes)
+    price = number_registered_classes * 10
 
-    price = len(registered_classes) * 10
-
-    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_selection_form': class_selection_form, 'classes': registered_classes, 'price': price})
+    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_selection_form': class_selection_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes})
 
 
 
