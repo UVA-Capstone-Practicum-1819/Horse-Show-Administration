@@ -420,6 +420,36 @@ def select_rider(request):
     form = RiderSelectForm()
     return render(request, 'rider_select.html', {'form': form})
 
+def select_rider2(request):
+    if request.method == "POST":
+        request.session['rider_pk'] = request.POST['rider']
+        return redirect('rider_edit')
+    form = RiderSelectForm()
+    return render(request, 'rider_select2.html', {'form': form})
+
+def edit_rider(request, email):
+    rider = Rider.objects.get(pk=email)
+    if request.POST.get('edit_rider'):
+        edit_form = RiderEditForm(request.POST)
+
+        if edit_form.is_valid():
+            rider.name = edit_form.cleaned_data['name']
+            rider.address = edit_form.cleaned_data['address']
+            rider.email = edit_form.cleaned_data['email']
+            rider.birth_date = edit_form.cleaned_data['birth_date']
+            rider.member_VHSA = edit_form.cleaned_data['member_VHSA']
+            rider.county = edit_form.cleaned_data['county']
+            rider.save()
+        else:
+            print("INVALID")
+
+    edit_rider_form = RiderEditForm(
+        {'name': rider.name, 'address': rider.address, 'email': rider.email,
+         'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'county': rider.county},
+        instance=rider)
+    return render(request, 'rider_edit.html', {'rider': rider, 'edit_rider_form': edit_rider_form})
+
+
 def add_rider(request):
     if request.method == "POST":
         form = RiderForm(request.POST)

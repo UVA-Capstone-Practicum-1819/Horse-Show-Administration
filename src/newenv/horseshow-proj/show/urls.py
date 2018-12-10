@@ -36,6 +36,7 @@ urlpatterns = [
     path('show-autocomplete', views.ShowAutocomplete.as_view(),
          name="show_autocomplete"),
     path('rider', views.select_rider, name="select_rider"),
+    path('editrider', views.select_rider2, name="select_rider2"),
     path('rider-autocomplete', views.RiderAutocomplete.as_view(),
          name="rider_autocomplete"),
     path('horse-autocomplete', views.HorseAutocomplete.as_view(),
@@ -49,6 +50,7 @@ urlpatterns = [
     path('genpdf', views.populate_pdf, name="populate_pdf"),
     path('add-combo', views.add_combo, name="add_combo"),
     path('combo/<num>', views.edit_combo, name="edit_combo"),
+    path('rider/<email>', views.edit_rider, name="rider_edit"),
 
 ]
 urlpatterns += staticfiles_urlpatterns()
