@@ -168,6 +168,7 @@ class HorseSelectForm(forms.ModelForm):
 #This form allows you to enter class information for a show
 
 class AddClassForm(forms.Form):
+    #create a new class
     class Meta:
         model = Classes
         fields = ('name', 'number',)
@@ -211,6 +212,7 @@ class ClassSelectForm(forms.ModelForm):
 
 #This form allows info to be entered for a division
 class DivisionForm(forms.ModelForm):
+    #create new division
     class Meta:
         model = Division
         fields = ('name', 'number')

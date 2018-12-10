@@ -357,6 +357,10 @@ def new_division(request, showdate):
         if 'exit' in request.POST:
             form = DivisionForm(request.POST)
             if form.is_valid():
+                divisions = Division.objects.filter(number=form.cleaned_data['number'])
+                if(len(divisions) > 0):
+                    messages.error(request, "division number in use") #prepare error message, will display on submit.
+                    return redirect('divisions', showdate)
                 post = form.save(commit=False)
                 post.author = request.user
                 post.published_date = timezone.now()
@@ -370,6 +374,10 @@ def new_division(request, showdate):
         if 'another' in request.POST:
             form = DivisionForm(request.POST)
             if form.is_valid():
+                divisions = Division.objects.filter(number=form.cleaned_data['number'])
+                if(len(divisions) > 0):
+                    messages.error(request, "division number in use") #prepare error message, will display on submit.
+                    return redirect('divisions', showdate)
                 post = form.save(commit=False)
                 post.author = request.user
                 post.published_date = timezone.now()
@@ -396,26 +404,26 @@ def division(request, showdate, divisionname):
     """ Info about divisions/classes in a show """
     show = Show.objects.get(date=showdate)
     division = Division.objects.get(name=divisionname)
-    if request.method == 'POST':
+    if request.method == 'POST': #if POST, create a new class for this division
         form = AddClassForm(request.POST)
         if form.is_valid():
-            existing_classes = Classes.objects.all()
-            for cl in existing_classes:
-                if cl.number == form.cleaned_data['number']:
-                    messages.error(request, "class number in use")
+            existing_classes = Classes.objects.all() #verify number doesnt already exist
+            for cl in existing_classes: #number is not a primary key because theoretically, multiple shows should be able to have class number 2. 
+                if cl.number == form.cleaned_data['number']: #compare
+                    messages.error(request, "class number in use") #prepare error message, will display on submit.
                     return redirect('division_info', showdate, divisionname)
             c = Classes(name=form.cleaned_data['name'], number=form.cleaned_data['number'])
             c.save()
             division = Division.objects.get(name=divisionname)
             # division_classes = division.classes.all()
             # division_classes.add(c)
-            division.classes.add(c)
+            division.classes.add(c) #add class to that division 
             # division.classes = division_classes
             division.save()
-            return redirect('division_info', showdate, divisionname)
+            return redirect('division_info', showdate, divisionname) #render page with new division
     else:
-        if(len(division.classes.all()) < 3):
-            form = AddClassForm()
+        if(len(division.classes.all()) < 3): #each division only has a max of 3 classes, no input form if 3 classes present
+            form = AddClassForm() 
             context = {
                 "form": form,
                 "showdate" : showdate,
@@ -432,17 +440,17 @@ def division(request, showdate, divisionname):
             }
         return render(request, 'division.html', context)
 
-def class_info(request, showdate, divisionname, classnumber):
+def class_info(request, showdate, divisionname, classnumber):  #render class info including combos in class
     show = Show.objects.get(date=showdate)
     division = Division.objects.get(name=divisionname)
     this_class = Classes.objects.get(number = classnumber)
-    this_combos = []
+    this_combos = [] #will hold combos of class
     combos = HorseRiderCombo.objects.all()
-    for combo in combos:
+    for combo in combos: #iterate through combos to find matches//perhaps make a manytomany field later, but was told not to change models 
         classes = combo.classes.all()
         for c in classes:
             if c == this_class:
-                this_combos.append(combo)
+                this_combos.append(combo) #add if class in combo.classes
     context = {
         "combos":this_combos,
         "number":this_class.number,
@@ -450,13 +458,12 @@ def class_info(request, showdate, divisionname, classnumber):
         "name":divisionname,
         "showname":show.name,
     }
-    return render(request, "classpage.html", context)
+    return render(request, "classpage.html", context) #render info
 
-def delete_combo(request, showdate, divisionname, classnumber, combo):
-    combo = HorseRiderCombo.objects.get(num=combo)
+def delete_combo(request, showdate, divisionname, classnumber, combo): #scratch a combo from the class page so that it reflects in the combo's billing
+    combo = HorseRiderCombo.objects.get(num=combo) 
     classObj = Classes.objects.get(number=classnumber)
     combo.classes.remove(classObj)
-    # combo = {'classes': division.classes.all,'name': division.name}
     return redirect('edit_class', showdate=showdate, divisionname=divisionname, classnumber=classnumber)
 
 def division_select(request, showdate): #displays division select dropdown and ability to "Save" or "See Division Scores"
@@ -489,7 +496,6 @@ def division_select(request, showdate): #displays division select dropdown and a
     else:
         form = DivisionSelectForm()
     return render(request, 'division_select.html', {'form': form, 'date': showdate})
-
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
     """ fills in form automatically based on value entered by user """
@@ -623,7 +629,7 @@ def add_combo(request):
             HorseRiderCombo.objects.create(num=num, rider=rider, horse=horse, cell=cell, email=email)
             return redirect('edit_combo', num=num)
         else:
-            return redirect('index')
+            return redirect('show_select')
     rider_pk = request.session['rider_pk']
     if rider_pk is None:
         return redirect('show_select')
