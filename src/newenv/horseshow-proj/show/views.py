@@ -383,10 +383,10 @@ def new_division(request, showdate):
         }
         return render(request, 'new_division.html', context)
 
-def division(request, showdate, divisionname):
+def division(request, showdate, divisionname): #render division info
     show = Show.objects.get(date=showdate)
     division = Division.objects.get(name=divisionname)
-    if request.method == 'POST':
+    if request.method == 'POST': #if POST, create a new class for this division
         form = AddClassForm(request.POST)
         if form.is_valid():
             existing_classes = Classes.objects.all()
@@ -399,12 +399,12 @@ def division(request, showdate, divisionname):
             division = Division.objects.get(name=divisionname)
             # division_classes = division.classes.all()
             # division_classes.add(c)
-            division.classes.add(c)
+            division.classes.add(c) #add class to that division 
             # division.classes = division_classes
             division.save()
-            return redirect('division_info', showdate, divisionname)
+            return redirect('division_info', showdate, divisionname) #render page with new division
     else:
-        if(len(division.classes.all()) < 3):
+        if(len(division.classes.all()) < 3): #each division only has a max of 3 classes, no input form if 3 classes present
             form = AddClassForm() 
             context = {
                 "form": form,
@@ -422,17 +422,17 @@ def division(request, showdate, divisionname):
             } 
         return render(request, 'division.html', context)
 
-def class_info(request, showdate, divisionname, classnumber):
+def class_info(request, showdate, divisionname, classnumber):  #render class info including combos in class
     show = Show.objects.get(date=showdate)
     division = Division.objects.get(name=divisionname)
     this_class = Classes.objects.get(number = classnumber)
-    this_combos = []
+    this_combos = [] #will hold combos of class
     combos = HorseRiderCombo.objects.all()
-    for combo in combos:
+    for combo in combos: #iterate through combos to find matches//perhaps make a manytomany field later, but was told not to change models 
         classes = combo.classes.all()
         for c in classes:
             if c == this_class:
-                this_combos.append(combo)
+                this_combos.append(combo) #add if class in combo.classes
     context = {
         "combos":this_combos,
         "number":this_class.number,
@@ -440,13 +440,12 @@ def class_info(request, showdate, divisionname, classnumber):
         "name":divisionname,
         "showname":show.name,
     }
-    return render(request, "classpage.html", context)
+    return render(request, "classpage.html", context) #render info
 
-def delete_combo(request, showdate, divisionname, classnumber, combo): 
+def delete_combo(request, showdate, divisionname, classnumber, combo): #scratch a combo from the class page so that it reflects in the combo's billing
     combo = HorseRiderCombo.objects.get(num=combo) 
     classObj = Classes.objects.get(number=classnumber)
     combo.classes.remove(classObj)
-    # combo = {'classes': division.classes.all,'name': division.name}
     return redirect('edit_class', showdate=showdate, divisionname=divisionname, classnumber=classnumber)
 
 def division_select(request, showdate): #displays division select dropdown and ability to "Save" or "See Division Scores"
