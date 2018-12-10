@@ -35,7 +35,7 @@ class RankingForm(forms.ModelForm):
 
 
 class RiderForm(forms.ModelForm):
-
+    """ Form for a rider with name, address, email, birth date, whether it is a member of the VHSA, and its county """
     birth_date = forms.DateField(help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(
         years=range(1900, 2016)))
 
@@ -46,8 +46,9 @@ class RiderForm(forms.ModelForm):
 
 
 class RiderSelectForm(forms.ModelForm):
+    """ Form for selecting a rider and returning its primary key """
     # horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
-        # rider_names =  [rider.name for rider in Rider.objects.all()]
+    # rider_names =  [rider.name for rider in Rider.objects.all()]
     rider = forms.ModelChoiceField(
         queryset=Rider.objects.all(),
         widget=autocomplete.ModelSelect2(
@@ -60,6 +61,7 @@ class RiderSelectForm(forms.ModelForm):
 
 
 class HorseForm(forms.ModelForm):
+    """ the form for a horse, which has a coggins_date, name, accession number, owner, type, and size """
     coggins_date = forms.DateField(widget=forms.SelectDateWidget(
         years=range(2010, 2019)))
 
@@ -70,8 +72,9 @@ class HorseForm(forms.ModelForm):
 
 
 class ComboSelectForm(forms.ModelForm):
+    """ returns the primary key of the horse rider combo in a drop down list """
     # horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
-        # rider_names =  [rider.name for rider in Rider.objects.all()]
+    # rider_names =  [rider.name for rider in Rider.objects.all()]
     combo = forms.ModelChoiceField(
         queryset=HorseRiderCombo.objects.all(),
         widget=autocomplete.ModelSelect2(url='combo_autocomplete')
@@ -83,6 +86,7 @@ class ComboSelectForm(forms.ModelForm):
 
 
 class ComboNumForm(forms.Form):
+    """ the form for entering a horse rider combo number to go to its edit page """
     # class Meta:
     #     model = HorseRiderCombo
     #     fields = ('num',)
@@ -91,24 +95,28 @@ class ComboNumForm(forms.Form):
 
 
 class HorseRiderComboCreateForm(forms.ModelForm):
+    """ for creating a horse rider combo """
     class Meta:
         model = HorseRiderCombo
         fields = ('num', 'contact', 'email', 'cell')
 
 
 class HorseRiderEditForm(forms.ModelForm):
+    """ for updating a horse-rider combo """
     class Meta:
         model = HorseRiderCombo
         fields = ('contact', 'email', 'cell')
 
 
 class RiderEditForm(forms.ModelForm):
+    """ for updating a rider """
     class Meta:
         model = Rider
         fields = ('name', 'address', 'birth_date', 'member_VHSA', 'county')
 
 
 class HorseEditForm(forms.ModelForm):
+    """ for editing a horse """
     class Meta:
         model = Horse
         fields = ('accession_no', 'coggins_date',
@@ -154,8 +162,9 @@ class HorseSelectForm(forms.ModelForm):
         model = Horse
         fields = ('horse',)
 
+
 class AddClassForm(forms.Form):
-    class Meta: 
+    class Meta:
         model = Classes
         fields = ('name', 'number',)
 
@@ -165,10 +174,12 @@ class ClassForm(forms.ModelForm):
         model = Classes
         fields = ('name', 'number')
 
+
 class AddClassForm(forms.ModelForm):
     class Meta:
         model = Classes
         fields = ('name', 'number')
+
 
 class RemoveClassForm(forms.Form):
     num = models.IntegerField()
