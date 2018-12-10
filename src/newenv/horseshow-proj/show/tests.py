@@ -620,3 +620,16 @@ class ComboDatabaseInvalidTestCase(TestCase):
             HorseRiderCombo.objects.get(num=combo_num)
         except(HorseRiderCombo.DoesNotExist):
             self.assertTrue(HorseRiderCombo.DoesNotExist)
+
+class EditHorseandRider(TestCase):
+    def test_valid_form(self):
+        data_rider = {'name': "Lauren", 'address': "234 cotton lane", 'birth_date': "1980-10-15", 'email': "123@virginia.edu", 'member_VHSA': True, 'county': "Albermarle"}
+        form = RiderEditForm(data_rider)
+        self.assertTrue(form.is_valid())
+
+    def test_proper_horse(self):
+        data_horse = {'name':"Smokey Mountain", 'coggins_date':'2011-10-11', 'accession_no':48, 'owner':"Tina", 'size':"large", 'type':"pony"}
+        form = HorseEditForm(data_horse)
+        data_horse.update({'accession_no': 49})
+        form = HorseEditForm(data_horse)
+        self.assertEqual(data_horse.get('accession_no'), 49)

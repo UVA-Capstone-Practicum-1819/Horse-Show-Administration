@@ -338,6 +338,7 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
 
 
 def new_division(request, showdate):
+    """ Form for allowing users to create a new division, which is a subset of show """
     show = Show.objects.get(date=showdate)
     date = show.date
     if request.method == "POST":
@@ -380,6 +381,7 @@ def new_division(request, showdate):
         return render(request, 'new_division.html', context)
 
 def division(request, showdate, divisionname):
+    """ Info about divisions/classes in a show """
     if request.method == 'POST':
         form = AddClassForm(request.POST)
         if form.is_valid():
@@ -442,6 +444,7 @@ def division_select(request, showdate): #displays division select dropdown and a
 
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
+    """ fills in form automatically based on value entered by user """
     def get_queryset(self):
         qs = Division.objects.all().order_by('number')
         if self.q:
@@ -458,6 +461,7 @@ def select_rider(request):
     return render(request, 'rider_select.html', {'form': form})
 
 def select_rider2(request):
+    """ select rider function exclusively for editing a rider """
     if request.method == "POST":
         rider_pk = request.POST['rider']
         return redirect('edit_rider', rider_pk=rider_pk)
@@ -465,6 +469,7 @@ def select_rider2(request):
     return render(request, 'rider_select2.html', {'form': form})
 
 def edit_rider(request, rider_pk):
+    """ allows user to change the given fields in rider and save changes """
     rider = Rider.objects.get(pk=rider_pk)
     if request.method == "POST":
         edit_form = RiderEditForm(request.POST)
@@ -495,6 +500,7 @@ def add_rider(request):
     return render(request, 'editrider.html', {'form': form})
 
 def select_horse2(request):
+    """ select horse function exclusively for editing a horse """
     if request.method == "POST":
         horse_pk = request.POST['horse']
         return redirect('edit_horse', horse_pk=horse_pk)
@@ -502,6 +508,7 @@ def select_horse2(request):
     return render(request, 'horse_select2.html', {'form': form})
 
 def edit_horse(request, horse_pk):
+    """ allows user to change the given fields in rider and save changes """
     horse = Horse.objects.get(pk=horse_pk)
     if request.method == "POST":
         edit_form = HorseEditForm(request.POST)
