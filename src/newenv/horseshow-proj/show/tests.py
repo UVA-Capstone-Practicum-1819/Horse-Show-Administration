@@ -633,3 +633,47 @@ class EditHorseandRider(TestCase):
         data_horse.update({'accession_no': 49})
         form = HorseEditForm(data_horse)
         self.assertEqual(data_horse.get('accession_no'), 49)
+
+class ComboAddClassTestCase(TestCase):
+    def test_add_class(self):
+        data_horse = {'name':"Smokey Mountain", 'coggins_date':'2011-10-11', 'accession_no':48, 'owner':"Tina", 'size':"large", 'type':"pony"}
+        form_horse = HorseForm(data_horse)
+        horse = form_horse.save()
+        data_rider = {'name' : "Test", 'address':"idunno ln.",  'email':"ts4pe@virginia.edu", 'birth_date':"1996-10-15", 'member_VHSA': False, 'county':"Fairfax"}
+        form_rider = RiderForm(data_rider)
+        rider = form_rider.save()
+        combo = HorseRiderCombo.objects.create(
+                        num=665, rider=rider, horse=horse)
+        data = {'num': 665}
+        combo_form = ComboNumForm(data)
+        c1 = Classes.objects.create(name="Test1", number="1")
+
+        response = self.client.post('show/edit-combo', {'add_class': 1})
+        if combo_form.is_valid():
+            combo_num = combo_form.cleaned_data['num']
+        combo = HorseRiderCombo.objects.get(num=combo_num)
+        combo.classes.add(c1)
+        combo.save()
+        self.assertTrue(combo.classes.get(number=1))
+
+class ComboRemoveClassTestCase(TestCase):
+    def test_add_class(self):
+        horse = Horse.objects.create(name="Smokey Mountain", coggins_date='2011-10-11', accession_no=48, owner="Tina", size="large", type="pony")
+        rider = Rider.objects.create(name="Test", address="idunno ln.",  email="ts4pe@virginia.edu", birth_date="1996-10-15", member_VHSA= False, county="Fairfax")
+        combo = HorseRiderCombo.objects.create(
+                        num=665, rider=rider, horse=horse)
+        data = {'num': 665}
+        combo_form = ComboNumForm(data)
+        c1 = Classes.objects.create(name="Test1", number="1")
+        if combo_form.is_valid():
+            combo_num = combo_form.cleaned_data['num']
+        combo = HorseRiderCombo.objects.get(num=combo_num)
+        combo.classes.add(c1)
+        combo.save()
+        
+        remove_class=1
+        response = self.client.post('show/edit-combo', {'number': remove_class})
+        combo.classes.remove(Classes.objects.get(number = remove_class))
+        combo.save()
+        
+        self.assertTrue(combo.classes.count() == 0)
