@@ -7,7 +7,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.show_select, name="show_select"),
     path('signup', views.signup, name='signup'),
     path('login', auth_views.LoginView.as_view(
         template_name='login.html'), name='login'),
@@ -22,7 +22,7 @@ urlpatterns = [
     # path('<showdate>/<divisionname>/classes', views.division, name="division_info"),    
     path('<showdate>/newdivision', views.new_division, name="divisions"),
     path('horse', views.select_horse, name="select_horse"),
-    path('show', views.show_select, name="show_select"),
+
     path('class', views.class_select, name="class_select"),
     path('<showdate>/division', views.division_select, name="division_select"),
     path('<divisionname>/divisionscore',
