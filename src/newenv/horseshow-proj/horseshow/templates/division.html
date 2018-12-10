@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+
+<div class="content container">
+    <div class="row">
+        <div class="col-md-8">
+
+            <h2>Show: {{showname}}</h2>
+            <h4>Division: {{division}}</h4>
+            <h5>Classes:</h5>
+                <div class="row">
+                    <form class="remove_form" action="" method="patch">
+                        {% csrf_token %}
+                        <!-- {{ form | crispy}} -->
+                        <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
+                      <table class="table">
+                        <thead>
+                          <th>Class</th>
+                          <th>Remove</th>
+                          <th>Edit</th>
+                        </thead>
+                         <tbody>
+                          {% for c in classes %}
+                            <tr>
+                              <td>
+                                {{ c.name }}
+                              </td>
+                              <td>
+                                <button><a href="{% url 'delete_class' showdate=showdate divisionname=division classname=c.name %}">Remove</a></button>
+                              </td>
+                              <td>
+                                <button><a href="">Edit Class</a></button>
+                              </td>
+                               <td>
+                                {{ remove_form | crispy}}
+                               </td>
+                            </tr>
+                           {% endfor %}
+                        </tbody>
+                      </table>
+                    </form>
+                </div>
+        </div>
+    </div>
+            {% if form %}
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Submit</button>
+            </form>
+            {% else %}
+            <p>Division contains maximum of 3 classes</p>
+            {% endif %}
+
+</div>
+{% endblock %}
+

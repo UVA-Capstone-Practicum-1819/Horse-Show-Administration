@@ -9,11 +9,11 @@ from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
 from show.forms import *
+from django.contrib.auth import views as auth_views
 from django.forms.models import model_to_dict
 from show.models import *
 from django.utils import timezone
 from dal import autocomplete
-""" for authentication/signin/signup purposes """
 from .populatepdf import write_fillable_pdf
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -21,6 +21,10 @@ from django.contrib import messages
 
 
 class AuthRequiredMiddleware(object):
+    """ 
+    Middleware required so that non-logged-in users cannot see pages they aren't authorized to see
+    The exceptions are the login, signup, and admin pages
+    """
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -37,8 +41,10 @@ class AuthRequiredMiddleware(object):
 
         return response
 
-
 def index(request):
+    """ 
+    Deprecated. The home page is now the show select page.
+     """
     if 'navigation' in request.session:
         del request.session['navigation']
     if 'rider_pk' in request.session:
@@ -50,6 +56,7 @@ def index(request):
     context = {
         'latest_show_list': latest_show_list,
     }
+    return redirect('show_select')
     return HttpResponse(template.render(context, request))
 
 
@@ -84,13 +91,13 @@ def showpage(request, showdate):
     return render(request, 'showpage.html', context)
 
 
-def classpage(request):
-    latest_show_list = Show.objects.all
-    template = loader.get_template('classpage.html')
-    context = {
-        'latest_show_list': latest_show_list,
-    }
-    return HttpResponse(template.render(context, request))
+# def classpage(request):
+#     latest_show_list = Show.objects.all
+#     template = loader.get_template('classpage.html')
+#     context = {
+#         'latest_show_list': latest_show_list,
+#     }
+#     return HttpResponse(template.render(context, request))
 
 
 def create_show(request):
@@ -141,8 +148,9 @@ class ShowAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
+
 def signup(request):
-    """ signs user up via form """
+    """ signs up the user (creates an account) """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         
@@ -152,7 +160,7 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return redirect('index')
+            return redirect('show_select')
     else:
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
@@ -228,13 +236,14 @@ def divisionscore(request,divisionname): #displays list of classes in division, 
     context = {'classes': division.classes.all, 'name': division.name, 'form': form}
     return render(request, 'division_score.html', context) #passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
 
-def delete_class(request, divisionname, classname): #deletes a class from a division
+def delete_class(request, showdate, divisionname, classname): #deletes a class from a division
     division = Division.objects.get(name=divisionname) #gets the division object from the division name that was passed in
     classObj = Classes.objects.get(name=classname) #gets the class object from the class name that was passed in
-    division.classes.remove(classObj) #removes the class object from the division's many-to-many "classes" field
+    division.classes.remove(classObj)
+    classObj.delete() #removes the class object from the division's many-to-many "classes" field
     division.save() #saves the division object in the database
     context = {'classes': division.classes.all,'name': division.name}
-    return redirect('division_classes', divisionname=divisionname)  #redirects to division_classes and passes in the division's name
+    return redirect('division_info', showdate=showdate, divisionname=divisionname)  #redirects to division_classes and passes in the division's name
 
 
 
@@ -328,8 +337,8 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def new_division(request, showname):
-    show = Show.objects.get(name=showname)
+def new_division(request, showdate):
+    show = Show.objects.get(date=showdate)
     date = show.date
     if request.method == "POST":
         if 'exit' in request.POST:
@@ -357,30 +366,57 @@ def new_division(request, showname):
                 divisions = show.divisions
                 divisions.add(division)
                 show.save()
-
-                return redirect('divisions', showname)
+                return redirect('divisions', showdate)
     else:
         form = DivisionForm()
-        shows = Show.objects.all().order_by('date')
-        for show in shows:
-            if showname == show.name:
-                context = {
-                    "form": form,
-                    "name": show.name,
-                    "date": show.date,
-                    "location": show.location,
-                    "divisions": show.divisions.all,
-                }
+        show = Show.objects.get(date=showdate)
+        context = {
+            "form": form,
+            "name": show.name,
+            "date": show.date,
+            "location": show.location,
+            "divisions": show.divisions.all,
+        }
         return render(request, 'new_division.html', context)
 
+def division(request, showdate, divisionname):
+    if request.method == 'POST':
+        form = AddClassForm(request.POST)
+        if form.is_valid():
+            c = form.save()
+            division = Division.objects.get(name=divisionname)
+            division.classes.add(c)
+            division.save()
+            return redirect('division_info', showdate, divisionname)
+    else:
+        show = Show.objects.get(date=showdate)
+        division = Division.objects.get(name=divisionname)
+        if(len(division.classes.all()) < 3):
+            form = AddClassForm() 
+            context = {
+                "form": form,
+                "showdate" : showdate,
+                "showname": show.name,
+                "division": division.name,
+                "classes": division.classes.all,
+            } 
+        else:
+            context = {
+                "showdate":show.date,
+                "showname": show.name,
+                "division": division.name,
+                "classes": division.classes.all,
+            } 
+        return render(request, 'division.html', context)
 
-def division_select(request, showname): #displays division select dropdown and ability to "Save" or "See Division Scores"
+def division_select(request, showdate): #displays division select dropdown and ability to "Save" or "See Division Scores"
     if request.method == "POST":
         if 'save' in request.POST: #if a division is selected and the "Save" button is clicked
             form = DivisionSelectForm(request.POST)
             if form.is_valid():
-                show = Show.objects.get(name=showname) #gets the show object from the showname that was passed in
-                current_divisions = show.divisions #gets the divisions of the show object
+                print("form valid ")
+                show = Show.objects.get(date=showdate)
+                current_divisions = show.divisions
                 division = Division.objects.get(
                     name=form.cleaned_data['name'])
                 current_divisions.add(division)
@@ -402,7 +438,7 @@ def division_select(request, showname): #displays division select dropdown and a
 
     else:
         form = DivisionSelectForm()
-    return render(request, 'division_select.html', {'form': form, 'name': showname}) #passes the DivisionSelectForm and show name to "division_select.html" and renders that page
+    return render(request, 'division_select.html', {'form': form, 'date': showdate})
 
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
@@ -414,6 +450,7 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
 
 
 def select_rider(request):
+    """ selects a rider from a dropdown and stores its primary key into a session """
     if request.method == "POST":
         request.session['rider_pk'] = request.POST['rider']
         return redirect('select_horse')
@@ -447,6 +484,7 @@ def edit_rider(request, rider_pk):
 
 
 def add_rider(request):
+    """ creates a new rider in a form and stores its primary key into a session, then redirects to select_horse """
     if request.method == "POST":
         form = RiderForm(request.POST)
         if form.is_valid():
@@ -483,6 +521,7 @@ def edit_horse(request, horse_pk):
 
 
 def add_horse(request):
+    """ creates a new horse in a form and stores its primary key into a session, then redirects to add_combo """
     if request.method == "POST":
         form = HorseForm(request.POST)
         if form.is_valid():
@@ -501,6 +540,7 @@ class RiderAutocomplete(autocomplete.Select2QuerySetView):
 
 
 def select_horse(request):
+    """ selects a horse from a dropdown and stores its primary key into a session """
     if request.method == 'POST':
         horse = request.POST['horse']
         request.session['horse_pk'] = request.POST['horse']
@@ -512,6 +552,10 @@ def select_horse(request):
 
 
 def add_combo(request):
+    """ 
+        creates a page for adding a horse-rider combination, taking in the session variables for the primary keys of the chosen horse and rider
+        redirects to the edit combo page for the same combination after it is done
+     """
     if request.method == 'POST':
         form = HorseRiderComboCreateForm(request.POST)
         if form.is_valid():
@@ -529,16 +573,20 @@ def add_combo(request):
             return redirect('index')
     rider_pk = request.session['rider_pk']
     if rider_pk is None:
-        return redirect('index')
+        return redirect('show_select')
     horse_pk = request.session['horse_pk']
     if horse_pk is None:
-        return redirect('index')
+        return redirect('show_select')
     rider = get_object_or_404(Rider, pk=rider_pk)
     horse = get_object_or_404(Horse, pk=horse_pk)
     form = HorseRiderComboCreateForm()
     return render(request, 'add_combo.html', {'form': form, 'rider': rider, 'horse': horse})
 
 def edit_combo(request, num):
+    """ 
+    edits the combination that was specified by num
+    also handles the addition/removal of classes and the calculation of price
+     """
     combo = HorseRiderCombo.objects.get(pk=num)
     if request.method == "POST":
         if request.POST.get('remove_class'):
@@ -579,6 +627,9 @@ def edit_combo(request, num):
 
 
 def check_combo(request, num):
+    """ 
+    Deprecated. edit_combo now accomplishes this functions' tasks
+     """
     if request.method == "POST":
         rider = HorseRiderCombo.objects.get(pk=num).rider
         horse = HorseRiderCombo.objects.get(pk=num).horse
