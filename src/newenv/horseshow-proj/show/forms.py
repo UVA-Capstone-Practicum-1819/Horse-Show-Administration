@@ -102,6 +102,19 @@ class HorseRiderEditForm(forms.ModelForm):
         fields = ('contact', 'email', 'cell')
 
 
+class RiderEditForm(forms.ModelForm):
+    class Meta:
+        model = Rider
+        fields = ('name', 'address', 'birth_date', 'member_VHSA', 'county')
+
+
+class HorseEditForm(forms.ModelForm):
+    class Meta:
+        model = Horse
+        fields = ('accession_no', 'coggins_date',
+                  'owner', 'type', 'size')
+
+
 class ShowSelectForm(forms.ModelForm):
     # horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
 

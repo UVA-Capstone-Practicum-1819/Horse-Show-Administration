@@ -7,7 +7,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.show_select, name="show_select"),
     path('signup', views.signup, name='signup'),
     path('login', auth_views.LoginView.as_view(
         template_name='login.html'), name='login'),
@@ -23,7 +23,7 @@ urlpatterns = [
     path('<showdate>/<divisionname>/classes/<classnumber>/scratch/<combo>', views.delete_combo, name="delete_combo"),    
     path('<showdate>/newdivision', views.new_division, name="divisions"),
     path('horse', views.select_horse, name="select_horse"),
-    path('show', views.show_select, name="show_select"),
+
     path('class', views.class_select, name="class_select"),
     path('<showdate>/division', views.division_select, name="division_select"),
     path('<divisionname>/divisionscore',
@@ -39,6 +39,8 @@ urlpatterns = [
     path('show-autocomplete', views.ShowAutocomplete.as_view(),
          name="show_autocomplete"),
     path('rider', views.select_rider, name="select_rider"),
+    path('select-rider', views.select_rider2, name="select_rider2"),
+    path('select-horse', views.select_horse2, name="select_horse2"),
     path('rider-autocomplete', views.RiderAutocomplete.as_view(),
          name="rider_autocomplete"),
     path('horse-autocomplete', views.HorseAutocomplete.as_view(),
@@ -52,6 +54,8 @@ urlpatterns = [
     path('genpdf', views.populate_pdf, name="populate_pdf"),
     path('add-combo', views.add_combo, name="add_combo"),
     path('combo/<num>', views.edit_combo, name="edit_combo"),
+    path('rider/<rider_pk>', views.edit_rider, name="edit_rider"),
+    path('horse/<horse_pk>', views.edit_horse, name="edit_horse")
 
 ]
 urlpatterns += staticfiles_urlpatterns()

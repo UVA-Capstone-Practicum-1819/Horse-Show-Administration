@@ -9,11 +9,11 @@ from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import resolve, reverse
 from show.forms import *
+from django.contrib.auth import views as auth_views
 from django.forms.models import model_to_dict
 from show.models import *
 from django.utils import timezone
 from dal import autocomplete
-""" for authentication/signin/signup purposes """
 from .populatepdf import write_fillable_pdf
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -21,6 +21,10 @@ from django.contrib import messages
 
 
 class AuthRequiredMiddleware(object):
+    """ 
+    Middleware required so that non-logged-in users cannot see pages they aren't authorized to see
+    The exceptions are the login, signup, and admin pages
+    """
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -37,8 +41,10 @@ class AuthRequiredMiddleware(object):
 
         return response
 
-
 def index(request):
+    """ 
+    Deprecated. The home page is now the show select page.
+     """
     if 'navigation' in request.session:
         del request.session['navigation']
     if 'rider_pk' in request.session:
@@ -50,6 +56,7 @@ def index(request):
     context = {
         'latest_show_list': latest_show_list,
     }
+    return redirect('show_select')
     return HttpResponse(template.render(context, request))
 
 
@@ -141,18 +148,19 @@ class ShowAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
+
 def signup(request):
-    """ signs user up via form """
+    """ signs up the user (creates an account) """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
-        print(request.POST)
+        
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return redirect('index')
+            return redirect('show_select')
     else:
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
@@ -482,13 +490,41 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
 
 
 def select_rider(request):
+    """ selects a rider from a dropdown and stores its primary key into a session """
     if request.method == "POST":
         request.session['rider_pk'] = request.POST['rider']
         return redirect('select_horse')
     form = RiderSelectForm()
     return render(request, 'rider_select.html', {'form': form})
 
+def select_rider2(request):
+    if request.method == "POST":
+        rider_pk = request.POST['rider']
+        return redirect('edit_rider', rider_pk=rider_pk)
+    form = RiderSelectForm()
+    return render(request, 'rider_select2.html', {'form': form})
+
+def edit_rider(request, rider_pk):
+    rider = Rider.objects.get(pk=rider_pk)
+    if request.method == "POST":
+        edit_form = RiderEditForm(request.POST)
+        if edit_form.is_valid():
+            rider.name = edit_form.cleaned_data['name']
+            rider.address = edit_form.cleaned_data['address']
+            rider.birth_date = edit_form.cleaned_data['birth_date']
+            rider.member_VHSA = edit_form.cleaned_data['member_VHSA']
+            rider.county = edit_form.cleaned_data['county']
+            rider.save()
+
+    edit_rider_form = RiderEditForm(
+        {'name': rider.name, 'address': rider.address, 
+         'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'county': rider.county},
+        instance=rider)
+    return render(request, 'rider_edit.html', {'rider': rider, 'edit_rider_form': edit_rider_form})
+
+
 def add_rider(request):
+    """ creates a new rider in a form and stores its primary key into a session, then redirects to select_horse """
     if request.method == "POST":
         form = RiderForm(request.POST)
         if form.is_valid():
@@ -498,7 +534,34 @@ def add_rider(request):
     form = RiderForm()
     return render(request, 'editrider.html', {'form': form})
 
+def select_horse2(request):
+    if request.method == "POST":
+        horse_pk = request.POST['horse']
+        return redirect('edit_horse', horse_pk=horse_pk)
+    form = HorseSelectForm()
+    return render(request, 'horse_select2.html', {'form': form})
+
+def edit_horse(request, horse_pk):
+    horse = Horse.objects.get(pk=horse_pk)
+    if request.method == "POST":
+        edit_form = HorseEditForm(request.POST)
+        if edit_form.is_valid():
+            horse.accession_no = edit_form.cleaned_data['accession_no']
+            horse.coggins_date = edit_form.cleaned_data['coggins_date']
+            horse.owner = edit_form.cleaned_data['owner']
+            horse.type = edit_form.cleaned_data['type']
+            horse.size = edit_form.cleaned_data['size']
+            horse.save()
+
+    edit_horse_form = HorseEditForm(
+        {'accession_no': horse.accession_no, 'coggins_date': horse.coggins_date, 
+         'owner': horse.owner, 'type': horse.type, 'size': horse.size},
+        instance=horse)
+    return render(request, 'horse_edit.html', {'horse': horse, 'edit_horse_form': edit_horse_form})
+
+
 def add_horse(request):
+    """ creates a new horse in a form and stores its primary key into a session, then redirects to add_combo """
     if request.method == "POST":
         form = HorseForm(request.POST)
         if form.is_valid():
@@ -506,7 +569,7 @@ def add_horse(request):
             request.session['horse_pk'] = horse.pk
             return redirect('add_combo')
     form = HorseForm()
-    return render(request, 'horse_edit.html', {'form': form})
+    return render(request, 'horse_add.html', {'form': form})
 
 class RiderAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -517,6 +580,7 @@ class RiderAutocomplete(autocomplete.Select2QuerySetView):
 
 
 def select_horse(request):
+    """ selects a horse from a dropdown and stores its primary key into a session """
     if request.method == 'POST':
         horse = request.POST['horse']
         request.session['horse_pk'] = request.POST['horse']
@@ -525,7 +589,13 @@ def select_horse(request):
     return render(request, 'horse_select.html', {'form': form})
 
 
+
+
 def add_combo(request):
+    """ 
+        creates a page for adding a horse-rider combination, taking in the session variables for the primary keys of the chosen horse and rider
+        redirects to the edit combo page for the same combination after it is done
+     """
     if request.method == 'POST':
         form = HorseRiderComboCreateForm(request.POST)
         if form.is_valid():
@@ -543,16 +613,20 @@ def add_combo(request):
             return redirect('index')
     rider_pk = request.session['rider_pk']
     if rider_pk is None:
-        return redirect('index')
+        return redirect('show_select')
     horse_pk = request.session['horse_pk']
     if horse_pk is None:
-        return redirect('index')
+        return redirect('show_select')
     rider = get_object_or_404(Rider, pk=rider_pk)
     horse = get_object_or_404(Horse, pk=horse_pk)
     form = HorseRiderComboCreateForm()
     return render(request, 'add_combo.html', {'form': form, 'rider': rider, 'horse': horse})
 
 def edit_combo(request, num):
+    """ 
+    edits the combination that was specified by num
+    also handles the addition/removal of classes and the calculation of price
+     """
     combo = HorseRiderCombo.objects.get(pk=num)
     if request.method == "POST":
         if request.POST.get('remove_class'):
@@ -577,8 +651,7 @@ def edit_combo(request, num):
                 combo.cell = edit_form.cleaned_data['cell']
                 combo.contact = edit_form.cleaned_data['contact']
                 combo.save()
-            else:
-                print("INVALID")
+            
 
     edit_form = HorseRiderEditForm({'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
 
@@ -594,6 +667,9 @@ def edit_combo(request, num):
 
 
 def check_combo(request, num):
+    """ 
+    Deprecated. edit_combo now accomplishes this functions' tasks
+     """
     if request.method == "POST":
         rider = HorseRiderCombo.objects.get(pk=num).rider
         horse = HorseRiderCombo.objects.get(pk=num).horse
@@ -635,5 +711,5 @@ def populate_pdf(request): #populates text fields of PDF
     } #info to populate the pdf's "show" and "judge" text fields
     write_fillable_pdf("show/static/VHSA_Results_2015.pdf",
                        "show/static/VHSA_Final_Results.pdf", data_dict) #uses "VHSA_Results_2015.pdf" and populates it's fields with the info in data dict, then it saves this new populated pdf to "VHSA_Final_Results.pdf"
-    print(os.getcwd())
+    
     return render(request, 'finalresults.html', {"filename": "show/static/VHSA_Final_Results.pdf"}) #returns the populated pdf

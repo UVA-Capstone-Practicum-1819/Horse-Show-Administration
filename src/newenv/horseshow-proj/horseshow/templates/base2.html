@@ -14,19 +14,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-16">
-            <h1 class="mt-2">Hoof-N-Woof</h1>
-            <div class="row">
-                
-                
-                <form action="{% url 'show_select' %}" method="post" class="form">
-                    {% csrf_token %}
-                    <button class="btn btn-sm btn-success" type="submit" >Select Show</button>
-                </form>
-
-                <form action="{% url 'logout' %}" method="post" class="form">{% csrf_token %}
-                    <button class="btn btn-sm btn-danger" type="submit" >Log Out</button>
-                </form>
-            </div>
+                <h1 class="mt-2">Hoof-N-Woof</h1>
                 <hr class="mt-0 mb-8">
                 {% block content %}
                 {% endblock %}
