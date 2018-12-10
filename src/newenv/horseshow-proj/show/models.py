@@ -46,16 +46,8 @@ class Show(models.Model):
 #Model for a horse, includes possible sizes of the horse and the choice to refer to it as a horse or a Pony
 #coggins date is important for health consideration and the owner is not necessarily the riders
 class Horse(models.Model):
-    size_choices = (
-        ("NA", "N/A"),
-        ("small", "SM"),
-        ("medium", "MED"),
-        ("large", "LG"),
-    )
-    type_choices = (
-        ("horse", "Horse"),
-        ("pony", "Pony"),
-    )
+    size_choices = ( ("NA", "N/A"), ("small", "SM"), ("medium", "MED"), ("large", "LG"), )
+    type_choices = ( ("horse", "Horse"), ("pony", "Pony"), )
     name = models.CharField(primary_key=True, max_length=200, verbose_name="Name (Barn Name)")
     accession_no = models.IntegerField(verbose_name="Accession Number")
     coggins_date = models.DateField(default=datetime.date.today,  verbose_name="Coggins Date", )
@@ -88,12 +80,8 @@ class ClassScore(models.Model):
 #relationship between a specific horse and specific rider for the day of the show
 #Class scores are recorded for each class they compete in
 class HorseRiderCombo(models.Model):
-    contact_choices = (
-        ("rider", "Rider"),
-        ("owner", "Owner"),
-        ("parent", "Parent"),
-        ("trainer", "Trainer")
-    )
+    contact_choices = ( ("rider", "Rider"), ("owner", "Owner"),
+        ("parent", "Parent"), ("trainer", "Trainer") )
     num = models.IntegerField(primary_key=True, validators=[MinValueValidator(100), MaxValueValidator(999)], verbose_name="Combination Number")
     rider = models.ForeignKey(Rider, on_delete=models.CASCADE, verbose_name="Rider")
     horse = models.ForeignKey(Horse, on_delete=models.CASCADE, verbose_name="Horse")
