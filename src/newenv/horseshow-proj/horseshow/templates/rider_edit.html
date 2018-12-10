@@ -4,7 +4,7 @@
 {% load crispy_forms_tags %}
 
 <h3>Edit Rider</h3>
-<form action="{% url 'rider_edit' rider.email %}" method="POST" class="post-form">
+<form action="" method="POST" class="form">
   {% csrf_token %}
   {{ edit_rider_form | crispy }}
    <button type="submit" name="edit_rider" value="Edit" class="btn btn-success">Edit Rider Info</button>
