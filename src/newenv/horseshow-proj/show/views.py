@@ -59,7 +59,7 @@ def index(request):
     return redirect('show_select')
     return HttpResponse(template.render(context, request))
 
-
+#used as the home page for a selected show
 def showpage(request, showdate):
     if request.method == "POST":
         form = ComboNumForm(request.POST)
@@ -99,7 +99,7 @@ def showpage(request, showdate):
 #     }
 #     return HttpResponse(template.render(context, request))
 
-
+#view used to create the show, if successful, redirects to its show home page
 def create_show(request):
     form = ShowForm()
     if request.method == "GET":
@@ -123,7 +123,7 @@ def create_show(request):
     # return render(request, 'create_show.html', response)
     return redirect('showpage', showdate)
 
-
+#view that allows the user to select a show
 def show_select(request):
     if request.method == "POST":
         form = ShowSelectForm(request.POST)
@@ -137,7 +137,7 @@ def show_select(request):
         form = ShowSelectForm()
     return render(request, 'show_select.html', {'form': form})
 
-
+#Autocomplete functionality for the select page
 class ShowAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # if not self.request.user.is_authenticated():
@@ -165,7 +165,7 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
-
+#Autocomplete functionality for selecting a combo
 class ComboAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = HorseRiderCombo.objects.all().order_by('num')
@@ -173,7 +173,7 @@ class ComboAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
 
-
+#Used to retrieve information necessary for billing a rider
 def billing(request, showdate):
     if request.method == "POST":
         form = ComboSelectForm(request.POST)
@@ -186,7 +186,7 @@ def billing(request, showdate):
         form = ComboSelectForm()
     return render(request, 'billing.html', {'form': form, 'date': showdate})
 
-
+#Billing list shows what horse rider combos need to be billed for and their total price
 def billinglist(request, showdate, combonum):
     show = Show.objects.get(date=showdate)
     # form = RegistrationBillForm()
@@ -199,6 +199,7 @@ def billinglist(request, showdate, combonum):
      # the context will help create the table for the list of classes a user is currently in
     return render(request, 'billinglist.html', context)
 
+#This view allows you to scratch from a show
 def scratch(request, showdate, combonum):
     # combonum = request.GET['combonum']
     # showdate = request.GET['showdate']
@@ -218,6 +219,7 @@ def scratch(request, showdate, combonum):
     # context information need to populate table
     return render(request, 'billinglist.html', context)
     # rendered to the same html page
+
 
 def divisionscore(request,divisionname): #displays list of classes in division, hrc winners of each of those classes from 1st-6th places, and form to enter champion info
     division = Division.objects.get(name= divisionname) # get the division object from the name of the divison that was passed in
@@ -255,6 +257,8 @@ def division_classes(request,divisionname): #lists the classes in a division
     context = {'classes': division.classes.all,'name': division.name}
     return render(request, 'division_classes.html', context) #passes the division's name and classes to the "division_classes.html" and renders that page
 
+
+#This view allows you to add a new class
 def new_class(request):
     if request.method == "POST":
         form = ClassForm(request.POST)
@@ -274,7 +278,7 @@ def new_class(request):
         form = ClassForm()
     return render(request, 'new_class.html', {'form': form})
 
-
+#This view allows you to select a class from a prepopulated list
 def class_select(request):
     if request.method == "POST":
         form = ClassSelectForm(request.POST)
@@ -287,7 +291,9 @@ def class_select(request):
         form = ClassSelectForm()
     return render(request, 'class_select.html', {'form': form})
 
-
+#This method ranks classes from 1st through 6th and stores the winning scores under
+#specific horse rider combos that competed in that class and were awarded points
+#points are always starting from 10, then 6, and so on
 def rankclass(request, classname):
     if request.method == 'POST':
         # if 'classobj' in request.session:
@@ -336,7 +342,7 @@ def rankclass(request, classname):
         form = RankingForm()
         return render(request, 'rankclass.html', {'form': form})
 
-
+#This is the autocomplete functionality for selecting a class
 class ClassAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = Classes.objects.all().order_by('number')
@@ -344,7 +350,7 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
 
-
+#This view allows you to create a new division
 def new_division(request, showdate):
     show = Show.objects.get(date=showdate)
     date = show.date
@@ -387,6 +393,7 @@ def new_division(request, showdate):
         }
         return render(request, 'new_division.html', context)
 
+#This view displays information for a specific division
 def division(request, showdate, divisionname):
     show = Show.objects.get(date=showdate)
     division = Division.objects.get(name=divisionname)
@@ -492,7 +499,6 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(division_name__istartswith=self.q)
         return qs
 
-
 def select_rider(request):
     """ selects a rider from a dropdown and stores its primary key into a session """
     if request.method == "POST":
@@ -501,6 +507,7 @@ def select_rider(request):
     form = RiderSelectForm()
     return render(request, 'rider_select.html', {'form': form})
 
+#this is another view for selecting a rider
 def select_rider2(request):
     if request.method == "POST":
         rider_pk = request.POST['rider']
@@ -508,6 +515,7 @@ def select_rider2(request):
     form = RiderSelectForm()
     return render(request, 'rider_select2.html', {'form': form})
 
+#This view allows you to edit rider information
 def edit_rider(request, rider_pk):
     rider = Rider.objects.get(pk=rider_pk)
     if request.method == "POST":
@@ -526,7 +534,6 @@ def edit_rider(request, rider_pk):
         instance=rider)
     return render(request, 'rider_edit.html', {'rider': rider, 'edit_rider_form': edit_rider_form})
 
-
 def add_rider(request):
     """ creates a new rider in a form and stores its primary key into a session, then redirects to select_horse """
     if request.method == "POST":
@@ -538,6 +545,7 @@ def add_rider(request):
     form = RiderForm()
     return render(request, 'editrider.html', {'form': form})
 
+#This view allows you to select a horse
 def select_horse2(request):
     if request.method == "POST":
         horse_pk = request.POST['horse']
@@ -545,6 +553,7 @@ def select_horse2(request):
     form = HorseSelectForm()
     return render(request, 'horse_select2.html', {'form': form})
 
+#This view allows you to edit a horse's information in the database
 def edit_horse(request, horse_pk):
     horse = Horse.objects.get(pk=horse_pk)
     if request.method == "POST":
@@ -563,7 +572,7 @@ def edit_horse(request, horse_pk):
         instance=horse)
     return render(request, 'horse_edit.html', {'horse': horse, 'edit_horse_form': edit_horse_form})
 
-
+#This view allows you to add a horse to the database
 def add_horse(request):
     """ creates a new horse in a form and stores its primary key into a session, then redirects to add_combo """
     if request.method == "POST":
@@ -575,6 +584,7 @@ def add_horse(request):
     form = HorseForm()
     return render(request, 'horse_add.html', {'form': form})
 
+#This view shows the autocomplete functionality for selection a rider
 class RiderAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = Rider.objects.all().order_by('name')
@@ -669,7 +679,6 @@ def edit_combo(request, num):
 
 
 
-
 def check_combo(request, num):
     """
     Deprecated. edit_combo now accomplishes this functions' tasks
@@ -681,7 +690,7 @@ def check_combo(request, num):
     return render(request, 'check_combo.html', {'num': num, 'rider': rider, 'horse': horse})
     # return redirect(reverse('index'))
 
-
+#This view shows the autocomplete functionality for selecting a horse
 class HorseAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = Horse.objects.all().order_by('name') #orders horses in dropdown queryset by name
@@ -708,6 +717,7 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
 #     return render(request, 'classes.html', {'form': form})
 #
 
+#This function will be implemented later for desired requirements. Used to populate pdfs for horse show reports
 def populate_pdf(request): #populates text fields of PDF
     data_dict = {
         'show': '11/7/2018',
