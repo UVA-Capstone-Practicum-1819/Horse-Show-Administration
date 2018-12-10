@@ -1,7 +1,36 @@
-<title>Class Home Page</title>
-
-<p><a href="{% url 'rider_select' %}">Edit Class</a></p>
-
-<p><a href="{% url 'rider_select' %}">Logout?</a></p>
-
-<p><a href="{% url 'rider_select' %}">Create or Select a Show</a></p>
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+<h2>Show: <a href = "{% url 'showpage' showdate=date %}">{{showname}}</a></h2>
+<h3>Class: {{number}}</h3>
+ <div class="row">
+    <form class="form" action="" method="post">
+        {% csrf_token %}
+        <!-- {{ form | crispy}} -->
+        <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
+      <table class="table">
+        <thead>
+          <th>Combo</th>
+          <th>Scratch</th>
+        </thead>
+         <tbody>
+          {% for c in combos %}
+            <tr>
+              <td>
+                {{c.num}}: {{c.rider}}, {{c.horse}}
+              </td>
+              <td>
+                <button><a href="{% url 'delete_combo' showdate=date divisionname=name classnumber=number combo=c.num %}">Remove</a></button>
+              </td>
+               <td>
+                {{ form | crispy}}
+               </td>
+            </tr>
+           {% endfor %}
+        </tbody>
+      </table>
+     <a href="{% url 'select_rider' %}">Add a Combo</a>
+     </form>
+</div>
+{% endblock %}
