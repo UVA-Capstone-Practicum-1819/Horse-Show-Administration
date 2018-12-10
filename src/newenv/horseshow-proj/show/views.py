@@ -333,7 +333,7 @@ def rankclass(request, classname):
         return render(request, 'rankclass.html', {'form': form})
 
 
-class ClassAutocomplete(autocomplete.Select2QuerySetView):
+class ClassAutocomplete(autocomplete.Select2QuerySetView): #auto fill select form for ease of searching
     def get_queryset(self):
         qs = Classes.objects.all().order_by('number')
         if self.q:
@@ -389,10 +389,10 @@ def division(request, showdate, divisionname): #render division info
     if request.method == 'POST': #if POST, create a new class for this division
         form = AddClassForm(request.POST)
         if form.is_valid():
-            existing_classes = Classes.objects.all()
-            for cl in existing_classes:
-                if cl.number == form.cleaned_data['number']:
-                    messages.error(request, "class number in use")
+            existing_classes = Classes.objects.all() #verify number doesnt already exist
+            for cl in existing_classes: #number is not a primary key because theoretically, multiple shows should be able to have class number 2. 
+                if cl.number == form.cleaned_data['number']: #compare
+                    messages.error(request, "class number in use") #prepare error message, will display on submit.
                     return redirect('division_info', showdate, divisionname)
             c = Classes(name=form.cleaned_data['name'], number=form.cleaned_data['number'])
             c.save()
@@ -480,8 +480,8 @@ def division_select(request, showdate): #displays division select dropdown and a
     return render(request, 'division_select.html', {'form': form, 'date': showdate})
 
 
-class DivisionAutocomplete(autocomplete.Select2QuerySetView):
-    def get_queryset(self):
+class DivisionAutocomplete(autocomplete.Select2QuerySetView): #autofil for searching division
+    def get_queryset(self): #function no longer in use
         qs = Division.objects.all().order_by('number')
         if self.q:
             qs = qs.filter(division_name__istartswith=self.q)
