@@ -4,6 +4,7 @@ from show.forms import *
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from show import models
+from django.urls import reverse
 # Create your tests here.
 
 class ClassesScoreTestCase(TestCase):
@@ -677,3 +678,45 @@ class ComboRemoveClassTestCase(TestCase):
         combo.save()
         
         self.assertTrue(combo.classes.count() == 0)
+
+# class AddDivisionsToShow(TestCase):
+#     def test_add(self):
+#         show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+#         self.client.post(reverse('divisions', kwargs={'showdate':show.date}),{'name':'test', 'number':0})
+#         self.assertEqual(len(show.divisions.all()),1)
+
+    # def test_no_duplicates(self):
+    #     show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+    #     self.client.post(reverse('divisions', kwargs={'showdate':show.date}),{'name':'test', 'number':0})
+    #     self.client.post(reverse('divisions', kwargs={'showdate':show.date}),{'name':'test', 'number':0})
+    #     self.assertEqual(len(show.divisions.all()),1)
+
+class AddClassToDivision(TestCase):
+    def test_add_class(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+        division = Division.objects.create(name="test", number=1)
+        response=self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
+        self.assertTrue(len(division.classes.all())==1)
+
+    def test_fail_add_class(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+        division = Division.objects.create(name="test", number=1)
+        try:
+            self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'','number':0})
+            self.fails()
+        except:
+            self.assertEqual(len(division.classes.all()), 0)
+
+    def test_no_duplicates(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+        division = Division.objects.create(name="test", number=1)
+        self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
+        self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
+        self.assertEqual(len(division.classes.all()),1)
+
+    def test_scratch(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+        division = Division.objects.create(name="test", number=1)
+        self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
+        self.client.patch(reverse('delete_class', kwargs={'showdate':show.date, 'divisionname':division.name, 'classnumber':0}), {'number':0})
+        self.assertEqual(len(division.classes.all()),0)
