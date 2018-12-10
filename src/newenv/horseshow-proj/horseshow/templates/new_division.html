@@ -7,8 +7,8 @@
     <form class="form" action="" method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" href="{% url 'showpage' showdate=date%}" name="exit" value="Save and Exit"/>
-        <input type="submit" href="{% url 'divisions' showdate=date%}" name="another" value="Save and Add another Division"/>
+        <input class="btn btn-success" type="submit" href="{% url 'showpage' showdate=date%}" name="exit" value="Save and Exit"/>
+        <input class="btn btn-success" type="submit" href="{% url 'divisions' showdate=date%}" name="another" value="Save and Add another Division"/>
     </form>
 </div>
 {{ form.media }}
