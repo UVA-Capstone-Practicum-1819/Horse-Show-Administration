@@ -16,10 +16,10 @@
 
   
 
-    <p><a class="btn btn-primary" href = "{% url 'divisions' showname=name %}">Add Division</a></p>
-    <p><a class="btn btn-primary" href = "{% url 'division_select' showname=name %}">Edit Division/ View Division Score</a></p>
+    <p><a class="btn btn-primary" href = "{% url 'divisions' showdate=date %}">Add Division</a></p>
+    <p><a class="btn btn-primary" href = "{% url 'division_select' showdate=date %}">Edit Division/ View Division Score</a></p>
     <p><a class="btn btn-primary" href="{% url 'select_rider' %}">Add Horse-Rider Combo to the Database</a></p>
-    <p><form method="POST" class="form"  action="{% url 'showpage' showdate=date%}">
+    <p><form method="POST" class="form"  action="{% url 'showpage' showdate=date %}">
       {% csrf_token %}
       <button class="btn btn-primary" type="submit">Edit Horse Rider Combo</button>
       {{ form.as_table }}
