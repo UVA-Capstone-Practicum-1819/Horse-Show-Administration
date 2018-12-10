@@ -529,7 +529,7 @@ def add_horse(request):
             request.session['horse_pk'] = horse.pk
             return redirect('add_combo')
     form = HorseForm()
-    return render(request, 'horse_edit.html', {'form': form})
+    return render(request, 'horse_add.html', {'form': form})
 
 class RiderAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
