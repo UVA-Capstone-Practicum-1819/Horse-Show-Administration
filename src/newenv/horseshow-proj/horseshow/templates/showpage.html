@@ -8,11 +8,11 @@
   <br><b>Location:</b> {{ location }}</h5>
   <h5><b>Divisions:</b></h5>
     {% for division in divisions %}
-        <li>{{ division }}</li>
+        <li><a href = "{% url 'division_info' showdate=date divisionname=division %}">{{division}}</a></li>
     {% endfor %}
   <p>
-    <br><a href = "{% url 'divisions' showname=name %}">Add Division</a>
-    <br><a href = "{% url 'division_select' showname=name %}">Edit Division/ View Division Score</a>
+    <br><a href = "{% url 'divisions' showdate=date %}">Add Division</a>
+    <br><a href = "{% url 'division_select' showdate=date %}">View Division Score</a>
     <br><a href="{% url 'select_rider' %}">Add Horse-Rider Combo to the Database</a>
     <br><a href="{% url 'classes' %}">Add Class</a>
     <br><a href="{% url 'class_select' %}">Rank Class</a>

@@ -84,13 +84,13 @@ def showpage(request, showdate):
     return render(request, 'showpage.html', context)
 
 
-def classpage(request):
-    latest_show_list = Show.objects.all
-    template = loader.get_template('classpage.html')
-    context = {
-        'latest_show_list': latest_show_list,
-    }
-    return HttpResponse(template.render(context, request))
+# def classpage(request):
+#     latest_show_list = Show.objects.all
+#     template = loader.get_template('classpage.html')
+#     context = {
+#         'latest_show_list': latest_show_list,
+#     }
+#     return HttpResponse(template.render(context, request))
 
 
 def create_show(request):
@@ -228,13 +228,14 @@ def divisionscore(request,divisionname): #displays list of classes in division, 
     context = {'classes': division.classes.all, 'name': division.name, 'form': form}
     return render(request, 'division_score.html', context) #passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
 
-def delete_class(request, divisionname, classname): #deletes a class from a division
+def delete_class(request, showdate, divisionname, classname): #deletes a class from a division
     division = Division.objects.get(name=divisionname) #gets the division object from the division name that was passed in
     classObj = Classes.objects.get(name=classname) #gets the class object from the class name that was passed in
-    division.classes.remove(classObj) #removes the class object from the division's many-to-many "classes" field
+    division.classes.remove(classObj)
+    classObj.delete() #removes the class object from the division's many-to-many "classes" field
     division.save() #saves the division object in the database
     context = {'classes': division.classes.all,'name': division.name}
-    return redirect('division_classes', divisionname=divisionname)  #redirects to division_classes and passes in the division's name
+    return redirect('division_info', showdate=showdate, divisionname=divisionname)  #redirects to division_classes and passes in the division's name
 
 
 
@@ -328,8 +329,8 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def new_division(request, showname):
-    show = Show.objects.get(name=showname)
+def new_division(request, showdate):
+    show = Show.objects.get(date=showdate)
     date = show.date
     if request.method == "POST":
         if 'exit' in request.POST:
@@ -357,30 +358,57 @@ def new_division(request, showname):
                 divisions = show.divisions
                 divisions.add(division)
                 show.save()
-
-                return redirect('divisions', showname)
+                return redirect('divisions', showdate)
     else:
         form = DivisionForm()
-        shows = Show.objects.all().order_by('date')
-        for show in shows:
-            if showname == show.name:
-                context = {
-                    "form": form,
-                    "name": show.name,
-                    "date": show.date,
-                    "location": show.location,
-                    "divisions": show.divisions.all,
-                }
+        show = Show.objects.get(date=showdate)
+        context = {
+            "form": form,
+            "name": show.name,
+            "date": show.date,
+            "location": show.location,
+            "divisions": show.divisions.all,
+        }
         return render(request, 'new_division.html', context)
 
+def division(request, showdate, divisionname):
+    if request.method == 'POST':
+        form = AddClassForm(request.POST)
+        if form.is_valid():
+            c = form.save()
+            division = Division.objects.get(name=divisionname)
+            division.classes.add(c)
+            division.save()
+            return redirect('division_info', showdate, divisionname)
+    else:
+        show = Show.objects.get(date=showdate)
+        division = Division.objects.get(name=divisionname)
+        if(len(division.classes.all()) < 3):
+            form = AddClassForm() 
+            context = {
+                "form": form,
+                "showdate" : showdate,
+                "showname": show.name,
+                "division": division.name,
+                "classes": division.classes.all,
+            } 
+        else:
+            context = {
+                "showdate":show.date,
+                "showname": show.name,
+                "division": division.name,
+                "classes": division.classes.all,
+            } 
+        return render(request, 'division.html', context)
 
-def division_select(request, showname): #displays division select dropdown and ability to "Save" or "See Division Scores"
+def division_select(request, showdate): #displays division select dropdown and ability to "Save" or "See Division Scores"
     if request.method == "POST":
         if 'save' in request.POST: #if a division is selected and the "Save" button is clicked
             form = DivisionSelectForm(request.POST)
             if form.is_valid():
-                show = Show.objects.get(name=showname) #gets the show object from the showname that was passed in
-                current_divisions = show.divisions #gets the divisions of the show object
+                print("form valid ")
+                show = Show.objects.get(date=showdate)
+                current_divisions = show.divisions
                 division = Division.objects.get(
                     name=form.cleaned_data['name'])
                 current_divisions.add(division)
@@ -402,7 +430,7 @@ def division_select(request, showname): #displays division select dropdown and a
 
     else:
         form = DivisionSelectForm()
-    return render(request, 'division_select.html', {'form': form, 'name': showname}) #passes the DivisionSelectForm and show name to "division_select.html" and renders that page
+    return render(request, 'division_select.html', {'form': form, 'date': showdate})
 
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
