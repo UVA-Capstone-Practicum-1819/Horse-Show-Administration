@@ -148,7 +148,6 @@ class ShowAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-
 def signup(request):
     """ signs up the user (creates an account) """
     if request.method == 'POST':
@@ -196,7 +195,7 @@ def billinglist(request, showdate, combonum):
     # for minimum requirements, only calculates price based on pre-registration price
     context = {'name': combo.rider, 'show_date': show.date,
      'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
-     # the context will help create the table for the list of classes a user is currently in
+    # the context will help create the table for the list of classes a user is currently in
     return render(request, 'billinglist.html', context)
 
 #This view allows you to scratch from a show
@@ -350,8 +349,8 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
 
-#This view allows you to create a new division
 def new_division(request, showdate):
+    """ Form for allowing users to create a new division, which is a subset of show """
     show = Show.objects.get(date=showdate)
     date = show.date
     if request.method == "POST":
@@ -401,8 +400,8 @@ def new_division(request, showdate):
         }
         return render(request, 'new_division.html', context)
 
-#This view displays information for a specific division
 def division(request, showdate, divisionname):
+    """ Info about divisions/classes in a show """
     show = Show.objects.get(date=showdate)
     division = Division.objects.get(name=divisionname)
     if request.method == 'POST': #if POST, create a new class for this division
@@ -498,9 +497,9 @@ def division_select(request, showdate): #displays division select dropdown and a
         form = DivisionSelectForm()
     return render(request, 'division_select.html', {'form': form, 'date': showdate})
 
-
-class DivisionAutocomplete(autocomplete.Select2QuerySetView): #autofil for searching division
-    def get_queryset(self): #function no longer in use
+class DivisionAutocomplete(autocomplete.Select2QuerySetView):
+    """ fills in form automatically based on value entered by user """
+    def get_queryset(self):
         qs = Division.objects.all().order_by('number')
         if self.q:
             qs = qs.filter(division_name__istartswith=self.q)
@@ -514,16 +513,16 @@ def select_rider(request):
     form = RiderSelectForm()
     return render(request, 'rider_select.html', {'form': form})
 
-#this is another view for selecting a rider
 def select_rider2(request):
+    """ select rider function exclusively for editing a rider """
     if request.method == "POST":
         rider_pk = request.POST['rider']
         return redirect('edit_rider', rider_pk=rider_pk)
     form = RiderSelectForm()
     return render(request, 'rider_select2.html', {'form': form})
 
-#This view allows you to edit rider information
 def edit_rider(request, rider_pk):
+    """ allows user to change the given fields in rider and save changes """
     rider = Rider.objects.get(pk=rider_pk)
     if request.method == "POST":
         edit_form = RiderEditForm(request.POST)
@@ -552,16 +551,16 @@ def add_rider(request):
     form = RiderForm()
     return render(request, 'editrider.html', {'form': form})
 
-#This view allows you to select a horse
 def select_horse2(request):
+    """ select horse function exclusively for editing a horse """
     if request.method == "POST":
         horse_pk = request.POST['horse']
         return redirect('edit_horse', horse_pk=horse_pk)
     form = HorseSelectForm()
     return render(request, 'horse_select2.html', {'form': form})
 
-#This view allows you to edit a horse's information in the database
 def edit_horse(request, horse_pk):
+    """ allows user to change the given fields in rider and save changes """
     horse = Horse.objects.get(pk=horse_pk)
     if request.method == "POST":
         edit_form = HorseEditForm(request.POST)
@@ -579,7 +578,6 @@ def edit_horse(request, horse_pk):
         instance=horse)
     return render(request, 'horse_edit.html', {'horse': horse, 'edit_horse_form': edit_horse_form})
 
-#This view allows you to add a horse to the database
 def add_horse(request):
     """ creates a new horse in a form and stores its primary key into a session, then redirects to add_combo """
     if request.method == "POST":
