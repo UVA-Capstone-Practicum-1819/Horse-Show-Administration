@@ -243,13 +243,14 @@ def divisionscore(request,divisionname): #displays list of classes in division, 
     context = {'classes': division.classes.all, 'name': division.name, 'form': form}
     return render(request, 'division_score.html', context) #passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
 
-def delete_class(request, divisionname, classname): #deletes a class from a division
+def delete_class(request, showdate, divisionname, classname): #deletes a class from a division
     division = Division.objects.get(name=divisionname) #gets the division object from the division name that was passed in
     classObj = Classes.objects.get(name=classname) #gets the class object from the class name that was passed in
-    division.classes.remove(classObj) #removes the class object from the division's many-to-many "classes" field
+    division.classes.remove(classObj)
+    classObj.delete() #removes the class object from the division's many-to-many "classes" field
     division.save() #saves the division object in the database
     context = {'classes': division.classes.all,'name': division.name}
-    return redirect('division_classes', divisionname=divisionname)  #redirects to division_classes and passes in the division's name
+    return redirect('division_info', showdate=showdate, divisionname=divisionname)  #redirects to division_classes and passes in the division's name
 
 
 
@@ -401,12 +402,14 @@ def division(request, showdate, divisionname):
             form = AddClassForm() 
             context = {
                 "form": form,
+                "showdate" : showdate,
                 "showname": show.name,
                 "division": division.name,
                 "classes": division.classes.all,
             } 
         else:
             context = {
+                "showdate":show.date,
                 "showname": show.name,
                 "division": division.name,
                 "classes": division.classes.all,
