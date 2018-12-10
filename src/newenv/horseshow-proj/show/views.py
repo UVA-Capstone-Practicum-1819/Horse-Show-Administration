@@ -177,6 +177,7 @@ class ComboAutocomplete(autocomplete.Select2QuerySetView):
 def billing(request, showdate):
     if request.method == "POST":
         form = ComboSelectForm(request.POST)
+        # allows the user to select from the pre-existing horse-rider combos
         if form.is_valid():
             combo = form.cleaned_data['combo']
             combonum = combo.num
@@ -191,11 +192,11 @@ def billinglist(request, showdate, combonum):
     # form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num=combonum)
     tot = combo.classes.count()
-    # price = 0
     price = show.preRegistrationPrice * tot
-
+    # for minimum requirements, only calculates price based on pre-registration price
     context = {'name': combo.rider, 'show_date': show.date,
      'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
+     # the context will help create the table for the list of classes a user is currently in
     return render(request, 'billinglist.html', context)
 
 #This view allows you to scratch from a show
@@ -207,13 +208,17 @@ def scratch(request, showdate, combonum):
     combo = HorseRiderCombo.objects.get(num=int(combonum))
     cls = request.GET["cname"]
     dcls = combo.classes.get(name=cls)
-    # dcls.delete()
     combo.classes.remove(dcls)
+    # this line allows for a classes to be scratched (or removed) at no additional cost
+    # the list will be changed based on what classes were removed
+    # classes will only be removed from the horse-rider combo object, not from the entire database
     tot = combo.classes.count()
     price = show.preRegistrationPrice * tot
     context = {'name': combo.rider, 'show_date': show.date,
       'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
+    # context information need to populate table
     return render(request, 'billinglist.html', context)
+    # rendered to the same html page
 
 
 def divisionscore(request,divisionname): #displays list of classes in division, hrc winners of each of those classes from 1st-6th places, and form to enter champion info
@@ -239,7 +244,7 @@ def divisionscore(request,divisionname): #displays list of classes in division, 
 
 def delete_class(request, showdate, divisionname, classnumber): #deletes a class from a division
     division = Division.objects.get(name=divisionname) #gets the division object from the division name that was passed in
-    classObj = Classes.objects.get(number=classnumber) 
+    classObj = Classes.objects.get(number=classnumber)
     division.classes.remove(classObj)
     classObj.delete() #removes the class object from the division's many-to-many "classes" field
     division.save() #saves the division object in the database
@@ -418,14 +423,14 @@ def division(request, showdate, divisionname):
                 "showname": show.name,
                 "division": division.name,
                 "classes": division.classes.all(),
-            } 
+            }
         else:
             context = {
                 "showdate":show.date,
                 "showname": show.name,
                 "division": division.name,
                 "classes": division.classes.all(),
-            } 
+            }
         return render(request, 'division.html', context)
 
 def class_info(request, showdate, divisionname, classnumber):
@@ -448,8 +453,8 @@ def class_info(request, showdate, divisionname, classnumber):
     }
     return render(request, "classpage.html", context)
 
-def delete_combo(request, showdate, divisionname, classnumber, combo): 
-    combo = HorseRiderCombo.objects.get(num=combo) 
+def delete_combo(request, showdate, divisionname, classnumber, combo):
+    combo = HorseRiderCombo.objects.get(num=combo)
     classObj = Classes.objects.get(number=classnumber)
     combo.classes.remove(classObj)
     # combo = {'classes': division.classes.all,'name': division.name}
