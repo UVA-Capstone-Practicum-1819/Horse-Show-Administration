@@ -12,6 +12,10 @@
         <li><a href = "{% url 'division_info' showdate=date divisionname=division %}">{{division}}</a></li>
     {% endfor %}
   <p>
+
+
+  
+
     <p><a class="btn btn-primary" href = "{% url 'divisions' showname=name %}">Add Division</a></p>
     <p><a class="btn btn-primary" href = "{% url 'division_select' showname=name %}">Edit Division/ View Division Score</a></p>
     <p><a class="btn btn-primary" href="{% url 'select_rider' %}">Add Horse-Rider Combo to the Database</a></p>
@@ -24,6 +28,8 @@
     <p><a class="btn btn-primary" href="{% url 'classes' %}">Add Class</a></p>
     <p><a class="btn btn-primary" href="{% url 'class_select' %}">Rank Class</a></p>
     <p><a class="btn btn-primary" href="{% url 'billing' showdate=date %}">Bill a Rider</a></p>
+<p><a class="btn btn-primary" href="{% url 'select_rider2' %}">Edit Rider Information</a></p>
+  <p><a class="btn btn-primary" href="{% url 'select_horse2' %}">Edit Horse Information</a></p>
 
   </p>
 
