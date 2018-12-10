@@ -15,7 +15,6 @@ class Classes(models.Model):
     fourth = models.IntegerField(default=0)
     fifth = models.IntegerField(default=0)
     sixth = models.IntegerField(default=0)
-
     name = models.CharField(max_length=200)
 
     def __str__(self):

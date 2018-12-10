@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
+
 """horseshow URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -28,7 +29,10 @@ Including another URLconf
     Obsolete URLs were commented out or removed
     Autocomplete pages are only used for autocomplete functionality- will not be a functional page for the purpose
     of organizing a Horse Show
-"""
+
+The URL paths
+In the future, we need to split this file up into multiple URL confs in a tree-like fashion so as to better organize and have simpler paths
+ """
 
 urlpatterns = [
     path('', views.show_select, name="show_select"),
@@ -43,17 +47,17 @@ urlpatterns = [
     path('rider/new', views.add_rider, name="add_rider"),
     path('class/new', views.new_class, name="classes"),
     path('<showdate>/division/<divisionname>', views.division, name="division_info"),
-    # path('<showdate>/<divisionname>/classes', views.division, name="division_info"),
+    path('<showdate>/<divisionname>/classes/<classnumber>', views.class_info, name="edit_class"),    
+    path('<showdate>/<divisionname>/classes/<classnumber>/scratch/<combo>', views.delete_combo, name="delete_combo"),    
     path('<showdate>/newdivision', views.new_division, name="divisions"),
     path('horse', views.select_horse, name="select_horse"),
-
     path('class', views.class_select, name="class_select"),
     path('<showdate>/division', views.division_select, name="division_select"),
     path('<divisionname>/divisionscore',
          views.divisionscore, name="divisionscore"),
     path('<divisionname>/division_classes',
          views.division_classes, name="division_classes"),
-    path('<showdate>/<divisionname>/<classname>/delete_class',
+    path('<showdate>/<divisionname>/<classnumber>/delete_class',
          views.delete_class, name="delete_class"),
     path('<showdate>/billing', views.billing, name="billing"),
     path('<showdate>/<combonum>/billinglist',

@@ -37,7 +37,7 @@ class RankingForm(forms.ModelForm):
 
 #This allows you to enter information for an individual Rider. Birth date is necessary for people who are 18 or younger
 class RiderForm(forms.ModelForm):
-
+    """ Form for a rider with name, address, email, birth date, whether it is a member of the VHSA, and its county """
     birth_date = forms.DateField(help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(
         years=range(1900, 2016)))
 
@@ -48,8 +48,9 @@ class RiderForm(forms.ModelForm):
 
 #Used to select a rider from the database and prepopulate with options
 class RiderSelectForm(forms.ModelForm):
+    """ Form for selecting a rider and returning its primary key """
     # horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
-        # rider_names =  [rider.name for rider in Rider.objects.all()]
+    # rider_names =  [rider.name for rider in Rider.objects.all()]
     rider = forms.ModelChoiceField(
         queryset=Rider.objects.all(),
         widget=autocomplete.ModelSelect2(
@@ -62,6 +63,7 @@ class RiderSelectForm(forms.ModelForm):
 
 #This form allows you to enter information about an individual Horse.
 class HorseForm(forms.ModelForm):
+    """ the form for a horse, which has a coggins_date, name, accession number, owner, type, and size """
     coggins_date = forms.DateField(widget=forms.SelectDateWidget(
         years=range(2010, 2019)))
 
@@ -72,8 +74,9 @@ class HorseForm(forms.ModelForm):
 
 #This form allows you to select a combo
 class ComboSelectForm(forms.ModelForm):
+    """ returns the primary key of the horse rider combo in a drop down list """
     # horses = forms.ModelChoiceField(queryset=Horse.objects.all().order_by('name'))
-        # rider_names =  [rider.name for rider in Rider.objects.all()]
+    # rider_names =  [rider.name for rider in Rider.objects.all()]
     combo = forms.ModelChoiceField(
         queryset=HorseRiderCombo.objects.all(),
         widget=autocomplete.ModelSelect2(url='combo_autocomplete')
@@ -85,6 +88,7 @@ class ComboSelectForm(forms.ModelForm):
 
 #This combo Num Form is used to give each horse and rider a unique combo number
 class ComboNumForm(forms.Form):
+    """ the form for entering a horse rider combo number to go to its edit page """
     # class Meta:
     #     model = HorseRiderCombo
     #     fields = ('num',)
@@ -93,24 +97,28 @@ class ComboNumForm(forms.Form):
 
 #This creates the Horse Rider Combo itself
 class HorseRiderComboCreateForm(forms.ModelForm):
+    """ for creating a horse rider combo """
     class Meta:
         model = HorseRiderCombo
         fields = ('num', 'contact', 'email', 'cell')
 
 #This allows you to edit the HorseRiderCombo's infromation. The combo number cannot be changed.
 class HorseRiderEditForm(forms.ModelForm):
+    """ for updating a horse-rider combo """
     class Meta:
         model = HorseRiderCombo
         fields = ('contact', 'email', 'cell')
 
 #This allows you to edit the rider's information
 class RiderEditForm(forms.ModelForm):
+    """ for updating a rider """
     class Meta:
         model = Rider
         fields = ('name', 'address', 'birth_date', 'member_VHSA', 'county')
 
 #This allows you to edit the horse's information
 class HorseEditForm(forms.ModelForm):
+    """ for editing a horse """
     class Meta:
         model = Horse
         fields = ('accession_no', 'coggins_date',
@@ -156,11 +164,13 @@ class HorseSelectForm(forms.ModelForm):
         model = Horse
         fields = ('horse',)
 
+
 #This form allows you to enter class information for a show
+
 class AddClassForm(forms.Form):
     class Meta:
         model = Classes
-        fields = ('name', 'number')
+        fields = ('name', 'number',)
 
 #This form is a model form for Classes.
 class ClassForm(forms.ModelForm):
@@ -168,11 +178,13 @@ class ClassForm(forms.ModelForm):
         model = Classes
         fields = ('name', 'number')
 
+
 #This is another class form
 class AddClassForm(forms.ModelForm):
     class Meta:
         model = Classes
         fields = ('name', 'number')
+
 
 #This allows the user to remove classes by entering the class number
 class RemoveClassForm(forms.Form):
