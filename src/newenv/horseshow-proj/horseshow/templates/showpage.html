@@ -14,7 +14,7 @@
   <p>
 
 
-  
+
 
     <p><a class="btn btn-primary" href = "{% url 'divisions' showdate=date %}">Add Division</a></p>
     <p><a class="btn btn-primary" href = "{% url 'division_select' showdate=date %}">Edit Division/ View Division Score</a></p>
@@ -23,9 +23,8 @@
       {% csrf_token %}
       <button class="btn btn-primary" type="submit">Edit Horse Rider Combo</button>
       {{ form.as_table }}
-      
+
     </form></p>
-    <p><a class="btn btn-primary" href="{% url 'classes' %}">Add Class</a></p>
     <p><a class="btn btn-primary" href="{% url 'class_select' %}">Rank Class</a></p>
     <p><a class="btn btn-primary" href="{% url 'billing' showdate=date %}">Bill a Rider</a></p>
 <p><a class="btn btn-primary" href="{% url 'select_rider2' %}">Edit Rider Information</a></p>
