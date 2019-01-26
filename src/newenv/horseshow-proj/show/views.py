@@ -117,7 +117,7 @@ def create_show(request):
     showlocation = f.cleaned_data['location']
     new_show = Show.objects.create(
         name=showname, date=showdatestring, location=showlocation,
-        dayOfPrice=f.cleaned_data['dayOfPrice'], preRegistrationPrice=f.cleaned_data['preRegistrationPrice'])
+        day_of_price=f.cleaned_data['day_of_price'], pre_reg_price=f.cleaned_data['pre_reg_price'])
     response = {'ok': True, 'success_msg': "Show was successfully created",
                 'form': form, 'show': new_show}
     # return render(request, 'create_show.html', response)
@@ -191,7 +191,7 @@ def billinglist(request, showdate, combonum):
     # form = RegistrationBillForm()
     combo = HorseRiderCombo.objects.get(num=combonum)
     tot = combo.classes.count()
-    price = show.preRegistrationPrice * tot
+    price = show.pre_reg_price * tot
     # for minimum requirements, only calculates price based on pre-registration price
     context = {'name': combo.rider, 'show_date': show.date,
      'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
@@ -212,7 +212,7 @@ def scratch(request, showdate, combonum):
     # the list will be changed based on what classes were removed
     # classes will only be removed from the horse-rider combo object, not from the entire database
     tot = combo.classes.count()
-    price = show.preRegistrationPrice * tot
+    price = show.pre_reg_price * tot
     context = {'name': combo.rider, 'show_date': show.date,
       'classes': combo.classes.all, 'combo_num': combo.num, 'tot': tot, 'price': price}
     # context information need to populate table
@@ -243,7 +243,7 @@ def divisionscore(request,divisionname): #displays list of classes in division, 
 
 def delete_class(request, showdate, divisionname, classnumber): #deletes a class from a division
     division = Division.objects.get(name=divisionname) #gets the division object from the division name that was passed in
-    classObj = Classes.objects.get(number=classnumber)
+    classObj = Class.objects.get(number=classnumber)
     division.classes.remove(classObj)
     classObj.delete() #removes the class object from the division's many-to-many "classes" field
     division.save() #saves the division object in the database
@@ -262,7 +262,7 @@ def new_class(request):
     if request.method == "POST":
         form = ClassForm(request.POST)
         if form.is_valid():
-            existing_classes = Classes.objects.all()
+            existing_classes = Class.objects.all()
             for cl in existing_classes:
                 if cl.number == form.cleaned_data['number']:
                     messages.error(request, "class number in use")
@@ -306,7 +306,7 @@ def rankclass(request, classname):
             fourth = form.cleaned_data['fourth']
             fifth = form.cleaned_data['fifth']
             sixth = form.cleaned_data['sixth']
-            showclass = Classes.objects.get(name=classname)
+            showclass = Class.objects.get(name=classname)
             showclass.first = first
             showclass.second = second
             showclass.third = third
@@ -344,7 +344,7 @@ def rankclass(request, classname):
 #This is the autocomplete functionality for selecting a class
 class ClassAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Classes.objects.all().order_by('number')
+        qs = Class.objects.all().order_by('number')
         if self.q:
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
@@ -352,49 +352,29 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
 def new_division(request, showdate):
     """ Form for allowing users to create a new division, which is a subset of show """
     show = Show.objects.get(date=showdate)
-    date = show.date
+    
     if request.method == "POST":
-        if 'exit' in request.POST:
-            form = DivisionForm(request.POST)
-            if form.is_valid():
-                divisions = Division.objects.filter(number=form.cleaned_data['number'])
-                if(len(divisions) > 0):
-                    messages.error(request, "division number in use") #prepare error message, will display on submit.
-                    return redirect('divisions', showdate)
-                post = form.save(commit=False)
-                post.author = request.user
-                post.published_date = timezone.now()
-                post.save()
-                division = Division.objects.get(
-                    name=form.cleaned_data['name'])
-                divisions = show.divisions
-                divisions.add(division)
-                show.save()
-                return redirect('showpage', date)
-        if 'another' in request.POST:
-            form = DivisionForm(request.POST)
-            if form.is_valid():
-                divisions = Division.objects.filter(number=form.cleaned_data['number'])
-                if(len(divisions) > 0):
-                    messages.error(request, "division number in use") #prepare error message, will display on submit.
-                    return redirect('divisions', showdate)
-                post = form.save(commit=False)
-                post.author = request.user
-                post.published_date = timezone.now()
-                post.save()
-                division = Division.objects.get(
-                    name=form.cleaned_data['name'])
-                divisions = show.divisions
-                divisions.add(division)
-                show.save()
+        form = DivisionForm(request.POST)
+        if form.is_valid():
+            divisions = Division.objects.filter(name=form.cleaned_data['name'])
+            if(len(divisions) > 0):
+                messages.error(request, "division number in use") #prepare error message, will display on submit.
                 return redirect('divisions', showdate)
+            division_form = DivisionForm(request.POST)
+            division = division_form.save(commit=False)
+            division.show = show
+            division.save()
+        if 'another' in request.POST:
+            return redirect('divisions', showdate)
+        elif 'exit' in request.POST:
+            return redirect('showpage', showdate)
     else:
         form = DivisionForm()
-        show = Show.objects.get(date=showdate)
+        
         context = {
             "form": form,
             "name": show.name,
-            "date": show.date,
+            "date": showdate,
             "location": show.location,
             "divisions": show.divisions.all,
         }
@@ -407,19 +387,14 @@ def division(request, showdate, divisionname):
     if request.method == 'POST': #if POST, create a new class for this division
         form = AddClassForm(request.POST)
         if form.is_valid():
-            existing_classes = Classes.objects.all() #verify number doesnt already exist
+            existing_classes = Class.objects.all() #verify number doesnt already exist
             for cl in existing_classes: #number is not a primary key because theoretically, multiple shows should be able to have class number 2. 
                 if cl.number == form.cleaned_data['number']: #compare
                     messages.error(request, "class number in use") #prepare error message, will display on submit.
                     return redirect('division_info', showdate, divisionname)
-            c = Classes(name=form.cleaned_data['name'], number=form.cleaned_data['number'])
+            c = Class(request.POST)
+            c.division = division
             c.save()
-            division = Division.objects.get(name=divisionname)
-            # division_classes = division.classes.all()
-            # division_classes.add(c)
-            division.classes.add(c) #add class to that division 
-            # division.classes = division_classes
-            division.save()
             return redirect('division_info', showdate, divisionname) #render page with new division
     else:
         if(len(division.classes.all()) < 3): #each division only has a max of 3 classes, no input form if 3 classes present
@@ -443,7 +418,7 @@ def division(request, showdate, divisionname):
 def class_info(request, showdate, divisionname, classnumber):  #render class info including combos in class
     show = Show.objects.get(date=showdate)
     division = Division.objects.get(name=divisionname)
-    this_class = Classes.objects.get(number = classnumber)
+    this_class = Class.objects.get(number = classnumber)
     this_combos = [] #will hold combos of class
     combos = HorseRiderCombo.objects.all()
     for combo in combos: #iterate through combos to find matches//perhaps make a manytomany field later, but was told not to change models 
@@ -462,7 +437,7 @@ def class_info(request, showdate, divisionname, classnumber):  #render class inf
 
 def delete_combo(request, showdate, divisionname, classnumber, combo): #scratch a combo from the class page so that it reflects in the combo's billing
     combo = HorseRiderCombo.objects.get(num=combo) 
-    classObj = Classes.objects.get(number=classnumber)
+    classObj = Class.objects.get(number=classnumber)
     combo.classes.remove(classObj)
     return redirect('edit_class', showdate=showdate, divisionname=divisionname, classnumber=classnumber)
 
@@ -650,7 +625,7 @@ def edit_combo(request, num):
     if request.method == "POST":
         if request.POST.get('remove_class'):
             num = request.POST['remove_class']
-            selected_class = Classes.objects.get(number=num)
+            selected_class = Class.objects.get(number=num)
             combo.classes.remove(selected_class)
             combo.save()
 

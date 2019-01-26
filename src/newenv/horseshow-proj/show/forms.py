@@ -14,16 +14,16 @@ class ShowForm(forms.Form):
     date = forms.DateField(initial=datetime.date.today)
     location = forms.CharField(
         max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
-    dayOfPrice = forms.IntegerField()
-    preRegistrationPrice = forms.IntegerField()
+    day_of_price = forms.IntegerField(label="Day-of Price")
+    pre_reg_price = forms.IntegerField(label="Preregistration Price")
 
 #This allows you to check whether they were preregistered, or if they entered certain classes the day of
 class RegistrationBillForm(forms.Form):
-    typels = ['prereg', 'dayof']
-    registrationtype = forms.ChoiceField(choices=typels)
+    types = ['pre_reg', 'day_of']
+    registrationtype = forms.ChoiceField(choices=types)
 
 #This allows you to rank classes from 1st through 6th and store those rankings in the specific Class
-class RankingForm(forms.ModelForm):
+class RankingForm(forms.Form):
     first = forms.IntegerField()
     second = forms.IntegerField()
     third = forms.IntegerField()
@@ -31,9 +31,11 @@ class RankingForm(forms.ModelForm):
     fifth = forms.IntegerField()
     sixth = forms.IntegerField()
 
-    class Meta:
-        model = Classes
-        fields = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
+    fields = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
+
+    """ class Meta:
+        model = Class
+         """
 
 #This allows you to enter information for an individual Rider. Birth date is necessary for people who are 18 or younger
 class RiderForm(forms.ModelForm):
@@ -165,26 +167,13 @@ class HorseSelectForm(forms.ModelForm):
         fields = ('horse',)
 
 
-#This form allows you to enter class information for a show
 
-class AddClassForm(forms.Form):
-    #create a new class
-    class Meta:
-        model = Classes
-        fields = ('name', 'number',)
 
-#This form is a model form for Classes.
+#This form is a model form for Class.
 class ClassForm(forms.ModelForm):
     class Meta:
-        model = Classes
-        fields = ('name', 'number')
-
-
-#This is another class form
-class AddClassForm(forms.ModelForm):
-    class Meta:
-        model = Classes
-        fields = ('name', 'number')
+        model = Class
+        fields = ( 'number', )
 
 
 #This allows the user to remove classes by entering the class number
@@ -194,28 +183,28 @@ class RemoveClassForm(forms.Form):
 #This form allows the user to select a class from a prepopulated menu
 class ClassSelectForm(forms.ModelForm):
     selected_class = forms.ModelChoiceField(
-        queryset=Classes.objects.all(),
+        queryset=Class.objects.all(),
         widget=autocomplete.ModelSelect2(
             url='classes_autocomplete'),
     )
 
     class Meta:
-        model = Classes
+        model = Class
         fields = ('selected_class',)
 
     def clean_date(self):
-        classobj = self.cleaned_data['name']
-        classes = Classes.objects.all()
-        if classobj in classes:
-            classobj.name = classobj.name
-            return classobj
+        class_obj = self.cleaned_data['name']
+        classes = Class.objects.all()
+        if class_obj in classes:
+            class_obj.name = class_obj.name
+            return class_obj
 
 #This form allows info to be entered for a division
 class DivisionForm(forms.ModelForm):
     #create new division
     class Meta:
         model = Division
-        fields = ('name', 'number')
+        fields = ('name', )
 
 #This form provides information for the division champion of a specific division, recording the
 #champion/champion reserve and their respective points

@@ -7,7 +7,7 @@ from show import models
 from django.urls import reverse
 # Create your tests here.
 
-class ClassesScoreTestCase(TestCase):
+class ClassParticipationTestCase(TestCase):
     def RankForm_Valid(self):
         def test_showForm_validsdashes(self):
             form = RankingForm(data={'first':'231', 'second':'203','third':'332','fourth':'883','fifth':'902','sixth':'234'})
@@ -73,8 +73,8 @@ class BillTests(TestCase):
         rider1 = Rider.objects.create(name = "Lauren", address="234 cotton lane", birth_date="1980-10-15", email="sdd3ee@virginia.edu", member_VHSA=True, county="")
         # rider2 = Rider.objects.create(name = "Yunzhe", address="idunno ln.", age=22, email="ts4pe@virginia.edu")
         # rider3 = Rider.objects.create(name = "Shannon", address="sfds", age=22, email="t4pe@virginia.edu")
-        c = Classes.objects.create(name="Test", number="1")
-        c2 = Classes.objects.create(name="Test2", number="2")
+        c = Class.objects.create(name="Test", number="1")
+        c2 = Class.objects.create(name="Test2", number="2")
         hrc1 = HorseRiderCombo.objects.create(num = 12, rider = rider1, horse = horse1)
         hrc1.classes.add(c)
         hrc1.classes.add(c2)
@@ -239,19 +239,19 @@ class HorseSelectCase(TestCase):
 
 # class ClassTestCase(TestCase):
 #     def test_name(self):
-#         self.assertEqual(Classes.CLASS_CHOICES[0], ('cwu', '1. California Warm Up'))
+#         self.assertEqual(Class.CLASS_CHOICES[0], ('cwu', '1. California Warm Up'))
 
 #     def test_check_type(self):
-#         self.assertTrue(isinstance(Classes.CLASS_CHOICES[0], tuple))
+#         self.assertTrue(isinstance(Class.CLASS_CHOICES[0], tuple))
 
 #     def test_index(self):
-#         self.assertEqual(Classes.CLASS_CHOICES.index(('pef', '35. Pony Equitation on the Flat')), 34)
+#         self.assertEqual(Class.CLASS_CHOICES.index(('pef', '35. Pony Equitation on the Flat')), 34)
 
 #     def test_length(self):
-#         self.assertEqual(len(Classes.CLASS_CHOICES), 48)
+#         self.assertEqual(len(Class.CLASS_CHOICES), 48)
 
 #     def test_selected(self):
-#         self.assertFalse(Classes.CLASS_CHOICES[0] == 'on')
+#         self.assertFalse(Class.CLASS_CHOICES[0] == 'on')
 
 class LoginTestCase(TestCase):
     """
@@ -341,8 +341,8 @@ class ComboSelect(TestCase):
     def test_comboselectvalid(self):
         horse1 = Horse.objects.create(name="Smokey Mountain", coggins_date="2011-10-11", accession_no=48, owner="Tina", size="large", type="pony")
         rider1 = Rider.objects.create(name = "Lauren", address="234 cotton lane", birth_date="1980-10-15", email="sdd3ee@virginia.edu", member_VHSA=True, county="")
-        c = Classes.objects.create(name="Test", number="1")
-        c2 = Classes.objects.create(name="Test2", number="2")
+        c = Class.objects.create(name="Test", number="1")
+        c2 = Class.objects.create(name="Test2", number="2")
         hrc1 = HorseRiderCombo.objects.create(num=12, rider=rider1, horse=horse1)
 
         hrc1.classes.add(c)
@@ -352,8 +352,8 @@ class ComboSelect(TestCase):
     def test_comboselectinvalid(self):
         horse1 = Horse.objects.create(name="Smokey Mountain", coggins_date="2011-10-11", accession_no=48, owner="Tina", size="large", type="pony")
         rider1 = Rider.objects.create(name = "Lauren", address="234 cotton lane", birth_date="1980-10-15", email="sdd3ee@virginia.edu", member_VHSA=True, county="")
-        c = Classes.objects.create(name="Test", number="1")
-        c2 = Classes.objects.create(name="Test2", number="2")
+        c = Class.objects.create(name="Test", number="1")
+        c2 = Class.objects.create(name="Test2", number="2")
         hrc1 = HorseRiderCombo.objects.create(num = 12, rider = rider1, horse = horse1)
         hrc1.classes.add(c)
         values = {'num': 12}
@@ -361,10 +361,10 @@ class ComboSelect(TestCase):
         self.assertFalse(form.is_valid())
 
 
-class ClassesTest(TestCase):
+class ClassTest(TestCase):
     def test_create_class(self):
-        c = Classes.objects.create(name="Test", number="1")
-        self.assertTrue(isinstance(c, Classes))
+        c = Class.objects.create(name="Test", number="1")
+        self.assertTrue(isinstance(c, Class))
 
     def test_invalid_class_create(self):
         form_values = {'class_name': 'test', 'class_number':''}
@@ -372,7 +372,7 @@ class ClassesTest(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_class_select_form(self):
-        c = Classes.objects.create(name="Test", number="1")
+        c = Class.objects.create(name="Test", number="1")
         values = {'name': "Test"}
         form = ClassSelectForm(data=values)
         self.assertTrue(form.is_valid)
@@ -647,7 +647,7 @@ class ComboAddClassTestCase(TestCase):
                         num=665, rider=rider, horse=horse)
         data = {'num': 665}
         combo_form = ComboNumForm(data)
-        c1 = Classes.objects.create(name="Test1", number="1")
+        c1 = Class.objects.create(name="Test1", number="1")
 
         response = self.client.post('show/edit-combo', {'add_class': 1})
         if combo_form.is_valid():
@@ -665,7 +665,7 @@ class ComboRemoveClassTestCase(TestCase):
                         num=665, rider=rider, horse=horse)
         data = {'num': 665}
         combo_form = ComboNumForm(data)
-        c1 = Classes.objects.create(name="Test1", number="1")
+        c1 = Class.objects.create(name="Test1", number="1")
         if combo_form.is_valid():
             combo_num = combo_form.cleaned_data['num']
         combo = HorseRiderCombo.objects.get(num=combo_num)
@@ -674,32 +674,32 @@ class ComboRemoveClassTestCase(TestCase):
         
         remove_class=1
         response = self.client.post('show/edit-combo', {'number': remove_class})
-        combo.classes.remove(Classes.objects.get(number = remove_class))
+        combo.classes.remove(Class.objects.get(number = remove_class))
         combo.save()
         
         self.assertTrue(combo.classes.count() == 0)
 
 # class AddDivisionsToShow(TestCase):
 #     def test_add(self):
-#         show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+#         show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
 #         self.client.post(reverse('divisions', kwargs={'showdate':show.date}),{'name':'test', 'number':0})
 #         self.assertEqual(len(show.divisions.all()),1)
 
     # def test_no_duplicates(self):
-    #     show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+    #     show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
     #     self.client.post(reverse('divisions', kwargs={'showdate':show.date}),{'name':'test', 'number':0})
     #     self.client.post(reverse('divisions', kwargs={'showdate':show.date}),{'name':'test', 'number':0})
     #     self.assertEqual(len(show.divisions.all()),1)
 
 class AddClassToDivision(TestCase):
     def test_add_class(self):
-        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
         division = Division.objects.create(name="test", number=1)
         response=self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
         self.assertTrue(len(division.classes.all())==1)
 
     def test_fail_add_class(self):
-        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
         division = Division.objects.create(name="test", number=1)
         try:
             self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'','number':0})
@@ -708,14 +708,14 @@ class AddClassToDivision(TestCase):
             self.assertEqual(len(division.classes.all()), 0)
 
     def test_no_duplicates(self):
-        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
         division = Division.objects.create(name="test", number=1)
         self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
         self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
         self.assertEqual(len(division.classes.all()),1)
 
     def test_scratch(self):
-        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
         division = Division.objects.create(name="test", number=1)
         self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
         self.client.patch(reverse('delete_class', kwargs={'showdate':show.date, 'divisionname':division.name, 'classnumber':0}), {'number':0})
