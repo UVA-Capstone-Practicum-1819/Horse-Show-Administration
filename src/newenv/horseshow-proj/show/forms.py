@@ -71,7 +71,7 @@ class HorseForm(forms.ModelForm):
 
     class Meta:
         model = Horse
-        fields = ('name', 'coggins_date', 'accession_no',
+        fields = ('name', 'coggins_date', 'accession_num',
                   'owner', 'type', 'size', )
 
 #This form allows you to select a combo
@@ -123,7 +123,7 @@ class HorseEditForm(forms.ModelForm):
     """ for editing a horse """
     class Meta:
         model = Horse
-        fields = ('accession_no', 'coggins_date',
+        fields = ('accession_num', 'coggins_date',
                   'owner', 'type', 'size')
 
 #This allows you to select a show from a prepopulated list that you can search from
@@ -173,7 +173,7 @@ class HorseSelectForm(forms.ModelForm):
 class ClassForm(forms.ModelForm):
     class Meta:
         model = Class
-        fields = ( 'number', )
+        fields = ( 'num', )
 
 
 #This allows the user to remove classes by entering the class number
