@@ -1,4 +1,5 @@
 import random
+import re
 import os
 import json
 import pdfrw
@@ -29,15 +30,12 @@ class AuthRequiredMiddleware(object):
         self.get_response = get_response
 
     def __call__(self, request):
-        # Code to be executed for each request before
-        # the view (and later middleware) are called.
+        
         response = self.get_response(request)
         requested_path = request.path
-        excluded_urls = ["/show/login", "/show/signup", "/admin"]
-        if not request.user.is_authenticated and requested_path not in excluded_urls:
+        if re.match(r'/show.*', requested_path) and not requested_path == "/show/login" and not request.user.is_authenticated:
             return redirect('login')
-        # Code to be executed for each request/response after
-        # the view is called.
+        
 
         return response
 
