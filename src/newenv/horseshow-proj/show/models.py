@@ -7,33 +7,37 @@ import datetime
 #for riders who sign up for classes early. There is a dayof price for riders who sign up the day of the show.
 class Show(models.Model):
     name = models.CharField(max_length=100)
-    date = models.CharField(max_length=100, primary_key=True)
+    date = models.DateField(default=datetime.date.today, primary_key=True)
     location = models.CharField(max_length=100)
     day_of_price = models.IntegerField(blank=True, null=True, default=0, verbose_name="Day-of Price")
     pre_reg_price = models.IntegerField(blank=True, null=True, default=0, verbose_name="Preregistration Price")
     def __str__(self):
-        return self.date
+        return str(self.date)
 
 #Model for a single division. Includes a name, number for the division, and a
 # champion and champion reserve for the division as well as the points they earned in that division
 class Division(models.Model):
-    name = models.CharField(primary_key=True, max_length=100, default="")
+    class Meta:
+        unique_together = ('show', 'name')
+    name = models.CharField(max_length=100, default="")
     champion = models.IntegerField(default=0)
     champion_pts = models.IntegerField(default=0)
     champion_reserve = models.IntegerField(default=0)
     champion_reserve_pts = models.IntegerField(default=0)
-    show = models.ForeignKey(Show, on_delete=models.CASCADE, related_name="divisions")
+    show = models.ForeignKey(Show, on_delete=models.CASCADE, related_name="divisions", null=True)
     def __str__(self):
-        return self.name
+        return f"Show: {self.show.date}, Division: {self.name}"
 
-#Model for a single class. Because class is recognized in coding, we changed the name of a
-#single class to classes. Includes rankings from 1st through 6th and a number for the class as
-#well as a name
+# Model for a single class. Because class is recognized in coding, we changed the name of a
 class Class(models.Model):
-    number = models.IntegerField(default=0)
-    division = models.ForeignKey(Division, on_delete=models.CASCADE, related_name="classes")
+    class Meta:
+        unique_together = ('division', 'num')
+
+    num = models.IntegerField(default=0)
+    division = models.ForeignKey(Division, on_delete=models.CASCADE, related_name="classes", null=True)
+    
     def __str__(self):
-        return str(self.number)
+        return f"Show: {self.division.show.date}, Division: {self.division.name}, Number: {self.num}"
 
 #Model for a horse, includes possible sizes of the horse and the choice to refer to it as a horse or a Pony
 #coggins date is important for health consideration and the owner is not necessarily the riders
@@ -43,7 +47,7 @@ class Horse(models.Model):
     size_choices = ( ("NA", "N/A"), ("small", "SM"), ("medium", "MED"), ("large", "LG"), )
     type_choices = ( ("horse", "Horse"), ("pony", "Pony"), )
     name = models.CharField(primary_key=True, max_length=200, verbose_name="Name (Barn Name)")
-    accession_no = models.CharField(max_length=200, verbose_name="Accession Number", validators=[alphanumeric_validator])
+    accession_num = models.CharField(max_length=200, verbose_name="Accession Number", validators=[alphanumeric_validator])
     coggins_date = models.DateField(default=datetime.date.today,  verbose_name="Coggins Date", )
     owner = models.CharField(max_length=200, verbose_name="Owner")
     type = models.CharField(max_length=200, choices=type_choices, default="Horse", verbose_name="Type")
@@ -69,7 +73,9 @@ class Rider (models.Model):
 #relationship between a specific horse and specific rider for the day of the show
 #Class scores are recorded for each class they compete in
 class HorseRiderCombo(models.Model):
-    num = models.IntegerField(primary_key=True, validators=[MinValueValidator(100), MaxValueValidator(999)], verbose_name="Combination Number")
+    class Meta:
+        unique_together = ('rider', 'horse')
+    num = models.IntegerField(validators=[MinValueValidator(100), MaxValueValidator(999)], verbose_name="Combination Number")
 
     contact_choices = ( ("rider", "Rider"), ("owner", "Owner"),
         ("parent", "Parent"), ("trainer", "Trainer") )
@@ -84,10 +90,14 @@ class HorseRiderCombo(models.Model):
 
 #Model for a ClassParticipation. Includes a participating class and a score for that class to be placed under a HorseRider Combo
 class ClassParticipation(models.Model):
-    participated_class = models.ForeignKey(Class, on_delete=models.CASCADE)
+    class Meta:
+        unique_together = ('participated_class', 'combo')
+    participated_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="participations")
     
-    combo = models.ForeignKey(HorseRiderCombo, verbose_name="Horse Rider Combo", on_delete=models.CASCADE)
+    combo = models.ForeignKey(HorseRiderCombo, verbose_name="Horse Rider Combo", on_delete=models.CASCADE, related_name="participations")
+
     score = models.IntegerField(default=0)
     is_preregistered = models.BooleanField(default=False)
+
     def __str__(self):
-        return f"Combo #{self.combo.num} participates in class {self.participated_class.number}"
+        return f"Combo #{self.combo.num} participates in class {self.participated_class.num}"
