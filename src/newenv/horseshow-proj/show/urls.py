@@ -7,113 +7,112 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
 class_patterns = [
-     path('',
+    path('',
          views.view_class, name="view_class"),
 
-     path('rank',
+    path('rank',
          views.rank_class, name='rank_class'),
 
-     path('delete',
-         views.delete_class, name="delete_class"), 
+    path('delete',
+         views.delete_class, name="delete_class"),
+
+    path('combo/<combo_num>/delete', views.delete_combo, name="delete_combo")
 ]
 
 division_patterns = [
-     path('',
+    path('',
          views.view_division, name="view_division"),
 
-     path('class/add',
+    path('class/add',
          views.add_class, name="add_class"),
 
-     path('class/select',
-         views.class_select, name="select_class"),
+    path('class/select',
+         views.select_class, name="select_class"),
 
-     path('class/<class_num>/', include(class_patterns)),
+    path('class/<class_num>/', include(class_patterns)),
 
-     path('scores',
+    path('scores',
          views.view_division_scores, name="view_division_scores"),
 
-     path('classes',
+    path('classes',
          views.view_division_classes, name="view_division_classes"),
 
-     path('class-autocomplete', views.ClassAutocomplete.as_view(),
+    path('class-autocomplete', views.ClassAutocomplete.as_view(),
          name="classes_autocomplete"),
 ]
 
 combo_patterns = [
-     path('delete',
-         views.delete_combo, name="delete_combo"),
+    path('billing',
+         views.view_billing, name="view_billing"),
 
-     path('billing',
-         views.view_combo_billing, name="view_combo_billing"),
+    path('scratch', views.scratch_combo, name="scratch_combo"),
 
-     path('scratch', views.scratch_combo, name="scratch_combo"),
-
-     path('edit', views.edit_combo, name="edit_combo"),
+    path('edit', views.edit_combo, name="edit_combo"),
 ]
 
 show_patterns = [
-     path('', views.view_show, name='view_show'),
+    path('', views.view_show, name='view_show'),
 
-     path('division/add', views.add_division, name="add_division"),
-    
-     path('division/select', views.select_division, name="select_division"),
+    path('division/add', views.add_division, name="add_division"),
 
-     path('division/<division_name>/', include(division_patterns)),
-     
-     path('combo/add', views.add_combo, name="add_combo"),
+    path('division/select', views.select_division, name="select_division"),
 
-     path('combo/select', views.select_combo, name="select_combo"),
+    path('division/<division_name>/', include(division_patterns)),
 
-     path('combo/<combo_num>/', include(combo_patterns)),
+    path('combo/add', views.add_combo, name="add_combo"),
 
-     path('rider/add', views.add_rider, name="add_rider"),
+    path('combo/select', views.select_combo, name="select_combo"),
 
-     path('rider/select', views.select_rider, name="select_rider"),
-     
-     path('rider/select2', views.select_rider2, name="select_rider2"),
+    path('combo/<combo_num>/', include(combo_patterns)),
 
-     path('rider/<rider_pk>/edit', views.edit_rider, name="edit_rider"),
+    path('rider/add', views.add_rider, name="add_rider"),
 
-     path('horse/add', views.add_horse, name="add_horse"),
+    path('rider/select', views.select_rider, name="select_rider"),
 
-     path('horse/select', views.select_horse, name="select_horse"),
+    path('rider/select2', views.select_rider2, name="select_rider2"),
 
-     path('horse/select2', views.select_horse2, name="select_horse2"),
+    path('rider/<rider_pk>/edit', views.edit_rider, name="edit_rider"),
 
-     path('horse/<horse_pk>/edit', views.edit_horse, name="edit_horse"),
-     
-     path('combo-autocomplete', views.ComboAutocomplete.as_view(),
+    path('horse/add', views.add_horse, name="add_horse"),
+
+    path('horse/select', views.select_horse, name="select_horse"),
+
+    path('horse/select2', views.select_horse2, name="select_horse2"),
+
+    path('horse/<horse_pk>/edit', views.edit_horse, name="edit_horse"),
+
+    path('combo-autocomplete', views.ComboAutocomplete.as_view(),
          name="combo_autocomplete"),
-     
-     path('division-autocomplete', views.DivisionAutocomplete.as_view(),
+
+    path('division-autocomplete', views.DivisionAutocomplete.as_view(),
          name="division_autocomplete"),
 
-     path('populate-pdf', views.populate_pdf, name="populate_pdf"),
+    path('populate-pdf', views.populate_pdf, name="populate_pdf"),
 ]
 
 urlpatterns = [
-    path('', views.show_select, name="show_select"),
+    path('', views.select_show, name="select_show"),
 
-    path('add', views.create_show, name='add_show'),
+    path('add', views.add_show, name='add_show'),
 
     path('<show_date>/', include(show_patterns)),
 
-    path('signup', views.signup, name='sign_up'),
+    path('sign_up', views.sign_up, name='sign_up'),
 
-    path('login', auth_views.LoginView.as_view(
+    path('log_in', auth_views.LoginView.as_view(
         template_name='login.html'), name='log_in'),
 
     path('logout', auth_views.LogoutView.as_view(), name='log_out'),
 
     path('show-autocomplete', views.ShowAutocomplete.as_view(),
          name="show_autocomplete"),
-    
+
     path('rider-autocomplete', views.RiderAutocomplete.as_view(),
          name="rider_autocomplete"),
 
     path('horse-autocomplete', views.HorseAutocomplete.as_view(),
          name="horse_autocomplete"),
-    
+
 ]
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
