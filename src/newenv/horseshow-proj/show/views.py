@@ -21,16 +21,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 
 
-ranking_points_map = {
-    'first': 10,
-    'second': 6,
-    'third': 4,
-    'fourth': 2,
-    'fifth': 1,
-    'sixth': 0.5
-}
-
-
 class AuthRequiredMiddleware(object):
     """
     Middleware required so that non-logged-in users cannot see pages they aren't authorized to see
@@ -350,20 +340,20 @@ def view_division(request, show_date, division_name):
             class_obj.division = division
             class_obj.save()
             # render page with new division
-            return redirect('view_division', show_date, division_name)
+            return redirect('view_division', show_date=show_date, division_name=division_name)
     else:
         # each division only has a max of 3 classes, no input form if 3 classes present
-        division_classes = division.classes().all()
+        division_classes = division.classes.all()
         context = {
             "date": show_date,
             "show_name": show.name,
-            "division_name": division_name,
+            "name": division_name,
             "classes": division_classes,
         }
         if(len(division_classes) < 3):
             form = ClassForm()
             context['form'] = form
-
+        print("THIS IS THE DIVISION: " + division_name)
         return render(request, 'view_division.html', context)
 
 
@@ -424,7 +414,7 @@ def select_rider(request, show_date):
         request.session['rider_pk'] = request.POST['rider']
         return redirect('select_horse', show_date=show_date)
     form = RiderSelectForm()
-    return render(request, 'select_rider.html', {'form': form})
+    return render(request, 'select_rider.html', {'form': form, 'date': show_date})
 
 
 def select_rider2(request, show_date):
@@ -433,7 +423,7 @@ def select_rider2(request, show_date):
         rider_pk = request.POST['rider']
         return redirect('edit_rider', rider_pk=rider_pk, show_date=show_date)
     form = RiderSelectForm()
-    return render(request, 'select_rider2.html', {'form': form})
+    return render(request, 'select_rider2.html', {'form': form, 'show_date': show_date})
 
 
 def edit_rider(request, show_date, rider_pk):
@@ -453,7 +443,7 @@ def edit_rider(request, show_date, rider_pk):
         {'name': rider.name, 'address': rider.address,
          'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'county': rider.county},
         instance=rider)
-    return render(request, 'edit_rider.html', {'rider': rider, 'edit_rider_form': edit_rider_form})
+    return render(request, 'edit_rider.html', {'rider': rider, 'edit_rider_form': edit_rider_form, 'date': show_date})
 
 
 def add_rider(request, show_date):
@@ -465,7 +455,7 @@ def add_rider(request, show_date):
             request.session['rider_pk'] = rider.pk
             return redirect('select_horse', show_date=show_date)
     form = RiderForm()
-    return render(request, 'add_rider.html', {'form': form})
+    return render(request, 'add_rider.html', {'form': form, 'date': show_date})
 
 
 def select_horse2(request, show_date):
@@ -474,7 +464,7 @@ def select_horse2(request, show_date):
         horse_pk = request.POST['horse']
         return redirect('edit_horse', horse_pk=horse_pk, show_date=show_date)
     form = HorseSelectForm()
-    return render(request, 'select_horse2.html', {'form': form})
+    return render(request, 'select_horse2.html', {'form': form, 'date': show_date})
 
 
 def edit_horse(request, horse_pk, show_date):
@@ -494,7 +484,7 @@ def edit_horse(request, horse_pk, show_date):
         {'accession_no': horse.accession_no, 'coggins_date': horse.coggins_date,
          'owner': horse.owner, 'type': horse.type, 'size': horse.size},
         instance=horse)
-    return render(request, 'edit_horse.html', {'horse': horse, 'edit_horse_form': edit_horse_form})
+    return render(request, 'edit_horse.html', {'horse': horse, 'edit_horse_form': edit_horse_form, 'date': show_date})
 
 
 def add_horse(request, show_date):
@@ -506,7 +496,7 @@ def add_horse(request, show_date):
             request.session['horse_pk'] = horse.pk
             return redirect('add_combo', show_date=show_date)
     form = HorseForm()
-    return render(request, 'add_horse.html', {'form': form})
+    return render(request, 'add_horse.html', {'form': form, 'date': show_date})
 
 
 def select_horse(request, show_date):
@@ -516,7 +506,7 @@ def select_horse(request, show_date):
         request.session['horse_pk'] = request.POST['horse']
         return redirect('add_combo', show_date=show_date)
     form = HorseSelectForm()
-    return render(request, 'select_horse.html', {'form': form})
+    return render(request, 'select_horse.html', {'form': form, 'date': show_date})
 
 
 def add_combo(request, show_date):
@@ -543,14 +533,14 @@ def add_combo(request, show_date):
             return redirect('view_show', show_date=show_date)
     rider_pk = request.session['rider_pk']
     if rider_pk is None:
-        return redirect('show_select')
+        return redirect('select_show')
     horse_pk = request.session['horse_pk']
     if horse_pk is None:
-        return redirect('show_select')
+        return redirect('select_show')
     rider = get_object_or_404(Rider, pk=rider_pk)
     horse = get_object_or_404(Horse, pk=horse_pk)
     form = HorseRiderComboCreateForm()
-    return render(request, 'add_combo.html', {'form': form, 'rider': rider, 'horse': horse})
+    return render(request, 'add_combo.html', {'form': form, 'rider': rider, 'horse': horse, 'date': show_date})
 
 
 def edit_combo(request, show_date, combo_num):
@@ -593,7 +583,7 @@ def edit_combo(request, show_date, combo_num):
     number_registered_classes = len(registered_classes)
     price = number_registered_classes * 10
 
-    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_selection_form': class_selection_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes})
+    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_selection_form': class_selection_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
 
 
 def populate_pdf(request, show_date):
