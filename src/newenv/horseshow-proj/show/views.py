@@ -21,6 +21,16 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 
 
+ranking_points_map = {
+    'first': 10,
+    'second': 6,
+    'third': 4,
+    'fourth': 2,
+    'fifth': 1,
+    'sixth': 0.5
+}
+
+
 class AuthRequiredMiddleware(object):
     """
     Middleware required so that non-logged-in users cannot see pages they aren't authorized to see
@@ -35,7 +45,7 @@ class AuthRequiredMiddleware(object):
         response = self.get_response(request)
         requested_path = request.path
         if re.match(r'/show.*', requested_path) and not requested_path == "/show/login" and not request.user.is_authenticated:
-            return redirect('login')
+            return redirect('log_in')
 
         return response
 
@@ -58,7 +68,7 @@ def view_show(request, show_date):
     show = Show.objects.get(date=show_date)
 
     context = {
-        "name": show.name,
+        "show_name": show.name,
         "date": show_date,
         "location": show.location,
         "divisions": show.divisions.all(),
@@ -224,7 +234,8 @@ def add_class(request, show_date, division_name):
         if form.is_valid():
             show = Show.objects.get(date=show_date)
             division = show.divisions.filter(name=division_name)[0]
-            existing_classes = division.classes.filter(num=form.cleaned_data['num'])
+            existing_classes = division.classes.filter(
+                num=form.cleaned_data['num'])
             if existing_classes:
                 messages.error(request, "class number in use")
                 return redirect('view_division_classes', show_date=show_date, division_name=division_name)
@@ -240,10 +251,9 @@ def select_class(request, show_date, division_name):
     if request.method == "POST":
         form = ClassSelectForm(request.POST)
         if form.is_valid():
-            class_obj = form.cleaned_data['class_num']
-            class_num = class_obj.name
+            class_num = form.cleaned_data['num']
             #request.session['class_obj'] = class_name
-            return redirect('rank_class', class_name)
+            return redirect('rank_class', class_num)
     else:
         form = ClassSelectForm()
     return render(request, 'select_class.html', {'form': form})
@@ -256,57 +266,35 @@ def rank_class(request, show_date, division_name, class_num):
         points are always starting from 10, then 6, and so on
     """
     if request.method == 'POST':
-        # if 'classobj' in request.session:
-        #     classtoscore = request.session['classobj']
-        #classtoscore = request.POST.get('name', None)
+
         form = RankingForm(request.POST)
         if form.is_valid():
-            first = form.cleaned_data['first']
-            second = form.cleaned_data['second']
-            third = form.cleaned_data['third']
-            fourth = form.cleaned_data['fourth']
-            fifth = form.cleaned_data['fifth']
-            sixth = form.cleaned_data['sixth']
-            showclass = Class.objects.get(name=classname)
-            showclass.first = first
-            showclass.second = second
-            showclass.third = third
-            showclass.fourth = fourth
-            showclass.fifth = fifth
-            showclass.sixth = sixth
-            showclass.save()
-            firstcombo = HorseRiderCombo.objects.get(num=first)
+            combo_map = {
+                form.cleaned_data['first']: 10,
+                form.cleaned_data['second']: 6,
+                form.cleaned_data['third']: 4,
+                form.cleaned_data['fourth']: 2,
+                form.cleaned_data['fifth']: 1,
+                form.cleaned_data['sixth']: 0.5,
+            }
+            show = Show.objects.get(date=show_date)
+            division = show.divisions.filter(name=division_name)[0]
+            class_obj = division.classes.filter(num=class_num)[0]
 
-            firstscore = ClassScore.objects.create(
-                participated_class=showclass, score=10)
-            firstcombo.class_scores.add(firstscore)
-            secondcombo = HorseRiderCombo.objects.get(num=second)
-            secondscore = ClassScore.objects.create(
-                participated_class=showclass, score=6)
-            secondcombo.class_scores.add(secondscore)
-            thirdcombo = HorseRiderCombo.objects.get(num=third)
-            thirdscore = ClassScore.objects.create(
-                participated_class=showclass, score=4)
-            thirdcombo.class_scores.add(thirdscore)
-            fourthcombo = HorseRiderCombo.objects.get(num=fourth)
-            fourthscore = ClassScore.objects.create(
-                participated_class=showclass, score=2)
-            fourthcombo.class_scores.add(fourthscore)
-            fifthcombo = HorseRiderCombo.objects.get(num=fifth)
-            fifthscore = ClassScore.objects.create(
-                participated_class=showclass, score=1)
-            fifthcombo.class_scores.add(fifthscore)
-            sixthcombo = HorseRiderCombo.objects.get(num=sixth)
-            sixthscore = ClassScore.objects.create(
-                participated_class=showclass, score=0.5)
-            sixthcombo.class_scores.add(sixthscore)
-            if 'show_date' in request.session:
-                show_date = request.session['show_date']
-                return redirect('showpage', show_date)
+            participations = class_obj.participations.all()
+
+            for participation in participations:
+                combo_num = participation.combo.num
+                if combo_num in combo_map:
+                    participation.score = combo_map[combo_num]
+                    participation.save()
+
+            return redirect('view_class', show_date=show_date, division_name=division_name, class_num=class_num)
+
             # will redirect with a class rank page
     else:
         form = RankingForm()
-        return render(request, 'rankclass.html', {'form': form})
+        return render(request, 'rank_class.html', {'form': form})
 
 
 def add_division(request, show_date):
@@ -326,9 +314,9 @@ def add_division(request, show_date):
             division.show = show
             division.save()
         if 'another' in request.POST:
-            return redirect('divisions', show_date)
+            return redirect('add_division', show_date)
         elif 'exit' in request.POST:
-            return redirect('showpage', show_date)
+            return redirect('view_show', show_date)
     else:
         form = DivisionForm()
 
@@ -337,9 +325,9 @@ def add_division(request, show_date):
             "name": show.name,
             "date": show_date,
             "location": show.location,
-            "divisions": show.divisions.all,
+            "divisions": show.divisions.all(),
         }
-        return render(request, 'new_division.html', context)
+        return render(request, 'add_division.html', context)
 
 
 def view_division(request, show_date, division_name):
@@ -349,38 +337,34 @@ def view_division(request, show_date, division_name):
     if request.method == 'POST':  # if POST, create a new class for this division
         form = ClassForm(request.POST)
         if form.is_valid():
-            existing_classes = Class.objects.all()  # verify number doesnt already exist
-            # number is not a primary key because theoretically, multiple shows should be able to have class number 2.
-            for cl in existing_classes:
-                if cl.num == form.cleaned_data['num']:  # compare
-                    # prepare error message, will display on submit.
-                    messages.error(request, "class number in use")
-                    return redirect('division_info', show_date, division_name)
+            existing_classes_count = division.classes.filter(
+                num=form.cleaned_data['num']).count()
+            # verify number doesnt already exist
+            if existing_classes_count > 0:
+                # prepare error message, will display on submit.
+                messages.error(request, "class number in use")
+                return redirect('division_info', show_date, division_name)
+
             class_form = ClassForm(request.POST)
             class_obj = class_form.save(commit=False)
             class_obj.division = division
             class_obj.save()
             # render page with new division
-            return redirect('division_info', show_date, division_name)
+            return redirect('view_division', show_date, division_name)
     else:
         # each division only has a max of 3 classes, no input form if 3 classes present
-        if(len(division.classes.all()) < 3):
+        division_classes = division.classes().all()
+        context = {
+            "date": show_date,
+            "show_name": show.name,
+            "division_name": division_name,
+            "classes": division_classes,
+        }
+        if(len(division_classes) < 3):
             form = ClassForm()
-            context = {
-                "form": form,
-                "date": show_date,
-                "showname": show.name,
-                "division_name": division.name,
-                "classes": division.classes.all(),
-            }
-        else:
-            context = {
-                "date": show.date,
-                "showname": show.name,
-                "division_name": division.name,
-                "classes": division.classes.all(),
-            }
-        return render(request, 'division.html', context)
+            context['form'] = form
+
+        return render(request, 'view_division.html', context)
 
 
 def view_class(request, show_date, division_name, class_num):
@@ -388,21 +372,20 @@ def view_class(request, show_date, division_name, class_num):
     show = Show.objects.get(date=show_date)
     division = show.divisions.filter(name=division_name)[0]
     class_obj = division.classes.filter(num=class_num)[0]
-    this_combos = []  # will hold combos of class
-    combos = HorseRiderCombo.objects.all()
-    for combo in combos:  # iterate through combos to find matches//perhaps make a manytomany field later, but was told not to change models
+    combos = class_obj.combos.all()
+    """ for combo in combos:  # iterate through combos to find matches//perhaps make a manytomany field later, but was told not to change models
         classes = combo.classes.all()
         for c in classes:
             if c == class_obj:
-                this_combos.append(combo)  # add if class in combo.classes
+                this_combos.append(combo)  # add if class in combo.classes """
     context = {
-        "combos": this_combos,
+        "combos": combos,
         "number": class_num,
         "date": show_date,
-        "division_name": division_name,
-        "showname": show.name,
+        "name": division_name,
+        "show_name": show.name,
     }
-    return render(request, "classpage.html", context)  # render info
+    return render(request, "view_class.html", context)  # render info
 
 
 def delete_combo(request, show_date, division_name, class_num, combo):
@@ -418,45 +401,21 @@ def delete_combo(request, show_date, division_name, class_num, combo):
 def select_division(request, show_date):
     """ displays division select dropdown and ability to "Save" or "See Division Scores" """
     if request.method == "POST":
+
         if 'save' in request.POST:  # if a division is selected and the "Save" button is clicked
             form = DivisionSelectForm(request.POST)
             if form.is_valid():
-                print("form valid ")
                 show = Show.objects.get(date=show_date)
-                current_divisions = show.divisions
-                division = Division.objects.get(
-                    name=form.cleaned_data['name'])
-                current_divisions.add(division)
-                show.save()  # saves the show ohject in the database
-
-                division_name = division.name
-
-                # return render(request, 'horse_select.html', {'form': form})
-                # return redirect('/')
-                # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-                return redirect('division_classes', division_name)
+                return redirect('view_division_classes', show_date=show_date, division_name=form.cleaned_data['name'])
         if 'score' in request.POST:  # if a division is selected and the "See Divison Scores" button is clicked
             form = DivisionSelectForm(request.POST)
             if form.is_valid():
-                division = Division.objects.get(
-                    name=form.cleaned_data['name'])  # get the division object from the "name" field in the DivisionSelectFrom
-                division_name = division.name
                 # redirects to divisionscore and passes in the division_name
-                return redirect('divisionscore', division_name)
+                return redirect('view_division_scores', show_date=show_date, division_name=form.cleaned_data['name'])
 
     else:
         form = DivisionSelectForm()
-    return render(request, 'division_select.html', {'form': form, 'date': show_date})
-
-
-class DivisionAutocomplete(autocomplete.Select2QuerySetView):
-    """ fills in form automatically based on value entered by user """
-
-    def get_queryset(self):
-        qs = Division.objects.all().order_by('number')
-        if self.q:
-            qs = qs.filter(division_name__istartswith=self.q)
-        return qs
+    return render(request, 'select_division.html', {'form': form, 'date': show_date})
 
 
 def select_rider(request, show_date):
@@ -465,7 +424,7 @@ def select_rider(request, show_date):
         request.session['rider_pk'] = request.POST['rider']
         return redirect('select_horse', show_date=show_date)
     form = RiderSelectForm()
-    return render(request, 'rider_select.html', {'form': form})
+    return render(request, 'select_rider.html', {'form': form})
 
 
 def select_rider2(request, show_date):
@@ -474,7 +433,7 @@ def select_rider2(request, show_date):
         rider_pk = request.POST['rider']
         return redirect('edit_rider', rider_pk=rider_pk, show_date=show_date)
     form = RiderSelectForm()
-    return render(request, 'rider_select2.html', {'form': form})
+    return render(request, 'select_rider2.html', {'form': form})
 
 
 def edit_rider(request, show_date, rider_pk):
@@ -494,7 +453,7 @@ def edit_rider(request, show_date, rider_pk):
         {'name': rider.name, 'address': rider.address,
          'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'county': rider.county},
         instance=rider)
-    return render(request, 'rider_edit.html', {'rider': rider, 'edit_rider_form': edit_rider_form})
+    return render(request, 'edit_rider.html', {'rider': rider, 'edit_rider_form': edit_rider_form})
 
 
 def add_rider(request, show_date):
@@ -506,7 +465,7 @@ def add_rider(request, show_date):
             request.session['rider_pk'] = rider.pk
             return redirect('select_horse', show_date=show_date)
     form = RiderForm()
-    return render(request, 'editrider.html', {'form': form})
+    return render(request, 'add_rider.html', {'form': form})
 
 
 def select_horse2(request, show_date):
@@ -515,7 +474,7 @@ def select_horse2(request, show_date):
         horse_pk = request.POST['horse']
         return redirect('edit_horse', horse_pk=horse_pk, show_date=show_date)
     form = HorseSelectForm()
-    return render(request, 'horse_select2.html', {'form': form})
+    return render(request, 'select_horse2.html', {'form': form})
 
 
 def edit_horse(request, horse_pk, show_date):
@@ -535,7 +494,7 @@ def edit_horse(request, horse_pk, show_date):
         {'accession_no': horse.accession_no, 'coggins_date': horse.coggins_date,
          'owner': horse.owner, 'type': horse.type, 'size': horse.size},
         instance=horse)
-    return render(request, 'horse_edit.html', {'horse': horse, 'edit_horse_form': edit_horse_form})
+    return render(request, 'edit_horse.html', {'horse': horse, 'edit_horse_form': edit_horse_form})
 
 
 def add_horse(request, show_date):
@@ -547,7 +506,7 @@ def add_horse(request, show_date):
             request.session['horse_pk'] = horse.pk
             return redirect('add_combo', show_date=show_date)
     form = HorseForm()
-    return render(request, 'horse_add.html', {'form': form})
+    return render(request, 'add_horse.html', {'form': form})
 
 
 def select_horse(request, show_date):
@@ -557,7 +516,7 @@ def select_horse(request, show_date):
         request.session['horse_pk'] = request.POST['horse']
         return redirect('add_combo', show_date=show_date)
     form = HorseSelectForm()
-    return render(request, 'horse_select.html', {'form': form})
+    return render(request, 'select_horse.html', {'form': form})
 
 
 def add_combo(request, show_date):
@@ -579,9 +538,9 @@ def add_combo(request, show_date):
             horse = get_object_or_404(Horse, pk=horse_pk)
             HorseRiderCombo.objects.create(
                 num=num, rider=rider, horse=horse, cell=cell, email=email, show=show)
-            return redirect('edit_combo', show_date=show_date, num=num)
+            return redirect('edit_combo', show_date=show_date, combo_num=num)
         else:
-            return redirect('show_select')
+            return redirect('view_show', show_date=show_date)
     rider_pk = request.session['rider_pk']
     if rider_pk is None:
         return redirect('show_select')
@@ -604,7 +563,7 @@ def edit_combo(request, show_date, combo_num):
     if request.method == "POST":
         if request.POST.get('remove_class'):
             num = request.POST['remove_class']
-            selected_class = Class.objects.get(number=num)
+            selected_class = Class.objects.get(pk=num)
             combo.classes.remove(selected_class)
             combo.save()
 
@@ -647,7 +606,7 @@ def populate_pdf(request, show_date):
                        "show/static/VHSA_Final_Results.pdf", data_dict)  # uses "VHSA_Results_2015.pdf" and populates it's fields with the info in data dict, then it saves this new populated pdf to "VHSA_Final_Results.pdf"
 
     # returns the populated pdf
-    return render(request, 'finalresults.html', {"filename": "show/static/VHSA_Final_Results.pdf"})
+    return render(request, 'final_results.html', {"filename": "show/static/VHSA_Final_Results.pdf"})
 
 
 class ShowAutocomplete(autocomplete.Select2QuerySetView):
@@ -703,4 +662,14 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
             # filters horses in dropdown queryset by checking if horses' names start with the text entered into the field
             qs = qs.filter(name__istartswith=self.q)
 
+        return qs
+
+
+class DivisionAutocomplete(autocomplete.Select2QuerySetView):
+    """ fills in form automatically based on value entered by user """
+
+    def get_queryset(self):
+        qs = Division.objects.all()
+        if self.q:
+            qs = qs.filter(division_name__istartswith=self.q)
         return qs
