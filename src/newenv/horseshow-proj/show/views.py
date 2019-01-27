@@ -89,12 +89,14 @@ def add_show(request):
     return redirect('view_show', show_date=show_date)
 
 
+
 def select_show(request):
     """ view that allows the user to select a show """
     if request.method == "POST":
         form = ShowSelectForm(request.POST)
         if form.is_valid():
             show = form.cleaned_data['date']
+            show.date = show.date[:-3]
             show_date = show.date
             request.session['show_date'] = show_date
             return redirect('view_show', show_date)
