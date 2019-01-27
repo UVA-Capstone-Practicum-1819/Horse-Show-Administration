@@ -39,26 +39,8 @@ class AuthRequiredMiddleware(object):
 
         return response
 
-def index(request):
-    """
-    Deprecated. The home page is now the show select page.
-     """
-    if 'navigation' in request.session:
-        del request.session['navigation']
-    if 'rider_pk' in request.session:
-        del request.session['rider_pk']
-    if 'horse_pk' in request.session:
-        del request.session['horse_pk']
-    latest_show_list = Show.objects.all
-    template = loader.get_template('index.html')
-    context = {
-        'latest_show_list': latest_show_list,
-    }
-    return redirect('show_select')
-    return HttpResponse(template.render(context, request))
-
 # used as the home page for a selected show
-def showpage(request, show_date):
+def view_show(request, show_date):
     if request.method == "POST":
         form = ComboNumForm(request.POST)
         if form.is_valid():
@@ -86,29 +68,20 @@ def showpage(request, show_date):
             }
     return render(request, 'showpage.html', context)
 
-
-# def classpage(request):
-#     latest_show_list = Show.objects.all
-#     template = loader.get_template('classpage.html')
-#     context = {
-#         'latest_show_list': latest_show_list,
-#     }
-#     return HttpResponse(template.render(context, request))
-
 #view used to create the show, if successful, redirects to its show home page
-def create_show(request):
+def add_show(request):
     form = ShowForm()
     if request.method == "GET":
-        return render(request, 'create_show.html', {'form': form})
+        return render(request, 'add_show.html', {'form': form})
     f = ShowForm(request.POST)
     if not f.is_valid():
-        return render(request, 'create_show.html', {'form': f})
+        return render(request, 'add_show.html', {'form': f})
     showname = f.cleaned_data['name']
     show_date = f.cleaned_data['date']
     if Show.objects.filter(date=show_date).count() is 1:
         response = {'ok': True, 'success_msg': "Cannot have Shows with same date",
                     'form': form}
-        return render(request, 'create_show.html', response, {'form': f})
+        return render(request, 'add_show.html', response, {'form': f})
     showdatestring = str(show_date)
     showlocation = f.cleaned_data['location']
     new_show = Show.objects.create(
@@ -116,11 +89,11 @@ def create_show(request):
         day_of_price=f.cleaned_data['day_of_price'], pre_reg_price=f.cleaned_data['pre_reg_price'])
     response = {'ok': True, 'success_msg': "Show was successfully created",
                 'form': form, 'show': new_show}
-    # return render(request, 'create_show.html', response)
+    # return render(request, 'add_show.html', response)
     return redirect('showpage', show_date)
 
 #view that allows the user to select a show
-def show_select(request):
+def select_show(request):
     if request.method == "POST":
         form = ShowSelectForm(request.POST)
         if form.is_valid():
@@ -128,7 +101,7 @@ def show_select(request):
             show.date = show.date[:-3]
             show_date = show.date
             request.session['show_date'] = show_date
-            return redirect('showpage', show_date)
+            return redirect('view_show', show_date)
     else:
         form = ShowSelectForm()
     return render(request, 'show_select.html', {'form': form})
@@ -144,7 +117,7 @@ class ShowAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def signup(request):
+def sign_up(request):
     """ signs up the user (creates an account) """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
