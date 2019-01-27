@@ -32,42 +32,85 @@ In the future, we need to split this file up into multiple URL confs in a tree-l
  """
 urlpatterns = [
     path('', views.show_select, name="show_select"),
+
     path('signup', views.signup, name='signup'),
-    path('login', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+
+    path('login', auth_views.LoginView.as_view(
+        template_name='login.html'), name='login'),
+
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
+
     path('create_show', views.create_show, name='create_show'),
-    path('showpage/<showdate>', views.showpage, name='showpage'),
-    path('<classname>/rankclass', views.rankclass, name='rankclass'),
-    path('horse/new', views.add_horse, name="add_horse"),
-    path('rider/new', views.add_rider, name="add_rider"),
-    path('class/new', views.new_class, name="classes"),
-    path('<showdate>/division/<divisionname>', views.division, name="division_info"),
-    path('<showdate>/<divisionname>/classes/<classnumber>', views.class_info, name="edit_class"),
-    path('<showdate>/<divisionname>/classes/<classnumber>/scratch/<combo>', views.delete_combo, name="delete_combo"),
-    path('<showdate>/newdivision', views.new_division, name="divisions"),
-    path('horse', views.select_horse, name="select_horse"),
-    path('class', views.class_select, name="class_select"),
-    path('<showdate>/division', views.division_select, name="division_select"),
-    path('<divisionname>/divisionscore', views.divisionscore, name="divisionscore"),
-    path('<divisionname>/division_classes', views.division_classes, name="division_classes"),
-    path('<showdate>/<divisionname>/<classnumber>/delete_class', views.delete_class, name="delete_class"),
-    path('<showdate>/billing', views.billing, name="billing"),
-    path('<showdate>/<combonum>/billinglist', views.billinglist, name="billinglist"),
-    path('<showdate>/<combonum>/scratch', views.scratch, name="scratch"),
-    path('show-autocomplete', views.ShowAutocomplete.as_view(), name="show_autocomplete"),
-    path('rider', views.select_rider, name="select_rider"),
-    path('select-rider', views.select_rider2, name="select_rider2"),
-    path('select-horse', views.select_horse2, name="select_horse2"),
-    path('rider-autocomplete', views.RiderAutocomplete.as_view(), name="rider_autocomplete"),
-    path('horse-autocomplete', views.HorseAutocomplete.as_view(), name="horse_autocomplete"),
-    path('class_autocomplete', views.ClassAutocomplete.as_view(), name="classes_autocomplete"),
-    path('combo_autocomplete', views.ComboAutocomplete.as_view(), name="combo_autocomplete"),
-    path('division_autocomplete', views.DivisionAutocomplete.as_view(), name="division_autocomplete"),
+
+    path('showpage/<show_date>', views.showpage, name='showpage'),
+
+    path('<show_date>/<division_name>/<class_num>/rank',
+         views.rank_class, name='rank_class'),
+
+    path('<show_date>/add-horse', views.add_horse, name="add_horse"),
+
+    path('<show_date>/add-rider', views.add_rider, name="add_rider"),
+
+    path('<show_date>/<division_name>/add-class',
+         views.add_class, name="add_class"),
+
+    path('<show_date>/<division_name>',
+         views.division, name="division_info"),
+
+    path('<show_date>/<division_name>/<class_num>/edit',
+         views.class_info, name="edit_class"),
+
+    path('<show_date>/<combonum>/delete',
+         views.delete_combo, name="delete_combo"),
+    path('<show_date>/create_division', views.new_division, name="divisions"),
+
+    path('<show_date>/select-horse', views.select_horse, name="select_horse"),
+
+    path('<show_date>/<division_name>/select_class',
+         views.class_select, name="select_class"),
+
+    path('<show_date>/select_division',
+         views.division_select, name="division_select"),
+
+    path('<division_name>/divisionscore',
+         views.divisionscore, name="divisionscore"),
+
+    path('<division_name>/division_classes',
+         views.division_classes, name="division_classes"),
+
+    path('<show_date>/<division_name>/<class_num>/delete_class',
+         views.delete_class, name="delete_class"),
+    path('<show_date>/billing', views.billing, name="billing"),
+
+    path('<show_date>/<combonum>/billinglist',
+         views.billinglist, name="billinglist"),
+
+    path('<show_date>/<combonum>/scratch', views.scratch, name="scratch"),
+    path('show-autocomplete', views.ShowAutocomplete.as_view(),
+         name="show_autocomplete"),
+    path('<show_date>/rider', views.select_rider, name="select_rider"),
+    path('<show_date>/select-rider', views.select_rider2, name="select_rider2"),
+    path('<show_date>/select-horse', views.select_horse2, name="select_horse2"),
+    path('rider-autocomplete', views.RiderAutocomplete.as_view(),
+         name="rider_autocomplete"),
+    path('horse-autocomplete', views.HorseAutocomplete.as_view(),
+         name="horse_autocomplete"),
+    path('class_autocomplete', views.ClassAutocomplete.as_view(),
+         name="classes_autocomplete"),
+    path('combo_autocomplete', views.ComboAutocomplete.as_view(),
+         name="combo_autocomplete"),
+    path('division_autocomplete', views.DivisionAutocomplete.as_view(),
+         name="division_autocomplete"),
+
     path('genpdf', views.populate_pdf, name="populate_pdf"),
-    path('add-combo', views.add_combo, name="add_combo"),
-    path('combo/<num>', views.edit_combo, name="edit_combo"),
-    path('rider/<rider_pk>', views.edit_rider, name="edit_rider"),
-    path('horse/<horse_pk>', views.edit_horse, name="edit_horse")
+
+    path('<show_date>/add-combo', views.add_combo, name="add_combo"),
+
+    path('<show_date>/combo/<num>', views.edit_combo, name="edit_combo"),
+
+    path('<show_date>/rider/<rider_pk>', views.edit_rider, name="edit_rider"),
+
+    path('<show_date>/horse/<horse_pk>', views.edit_horse, name="edit_horse")
 ]
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
