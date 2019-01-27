@@ -1,20 +1,16 @@
-{% extends 'base.html' %}
-
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Show</title>
+</head>
+<body>
+{% extends 'add_show.html' %}
 
 {% block content %}
-<div class="content container">
-    <div class="row">
-        <div class="col-md-8">
-          <form class="form" action="" method="post">
-            {% csrf_token %}
-            <p><input type="text" name="name" value="{{name}}"></p>
-            <p>Date<input type="text" name="date" value="{{date}}"></p>
-            <p>Location<input type="text" name="location" value="{{location}}"></p>
-            <p><input type="submit" value="save"/></p>
-          </form>
-
-        </div>
-    </div>
-</div>
+<h1>Show</h1>
+<form class="form" method="POST" class="post-form">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Save</button>
+</form>
 {% endblock %}

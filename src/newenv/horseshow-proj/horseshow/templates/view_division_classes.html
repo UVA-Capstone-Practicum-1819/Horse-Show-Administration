@@ -4,7 +4,7 @@
  {% block content %}
 <h3>Division {{name}}</h3>
  <div class="row">
-    <form class="form" action="" method="post">
+    <form class="form" method="post">
         {% csrf_token %}
         <!-- {{ form | crispy}} -->
         <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
@@ -21,7 +21,7 @@
                 {{ c.name }}
               </td>
               <td>
-                <button><a href="{% url 'delete_class' divisionname=name classname=c.name %}">Remove</a></button>
+                <button><a href="{% url 'delete_class' show_date=date division_name=name class_num=c.num %}">Remove</a></button>
               </td>
               <td>
                 <button><a href="">Edit Class</a></button>

@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-md-8">
 
-            <h2>Show: <a href = "{% url 'showpage' showdate=showdate %}">{{showname}}</a></h2>
+            <h2>Show: <a href = "{% url 'view_show' show_date=date %}">{{show_name}}</a></h2>
             <h4>Division: {{division}}</h4>
             <h5>Classes:</h5>
                 <div class="row">
@@ -25,13 +25,13 @@
                           {% for c in classes %}
                             <tr>
                               <td>
-                                {{ c.number }}
+                                {{ c.num }}
                               </td>
                               <td>
-                                <button><a href="{% url 'delete_class' showdate=showdate divisionname=division classnumber=c.number %}">Remove</a></button>
+                                <button><a href="{% url 'delete_class' show_date=date division_name=name class_num=c.num %}">Remove</a></button>
                               </td>
                               <td>
-                                <button><a href="{% url 'edit_class' showdate=showdate divisionname=division classnumber=c.number %}">Edit Class</a></button>
+                                <button><a href="{% url 'view_class' show_date=date division_name=name class_num=c.num %}">Edit Class</a></button>
                               </td>
                                <td>
                                 {{ remove_form | crispy}}

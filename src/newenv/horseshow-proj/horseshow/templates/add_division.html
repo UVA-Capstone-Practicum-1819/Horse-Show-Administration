@@ -13,8 +13,8 @@
             </div>
         {% endfor %}
         {{ form.as_p }}
-        <input class="btn btn-success" type="submit" href="{% url 'showpage' showdate=date%}" name="exit" value="Save and Exit"/>
-        <input class="btn btn-success" type="submit" href="{% url 'divisions' showdate=date%}" name="another" value="Save and Add another Division"/>
+        <input class="btn btn-success" type="submit" href="{% url 'view_show' show_date=date %}" name="exit" value="Save and Exit"/>
+        <input class="btn btn-success" type="submit" href="{% url 'add_division' show_date=date %}" name="another" value="Save and Add another Division"/>
     </form>
 </div>
 {{ form.media }}
