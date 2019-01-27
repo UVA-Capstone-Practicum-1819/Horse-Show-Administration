@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load crispy_forms_tags %}
+
+<h3>Edit Horse</h3>
+<form action="" method="POST" class="form">
+  {% csrf_token %}
+  {{ edit_horse_form | crispy }}
+   <button type="submit" class="btn btn-success">Edit Horse Info</button>
+</form>
+
+
+{% endblock %}

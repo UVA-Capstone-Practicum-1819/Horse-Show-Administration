@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+<h2>Bill for {{name}} in combo {{combo_num}}</h2>
+<div class="row">
+    <form method="post">
+        {% csrf_token %}
+        
+      <table class="table">
+        <thead>
+          <th>Class Name</th>
+          <th>Registration Type</th>
+          <th>Scratch</th>
+        </thead>
+
+        <tbody>
+          {% for c in classes %}
+            <tr>
+              <td>
+                {{ c.name }}
+              </td>
+              <td>
+                Pre-Registered
+                <!-- {{ form | crispy}} -->
+              </td>
+              <td>
+                <a
+                class="btn btn-primary btn-sm"
+                href="{% url 'scratch' show_date=date combo_num=num%}?next={{request.path}}&cname={{c.num}}"
+                name="scratch">
+                
+                Scratch</a>
+              </td>
+            </tr>
+
+          {% endfor %}
+        </tbody>
+      </table>
+
+        <h4>Total Classes: {{ tot }}</h4>
+        <h4>Total Price: ${{ price }}</h4>
+        <a class="btn btn-primary btn-sm"
+        href="{% url 'view_show' show_date=date%}">Return to Show Page</a>
+    </form>
+</div>
+<!-- {{ form.media }} -->
+{% endblock %}

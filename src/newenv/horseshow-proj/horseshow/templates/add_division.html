@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<h1>New Division</h1>
+<div>
+    <form class="form" action="" method="post">
+        {% csrf_token %}
+        {% for message in messages %}
+            <div class="alert alert-success">
+                <a class="close" href="#" data-dismiss="alert">×</a>
+                    {{ message }}
+            </div>
+        {% endfor %}
+        {{ form.as_p }}
+        <input class="btn btn-success" type="submit" href="{% url 'view_show' show_date=date %}" name="exit" value="Save and Exit"/>
+        <input class="btn btn-success" type="submit" href="{% url 'add_division' show_date=date %}" name="another" value="Save and Add another Division"/>
+    </form>
+</div>
+{{ form.media }}
+{% endblock %}

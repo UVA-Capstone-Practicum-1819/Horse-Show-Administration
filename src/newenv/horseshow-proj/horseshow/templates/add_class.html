@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>New Class</h1>
+{% for message in messages %}
+
+    <div class="alert alert-success">
+        <a class="close" href="#" data-dismiss="alert">×</a>
+            {{ message }}
+    </div>
+{% endfor %}
+<div>
+    <form class="form" action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input  class="btn btn-success"type="submit" />
+    </form>
+
+</div>
+{{ form.media }}
+{% endblock %}

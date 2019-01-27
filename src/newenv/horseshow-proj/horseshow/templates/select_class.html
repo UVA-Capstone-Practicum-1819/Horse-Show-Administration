@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Select Classes</h1>
+
+<div>
+    <form class="form" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" class="btn btn-success" />
+        <a class="btn btn-success" href="{% url 'select_show' %}">Return to Show Select</a>
+        
+    </form>
+    <a href="{% url 'add_class' show_date=date division_name=name %}">Add a New Class</a>
+</div>
+
+{{ form.media }}
+
+{% endblock %}
