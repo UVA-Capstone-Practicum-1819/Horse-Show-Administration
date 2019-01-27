@@ -114,15 +114,16 @@ class HorseRiderCombo(models.Model):
     """
     class Meta:
         unique_together = (('rider', 'horse', 'show'), ('num', 'show'))
-        num = models.IntegerField(validators=[MinValueValidator(
-            100), MaxValueValidator(999)], verbose_name="Combination Number")
+
+    num = models.IntegerField(validators=[MinValueValidator(
+        100), MaxValueValidator(999)], verbose_name="Combination Number")
 
     contact_choices = (("rider", "Rider"), ("owner", "Owner"),
                        ("parent", "Parent"), ("trainer", "Trainer"))
     rider = models.ForeignKey(
-        Rider, on_delete=models.CASCADE)
+        Rider, on_delete=models.CASCADE, related_name='combos')
     horse = models.ForeignKey(
-        Horse, on_delete=models.CASCADE, verbose_name="Horse")
+        Horse, on_delete=models.CASCADE, verbose_name="Horse", related_name='combos')
     classes = models.ManyToManyField(
         Class, blank=True, through='ClassParticipation', related_name="combos")
     contact = models.CharField(
@@ -131,7 +132,8 @@ class HorseRiderCombo(models.Model):
                               verbose_name="Contact Email")
     cell = models.CharField(max_length=12, blank=True,
                             verbose_name="Contact Cell Phone Number")
-    show = models.ForeignKey(Show, on_delete=models.CASCADE)
+    show = models.ForeignKey(
+        Show, on_delete=models.CASCADE, null=True, related_name='combos')
 
     def __str__(self):
         return f"Show: {str(self.show.date)}, Number: {self.num}, Rider: {self.rider.name}, Horse: {self.horse.name}"
