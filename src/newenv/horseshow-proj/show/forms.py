@@ -187,7 +187,7 @@ class ShowSelectForm(forms.ModelForm):
         showobj = self.cleaned_data['date']
         shows = Show.objects.all()
         if showobj in shows:
-            showobj.date = showobj.date + 'foo'
+            showobj.date = showobj.date + "foo"
             return showobj
 
 
