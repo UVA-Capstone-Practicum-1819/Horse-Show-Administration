@@ -31,7 +31,7 @@
                                 <button><a href="{% url 'delete_class' show_date=date division_name=name class_num=c.num %}">Remove</a></button>
                               </td>
                               <td>
-                                <button><a href="{% url 'edit_class' show_date=date division_name=name class_num=c.num %}">Edit Class</a></button>
+                                <button><a href="{% url 'view_class' show_date=date division_name=name class_num=c.num %}">Edit Class</a></button>
                               </td>
                                <td>
                                 {{ remove_form | crispy}}
