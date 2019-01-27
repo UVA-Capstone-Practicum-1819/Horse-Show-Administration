@@ -2,8 +2,8 @@
 {% load crispy_forms_tags %}
 {% load static %}
 {% block content %}
-<h2>Show: <a href = "{% url 'showpage' showdate=date %}">{{showname}}</a></h2>
-<h3>Class: {{number}}</h3>
+<h2>Show: <a href = "{% url 'showpage' show_date=date %}">{{showname}}</a></h2>
+<h3>Class: {{class_num}}</h3>
  <div class="row">
     <form class="form" action="" method="post">
         {% csrf_token %}
@@ -15,13 +15,13 @@
           <th>Scratch</th>
         </thead>
          <tbody>
-          {% for c in combos %}
+          {% for combo in combos %}
             <tr>
               <td>
-                {{c.num}}: {{c.rider}}, {{c.horse}}
+                {{combo.num}}: {{combo.rider}}, {{combo.horse}}
               </td>
               <td>
-                <button><a href="{% url 'delete_combo' showdate=date divisionname=name classnumber=number combo=c.num %}">Remove</a></button>
+                <button><a href="{% url 'delete_combo' show_date=date division_name=division_name class_num=class_num combo=combo.num %}">Remove</a></button>
               </td>
                <td>
                 {{ form | crispy}}

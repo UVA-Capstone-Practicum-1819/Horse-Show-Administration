@@ -28,7 +28,7 @@
               <td>
                 <a
                 class="btn btn-primary btn-sm"
-                href="{% url 'scratch' showdate=show_date combonum=combo_num%}?next={{request.path}}&cname={{c.name}}"
+                href="{% url 'scratch' show_date=show_date combonum=combo_num%}?next={{request.path}}&cname={{c.name}}"
                 name="scratch">
                 <!-- cname=c.name
                 combonum={{combo_num}} -->
@@ -43,7 +43,7 @@
         <h4>Total Classes: {{ tot }}</h4>
         <h4>Total Price: ${{ price }}</h4>
         <a class="btn btn-primary btn-sm"
-        href="{% url 'showpage' showdate=show_date%}">Return to Show Page</a>
+        href="{% url 'showpage' show_date=show_date%}">Return to Show Page</a>
     </form>
 </div>
 <!-- {{ form.media }} -->
