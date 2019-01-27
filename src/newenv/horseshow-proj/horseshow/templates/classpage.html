@@ -21,7 +21,7 @@
                 {{c.num}}: {{c.rider}}, {{c.horse}}
               </td>
               <td>
-                <button><a href="{% url 'delete_combo' showdate=date divisionname=name classnumber=number combo=c.num %}">Remove</a></button>
+                <button><a href="{% url 'delete_combo' showdate=date divisionname=name classnumber=number combo=c.num %}">Scratch</a></button>
               </td>
                <td>
                 {{ form | crispy}}
