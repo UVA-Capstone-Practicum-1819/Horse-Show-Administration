@@ -7,11 +7,11 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
 class_patterns = [
+     path('',
+         views.view_class, name="view_class"),
+
      path('rank',
          views.rank_class, name='rank_class'),
-
-     path('edit',
-         views.class_info, name="edit_class"),
 
      path('delete',
          views.delete_class, name="delete_class"), 
@@ -19,21 +19,21 @@ class_patterns = [
 
 division_patterns = [
      path('',
-         views.division, name="division_info"),
+         views.view_division, name="view_division"),
 
-     path('add-class',
+     path('class/add',
          views.add_class, name="add_class"),
 
-     path('class/<class_num>/', include(class_patterns)),
-     
-     path('select-class',
+     path('class/select',
          views.class_select, name="select_class"),
 
-     path('division-score',
-         views.divisionscore, name="division_score"),
+     path('class/<class_num>/', include(class_patterns)),
 
-     path('division-classes',
-         views.division_classes, name="division_classes"),
+     path('scores',
+         views.view_division_scores, name="view_division_scores"),
+
+     path('classes',
+         views.view_division_classes, name="view_division_classes"),
 
      path('class-autocomplete', views.ClassAutocomplete.as_view(),
          name="classes_autocomplete"),
@@ -43,10 +43,10 @@ combo_patterns = [
      path('delete',
          views.delete_combo, name="delete_combo"),
 
-     path('billing-list',
-         views.billinglist, name="billinglist"),
+     path('billing',
+         views.view_combo_billing, name="view_combo_billing"),
 
-     path('scratch', views.scratch, name="scratch"),
+     path('scratch', views.scratch_combo, name="scratch_combo"),
 
      path('edit', views.edit_combo, name="edit_combo"),
 ]
@@ -54,34 +54,34 @@ combo_patterns = [
 show_patterns = [
      path('', views.view_show, name='view_show'),
 
+     path('division/add', views.add_division, name="add_division"),
+    
+     path('division/select', views.select_division, name="select_division"),
+
      path('division/<division_name>/', include(division_patterns)),
      
-     path('add-combo', views.add_combo, name="add_combo"),
+     path('combo/add', views.add_combo, name="add_combo"),
+
+     path('combo/select', views.select_combo, name="select_combo"),
 
      path('combo/<combo_num>/', include(combo_patterns)),
 
-     path('add-horse', views.add_horse, name="add_horse"),
+     path('rider/add', views.add_rider, name="add_rider"),
 
-     path('add-rider', views.add_rider, name="add_rider"),
-
-     path('add-division', views.add_division, name="add_division"),
-    
-     path('select-division', views.select_division, name="select_division"),
+     path('rider/select', views.select_rider, name="select_rider"),
      
-     path('view-billing', views.view_billing, name="view_billing"),
+     path('rider/select2', views.select_rider2, name="select_rider2"),
 
      path('rider/<rider_pk>/edit', views.edit_rider, name="edit_rider"),
 
+     path('horse/add', views.add_horse, name="add_horse"),
+
+     path('horse/select', views.select_horse, name="select_horse"),
+
+     path('horse/select2', views.select_horse2, name="select_horse2"),
+
      path('horse/<horse_pk>/edit', views.edit_horse, name="edit_horse"),
-
-     path('select-rider', views.select_rider, name="select_rider"),
-
-     path('select-horse', views.select_horse, name="select_horse"),
-
-     path('select-rider2', views.select_rider2, name="select_rider2"),
-
-     path('select-horse2', views.select_horse2, name="select_horse2"),
-
+     
      path('combo-autocomplete', views.ComboAutocomplete.as_view(),
          name="combo_autocomplete"),
      
@@ -94,6 +94,8 @@ show_patterns = [
 urlpatterns = [
     path('', views.show_select, name="show_select"),
 
+    path('add', views.create_show, name='add_show'),
+
     path('<show_date>/', include(show_patterns)),
 
     path('signup', views.signup, name='sign_up'),
@@ -102,8 +104,6 @@ urlpatterns = [
         template_name='login.html'), name='log_in'),
 
     path('logout', auth_views.LogoutView.as_view(), name='log_out'),
-
-    path('add-show', views.create_show, name='add_show'),
 
     path('show-autocomplete', views.ShowAutocomplete.as_view(),
          name="show_autocomplete"),
