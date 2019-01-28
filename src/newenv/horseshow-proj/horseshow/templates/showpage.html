@@ -4,20 +4,20 @@
 {% block content %}
 
 <h3>Show: {{ name }}</h3>
+
 <body>
   <h5><b>Date:</b> {{ date }}
-  <br><b>Location:</b> {{ location }}</h5>
+    <br><b>Location:</b> {{ location }}</h5>
   <h5><b>Divisions:</b></h5>
-    {% for division in divisions %}
-        <li><a href = "{% url 'division_info' showdate=date divisionname=division %}">{{division}}</a></li>
-    {% endfor %}
+  {% for division in divisions %}
+  <li><a href="{% url 'division_info' showdate=date divisionname=division %}">{{division}}</a></li>
+  {% endfor %}
   <p>
 
 
 
-
-    <p><a class="btn btn-primary" href = "{% url 'divisions' showdate=date %}">Add Division</a></p>
-    <p><a class="btn btn-primary" href = "{% url 'division_select' showdate=date %}">Edit Division/ View Division Score</a></p>
+    <p><a class="btn btn-primary" href="{% url 'divisions' showdate=date %}">Add Division</a></p>
+    <p><a class="btn btn-primary" href="{% url 'division_select' showdate=date %}">Edit Division/ View Division Score</a></p>
     <p><a class="btn btn-primary" href="{% url 'select_rider' %}">Add Horse-Rider Combo to the Database</a></p>
     <p><form method="POST" class="form"  action="{% url 'showpage' showdate=date %}">
       {% csrf_token %}
@@ -27,8 +27,9 @@
     </form></p>
     <p><a class="btn btn-primary" href="{% url 'class_select' %}">Rank Class</a></p>
     <p><a class="btn btn-primary" href="{% url 'billing' showdate=date %}">Bill a Rider</a></p>
-<p><a class="btn btn-primary" href="{% url 'select_rider2' %}">Edit Rider Information</a></p>
-  <p><a class="btn btn-primary" href="{% url 'select_horse2' %}">Edit Horse Information</a></p>
+    <p><a class="btn btn-primary" href="{% url 'select_rider2' %}">Edit Rider Information</a></p>
+    <p><a class="btn btn-primary" href="{% url 'select_horse2' %}">Edit Horse Information</a></p>
+    <p><a class="btn btn-primary" href="{% url 'populate_pdf' showdate=date %}">Generate VHSA PDF</a></p>
 
   </p>
 

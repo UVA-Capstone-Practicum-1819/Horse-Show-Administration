@@ -36,8 +36,8 @@ class Show(models.Model):
     name = models.CharField(max_length=100)
     date = models.CharField(max_length=100, primary_key=True)
     location = models.CharField(max_length=100)
-    dayOfPrice = models.IntegerField(blank=True, null=True, default=0)
-    preRegistrationPrice = models.IntegerField(blank=True, null=True, default=0)
+    dayOfPrice = models.IntegerField(blank=True, null=True, default=0, verbose_name='Day Of Price')
+    preRegistrationPrice = models.IntegerField(blank=True, null=True, default=0, verbose_name='Pre-registration Price')
     divisions = models.ManyToManyField(Division, blank=True)
     def __str__(self):
         return self.date
@@ -62,7 +62,7 @@ class Rider (models.Model):
     address = models.CharField(max_length=200, verbose_name="Address")
     email = models.EmailField(primary_key=True, max_length=200, validators=[EmailValidator()], verbose_name="Email")
     birth_date = models.DateField(blank=True, null=True, verbose_name="Birth Date", )
-    member_VHSA = models.BooleanField(default=False, blank=True, verbose_name="Member of the VHSA")
+    member_VHSA = models.BooleanField(default=False, blank=True, verbose_name="Member of the VHSA")	    
     county = models.CharField(max_length=200, blank=True, verbose_name="If member of 4H, specify county")
     horses = models.ManyToManyField(Horse, through='HorseRiderCombo')
     def __str__(self):

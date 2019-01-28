@@ -18,6 +18,7 @@ from .populatepdf import write_fillable_pdf
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class AuthRequiredMiddleware(object):
@@ -220,7 +221,8 @@ def scratch(request, showdate, combonum):
     # rendered to the same html page
 
 
-def divisionscore(request,divisionname): #displays list of classes in division, hrc winners of each of those classes from 1st-6th places, and form to enter champion info
+def divisionscore(request,divisionname): 
+    #displays list of classes in division, hrc winners of each of those classes from 1st-6th places, and form to enter champion info
     division = Division.objects.get(name= divisionname) # get the division object from the name of the divison that was passed in
     form = DivisionChampForm()
     if request.method == "POST":
@@ -733,13 +735,119 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
 #     return render(request, 'classes.html', {'form': form})
 #
 
-#This function will be implemented later for desired requirements. Used to populate pdfs for horse show reports
-def populate_pdf(request): #populates text fields of PDF
-    data_dict = {
-        'show': '11/7/2018',
-        'judge': 'Bertha',
-    } #info to populate the pdf's "show" and "judge" text fields
+def populate_pdf(request, showdate): # populates text fields of PDF
+    """ populate pdf for VHSA horse show reports """
+    show = Show.objects.get(date=showdate) # get the show by its date
+    d = {
+        'p2_show_name': show.name,
+        'p2_show_date': showdate,
+    } #populate the 2nd page of pdf with the show name and show time. 
+    
+    try: # p4 Amateur Hunter
+        # if the division name in the database contains "Amateur Hunter"
+        div_amateur = show.divisions.get(name__icontains="Amateur Hunter")
+        # fill in show name and show date
+        d["p4_show_name"] = show.name
+        d["p4_show_date"] = showdate
+        int = 1 #start int value at 1
+        for c in div_amateur.classes.all(): # for all the classes in "Amateur Hunter"
+            s = 'p4_c' + str(int) # set the key to the right class (initially c1) text field
+            d[s] = c.number # add to the dictionary the class number
+            e = 'p4_e' + str(int) # set the key to the right entry (initially c1) text field
+            # d[e] =  # system does not keep track of entry yep need to update then fix this line
+            list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
+            for i in range(1,7): # for i range from 1st place to 6th place
+                # set the keys to the right combo, owner and rider text fields
+                scombo = s + '_combo' + str(i)
+                sowner = s + '_owner' + str(i)
+                srider = s + '_rider' + str(i)
+                if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
+                    d[scombo] = list[i-1] # write to pdf the correct combo to that rank
+                try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                    combo = HorseRiderCombo.objects.get(num=list[i-1])
+                    d[srider] = combo.rider
+                    d[sowner] = combo.horse.owner
+                except ObjectDoesNotExist:
+                    print("")
+            print(scombo)
+            int += 1 # increment to write to the next class section
+    except ObjectDoesNotExist:
+        print("")
+        
+    #p5 Small/Medium Pony Hunter
+    #p6 Large Pony Hunter
+    #p7 green hunter pony, p8 green hunter horse
+    
+    try: # p9 Thoroughbred Hunter
+        # if the division name in the database contains "Thoroughbred"
+        div_amateur = show.divisions.get(name__icontains="Thoroughbred")
+        # fill in show name and show date
+        d["p9_show_name"] = show.name
+        d["p9_show_date"] = showdate
+        int = 1 #start int value at 1
+        for c in div_amateur.classes.all(): # for all the classes in "Thoroughbred"
+            s = 'p9_c' + str(int) # set the key to the right class (initially c1) text field
+            d[s] = c.number # add to the dictionary the class number
+            e = 'p9_e' + str(int) # set the key to the right entry (initially c1) text field
+            # d[e] =  # system does not keep track of entry yep need to update then fix this line
+            list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
+            for i in range(1,7): # for i range from 1st place to 6th place
+                # set the keys to the right combo, owner and rider text fields
+                scombo = s + '_combo' + str(i)
+                sowner = s + '_owner' + str(i)
+                srider = s + '_rider' + str(i)
+                if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
+                    d[scombo] = list[i-1] # write to pdf the correct combo to that rank
+                try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                    combo = HorseRiderCombo.objects.get(num=list[i-1])
+                    d[srider] = combo.rider
+                    d[sowner] = combo.horse.owner
+                except ObjectDoesNotExist:
+                    print("")
+            print(scombo)
+            int += 1 # increment to write to the next class section
+    except ObjectDoesNotExist:
+        print("")
+
+    #p10 working hunter
+    try: # p9 Thoroughbred Hunter
+        # if the division name in the database contains "Thoroughbred"
+        div_amateur = show.divisions.get(name__icontains="Thoroughbred")
+        # fill in show name and show date
+        d["p9_show_name"] = show.name
+        d["p9_show_date"] = showdate
+        int = 1 #start int value at 1
+        for c in div_amateur.classes.all(): # for all the classes in "Thoroughbred"
+            s = 'p9_c' + str(int) # set the key to the right class (initially c1) text field
+            d[s] = c.number # add to the dictionary the class number
+            e = 'p9_e' + str(int) # set the key to the right entry (initially c1) text field
+            # d[e] =  # system does not keep track of entry yep need to update then fix this line
+            list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
+            for i in range(1,7): # for i range from 1st place to 6th place
+                # set the keys to the right combo, owner and rider text fields
+                scombo = s + '_combo' + str(i)
+                sowner = s + '_owner' + str(i)
+                srider = s + '_rider' + str(i)
+                if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
+                    d[scombo] = list[i-1] # write to pdf the correct combo to that rank
+                try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                    combo = HorseRiderCombo.objects.get(num=list[i-1])
+                    d[srider] = combo.rider
+                    d[sowner] = combo.horse.owner
+                except ObjectDoesNotExist:
+                    print("")
+            print(scombo)
+            int += 1 # increment to write to the next class section
+    except ObjectDoesNotExist:
+        print("")
+    #p11 Hunter Pleasure Pony
+    #p12 Junior Hunter Pleasure Horse
+    #p13 Adult Hunter Pleasure Horse
+    #p14 Hunter Short Stirrup
+    #p15 Associate Equitation Classes (adult/children/pony)
+    #p16 Associate Equitation On the Flat Classes (adult/children)
+    #p17 
     write_fillable_pdf("show/static/VHSA_Results_2015.pdf",
-                       "show/static/VHSA_Final_Results.pdf", data_dict) #uses "VHSA_Results_2015.pdf" and populates it's fields with the info in data dict, then it saves this new populated pdf to "VHSA_Final_Results.pdf"
+                       "show/static/VHSA_Final_Results.pdf", d) #uses "VHSA_Results_2015.pdf" and populates it's fields with the info in data dict, then it saves this new populated pdf to "VHSA_Final_Results.pdf"
 
     return render(request, 'finalresults.html', {"filename": "show/static/VHSA_Final_Results.pdf"}) #returns the populated pdf
