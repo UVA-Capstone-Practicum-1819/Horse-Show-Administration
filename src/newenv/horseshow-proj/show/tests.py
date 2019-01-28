@@ -737,8 +737,20 @@ class ButtonChanges(TestCase):
                       'type': "horse", 'size': "N/A"}
         self.assertEqual(horse.get('size'), "N/A")
 
-class AddDivisionsToShow(TestCase):
+class NewDivision(TestCase):
     def test_add(self):
+        division = Division.objects.create(name="division")
+
+class AddClassToDivision(TestCase):
+    def test_add_class(self):
         show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
-        self.client.post(reverse('divisions', kwargs={'showdate':show.date}),{'name':'test'})
-        self.assertEqual(len(show.divisions.all()),1)
+        division = Division.objects.create(name="test")
+        response=self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
+        self.assertTrue(len(division.classes.all())==1)
+        
+    def test_add_duplicate_class(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+        division = Division.objects.create(name="test")
+        self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
+        self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
+        self.assertTrue(len(division.classes.all())==1)
