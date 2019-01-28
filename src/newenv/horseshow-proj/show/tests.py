@@ -1,10 +1,12 @@
 from django.test import TestCase, Client
 from show.models import *
 from show.forms import *
+from show.views import *
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from show import models
 from django.urls import reverse
+from django.http import HttpRequest
 from .populatepdf import write_fillable_pdf, read_pdf, read_written_pdf
 # Create your tests here.
 
@@ -114,7 +116,6 @@ class RiderTestCase(TestCase):
             print("this is an invalid insert")
             return 0
         return rider
-
     def test_rider_creation(self):
         testrider = self.create_rider()
         self.assertFalse(isinstance(testrider, Rider)) """
@@ -672,12 +673,12 @@ class ComboRemoveClassTestCase(TestCase):
         combo = HorseRiderCombo.objects.get(num=combo_num)
         combo.classes.add(c1)
         combo.save()
-        
+
         remove_class=1
         response = self.client.post('show/edit-combo', {'number': remove_class})
         combo.classes.remove(Classes.objects.get(number = remove_class))
         combo.save()
-        
+
         self.assertTrue(combo.classes.count() == 0)
 
 # class AddDivisionsToShow(TestCase):
@@ -748,7 +749,7 @@ class AddClassToDivision(TestCase):
         division = Division.objects.create(name="test")
         response=self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
         self.assertTrue(len(division.classes.all())==1)
-        
+
     def test_add_duplicate_class(self):
         show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
         division = Division.objects.create(name="test")
@@ -756,6 +757,23 @@ class AddClassToDivision(TestCase):
         self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
         self.client.patch(reverse('delete_class', kwargs={'showdate':show.date, 'divisionname':division.name, 'classnumber':0}), {'number':0})
         self.assertEqual(len(division.classes.all()),0)
+
+    def test_scratch_correct_division_html(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+        new_division = Division.objects.create(name="division")
+        request = HttpRequest()
+        response = division(request, "2018-12-10", "division")
+        html = response.content.decode('utf8')
+        self.assertIn('<th>Scratch</th>', html)
+
+    def test_scratch_correct_combo_html(self):
+        horse = Horse.objects.create(name="Sweet Dee", coggins_date="2001-08-11", accession_no=34, owner="Jen", size="large", type="pony")
+        rider = Rider.objects.create(name = "Al", address="1234 Zany Lane", birth_date="1985-10-05", email="aaaaa@virginia.edu", member_VHSA=True, county="")
+        combo= HorseRiderCombo.objects.create(num = 12, rider = rider, horse = horse)
+        request = HttpRequest()
+        response = edit_combo(request, "12")
+        html = response.content.decode('utf8')
+        self.assertIn('<th scope="col">Scratch</th>', html)
 
 class ReadPdf(TestCase):
     def test_read_pdf(self):
@@ -777,4 +795,4 @@ class WritePdf(TestCase):
                        "show/static/VHSA_Final_Results.pdf", d)
         value = read_written_pdf("show/static/VHSA_Final_Results.pdf", d, 2, 1)
         self.assertEqual(value, show.date)
-       
+      
