@@ -300,7 +300,7 @@ def add_division(request, show_date):
             if(len(divisions) > 0):
                 # prepare error message, will display on submit.
                 messages.error(request, "division number in use")
-                return redirect('divisions', show_date)
+                return redirect('add_division', show_date=show_date)
             division_form = DivisionForm(request.POST)
             division = division_form.save(commit=False)
             division.show = show
