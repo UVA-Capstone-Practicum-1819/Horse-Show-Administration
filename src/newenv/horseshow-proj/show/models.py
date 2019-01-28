@@ -22,7 +22,6 @@ class Classes(models.Model):
 # champion and champion reserve for the division as well as the points they earned in that division
 class Division(models.Model):
     name = models.CharField(max_length=100, default="")
-    number = models.IntegerField(default=0)
     champion = models.IntegerField(default=0)
     champion_pts = models.IntegerField(default=0)
     champion_reserve = models.IntegerField(default=0)

@@ -374,9 +374,9 @@ def new_division(request, showdate):
         if 'another' in request.POST:
             form = DivisionForm(request.POST)
             if form.is_valid():
-                divisions = Division.objects.filter(number=form.cleaned_data['number'])
+                divisions = Division.objects.filter(name=form.cleaned_data['name'])
                 if(len(divisions) > 0):
-                    messages.error(request, "division number in use") #prepare error message, will display on submit.
+                    messages.error(request, "division name in use") #prepare error message, will display on submit.
                     return redirect('divisions', showdate)
                 post = form.save(commit=False)
                 post.author = request.user
@@ -408,7 +408,7 @@ def division(request, showdate, divisionname):
         form = AddClassForm(request.POST)
         if form.is_valid():
             existing_classes = Classes.objects.all() #verify number doesnt already exist
-            for cl in existing_classes: #number is not a primary key because theoretically, multiple shows should be able to have class number 2. 
+            for cl in existing_classes: #number is not a primary key because theoretically, multiple shows should be able to have class number 2.
                 if cl.number == form.cleaned_data['number']: #compare
                     messages.error(request, "class number in use") #prepare error message, will display on submit.
                     return redirect('division_info', showdate, divisionname)
@@ -417,13 +417,13 @@ def division(request, showdate, divisionname):
             division = Division.objects.get(name=divisionname)
             # division_classes = division.classes.all()
             # division_classes.add(c)
-            division.classes.add(c) #add class to that division 
+            division.classes.add(c) #add class to that division
             # division.classes = division_classes
             division.save()
             return redirect('division_info', showdate, divisionname) #render page with new division
     else:
         if(len(division.classes.all()) < 3): #each division only has a max of 3 classes, no input form if 3 classes present
-            form = AddClassForm() 
+            form = AddClassForm()
             context = {
                 "form": form,
                 "showdate" : showdate,
@@ -446,7 +446,7 @@ def class_info(request, showdate, divisionname, classnumber):  #render class inf
     this_class = Classes.objects.get(number = classnumber)
     this_combos = [] #will hold combos of class
     combos = HorseRiderCombo.objects.all()
-    for combo in combos: #iterate through combos to find matches//perhaps make a manytomany field later, but was told not to change models 
+    for combo in combos: #iterate through combos to find matches//perhaps make a manytomany field later, but was told not to change models
         classes = combo.classes.all()
         for c in classes:
             if c == this_class:
@@ -461,7 +461,7 @@ def class_info(request, showdate, divisionname, classnumber):  #render class inf
     return render(request, "classpage.html", context) #render info
 
 def delete_combo(request, showdate, divisionname, classnumber, combo): #scratch a combo from the class page so that it reflects in the combo's billing
-    combo = HorseRiderCombo.objects.get(num=combo) 
+    combo = HorseRiderCombo.objects.get(num=combo)
     classObj = Classes.objects.get(number=classnumber)
     combo.classes.remove(classObj)
     return redirect('edit_class', showdate=showdate, divisionname=divisionname, classnumber=classnumber)

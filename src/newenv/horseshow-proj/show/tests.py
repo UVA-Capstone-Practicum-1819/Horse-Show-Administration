@@ -18,6 +18,16 @@ class ClassesScoreTestCase(TestCase):
             form = RankingForm(data={'first':'', 'second':'','third':'','fourth':'','fifth':'','sixth':''})
             self.assertFalse(form.is_valid())
 
+    def RankForm_Valid(self):
+        def test_showForm_validsdashes(self):
+            form = RankingForm(data={'first':231, 'second':203,'third':332,'fourth':883,'fifth':902,'sixth':234})
+            self.assertTrue(form.is_valid())
+
+    def RankForm_Invalid(self):
+        def test_showForm_validsdashes(self):
+            form = RankingForm(data={'first':'abc', 'second':'def','third':'dee','fourth':'gtg','fifth':'pop','sixth':'poh'})
+            self.assertFalse(form.is_valid())
+
 
 class ShowTestCase(TestCase):
     def create_show(self, title="test", body="test for a show"):
@@ -313,7 +323,7 @@ class LoginTestCase(TestCase):
 
 class DivisionsTest(TestCase):
     def test_create_division(self):
-        div1 = Division.objects.create(name="Division 1", number="1")
+        div1 = Division.objects.create(name="Division 1")
         self.assertTrue(isinstance(div1, Division))
 
     def test_DivisionSelectPage(self):
@@ -323,7 +333,7 @@ class DivisionsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_invalid_division(self):
-        form_vals = {'name': '', 'number': '5'}
+        form_vals = {'name': ''}
         form = DivisionForm(data=form_vals)
         self.assertFalse(form.is_valid())
 
@@ -380,13 +390,13 @@ class ClassesTest(TestCase):
 class AddDivToShowTest(TestCase):
     def test_add_division(self):
         show = Show.objects.create(name="test", date="11/11/2018", location="here")
-        division = Division.objects.create(name="div", number=1)
+        division = Division.objects.create(name="div")
         show.divisions.add(division)
         self.assertTrue(show.divisions.all()[0]==division)
 
     def test_duplicate_division(self):
         show = Show.objects.create(name="test", date="11/11/2018", location="here")
-        division = Division.objects.create(name="div", number=1)
+        division = Division.objects.create(name="div")
         show.divisions.add(division)
         show.divisions.add(division)
         self.assertTrue(len(show.divisions.all())==1)
@@ -395,15 +405,15 @@ class AddDivToShowTest(TestCase):
 
 class AddDivFailures(TestCase):
     def test_addDivision_noname(self):
-        form = ShowForm(data={'name':'', 'number':'201'})
+        form = ShowForm(data={'name':''})
         self.assertFalse(form.is_valid())
 
     def test_addDivision_novalues(self):
-        form = ShowForm(data={'name':'', 'number':''})
+        form = ShowForm(data={'name':''})
         self.assertFalse(form.is_valid())
 
     def test_addDivision_novalues(self):
-        form = ShowForm(data={'name':'hunter division', 'number':'hello'})
+        form = ShowForm(data={'name':'hunter division'})
         self.assertFalse(form.is_valid())
 
 #tested Showselect for
@@ -671,12 +681,12 @@ class ComboRemoveClassTestCase(TestCase):
         combo = HorseRiderCombo.objects.get(num=combo_num)
         combo.classes.add(c1)
         combo.save()
-        
+
         remove_class=1
         response = self.client.post('show/edit-combo', {'number': remove_class})
         combo.classes.remove(Classes.objects.get(number = remove_class))
         combo.save()
-        
+
         self.assertTrue(combo.classes.count() == 0)
 
 # class AddDivisionsToShow(TestCase):
@@ -691,32 +701,32 @@ class ComboRemoveClassTestCase(TestCase):
     #     self.client.post(reverse('divisions', kwargs={'showdate':show.date}),{'name':'test', 'number':0})
     #     self.assertEqual(len(show.divisions.all()),1)
 
-class AddClassToDivision(TestCase):
-    def test_add_class(self):
-        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
-        division = Division.objects.create(name="test", number=1)
-        response=self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
-        self.assertTrue(len(division.classes.all())==1)
+# class AddClassToDivision(TestCase):
+    # def test_add_class(self):
+    #     show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+    #     division = Division.objects.create(name="test")
+    #     response=self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test'})
+    #     self.assertTrue(len(division.classes.all())==1)
+    #
+    # def test_fail_add_class(self):
+    #     show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+    #     division = Division.objects.create(name="test")
+    #     try:
+    #         self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':''})
+    #         self.fails()
+    #     except:
+    #         self.assertEqual(len(division.classes.all()), 0)
+    #
+    # def test_no_duplicates(self):
+    #     show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+    #     division = Division.objects.create(name="test")
+    #     self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test'})
+    #     self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test'})
+    #     self.assertEqual(len(division.classes.all()),1)
 
-    def test_fail_add_class(self):
-        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
-        division = Division.objects.create(name="test", number=1)
-        try:
-            self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'','number':0})
-            self.fails()
-        except:
-            self.assertEqual(len(division.classes.all()), 0)
-
-    def test_no_duplicates(self):
-        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
-        division = Division.objects.create(name="test", number=1)
-        self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
-        self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
-        self.assertEqual(len(division.classes.all()),1)
-
-    def test_scratch(self):
-        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
-        division = Division.objects.create(name="test", number=1)
-        self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
-        self.client.patch(reverse('delete_class', kwargs={'showdate':show.date, 'divisionname':division.name, 'classnumber':0}), {'number':0})
-        self.assertEqual(len(division.classes.all()),0)
+    # def test_scratch(self):
+    #     show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+    #     division = Division.objects.create(name="test", number=1)
+    #     self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
+    #     self.client.patch(reverse('delete_class', kwargs={'showdate':show.date, 'divisionname':division.name, 'classnumber':0}), {'number':0})
+    #     self.assertEqual(len(division.classes.all()),0)
