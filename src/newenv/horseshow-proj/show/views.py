@@ -388,6 +388,25 @@ def new_division(request, showdate):
                 divisions.add(division)
                 show.save()
                 return redirect('divisions', showdate)
+
+        if 'class_add' in request.POST:
+            form = DivisionForm(request.POST)
+            if form.is_valid():
+                divisions = Division.objects.filter(number=form.cleaned_data['number'])
+                if(len(divisions) > 0):
+                    messages.error(request, "division number in use") #prepare error message, will display on submit.
+                    return redirect('divisions', showdate)
+                post = form.save(commit=False)
+                post.author = request.user
+                post.published_date = timezone.now()
+                post.save()
+                division = Division.objects.get(
+                    name=form.cleaned_data['name'])
+                divisions = show.divisions
+                divisions.add(division)
+                show.save()
+                return redirect('division_info', showdate, division)
+            return redirect('add_division', showdate)
     else:
         form = DivisionForm()
         show = Show.objects.get(date=showdate)
