@@ -53,7 +53,7 @@ class Horse(models.Model):
     coggins_date = models.DateField(default=datetime.date.today,  verbose_name="Coggins Date", )
     owner = models.CharField(max_length=200, verbose_name="Owner")
     type = models.CharField(max_length=200, choices=type_choices, default="Horse", verbose_name="Type")
-    size = models.CharField(max_length=200, choices=size_choices, default="N/A", verbose_name="Size")
+    size = models.CharField(max_length=200, choices=size_choices, default="N/A", verbose_name="Size (if pony)")
     def __str__(self):
         return self.name
 
