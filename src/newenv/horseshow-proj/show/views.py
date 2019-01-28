@@ -357,9 +357,9 @@ def new_division(request, showdate):
         if 'exit' in request.POST:
             form = DivisionForm(request.POST)
             if form.is_valid():
-                divisions = Division.objects.filter(number=form.cleaned_data['number'])
+                divisions = Division.objects.filter(name=form.cleaned_data['name'])
                 if(len(divisions) > 0):
-                    messages.error(request, "division number in use") #prepare error message, will display on submit.
+                    messages.error(request, "division name in use") #prepare error message, will display on submit.
                     return redirect('divisions', showdate)
                 post = form.save(commit=False)
                 post.author = request.user
@@ -374,9 +374,9 @@ def new_division(request, showdate):
         if 'another' in request.POST:
             form = DivisionForm(request.POST)
             if form.is_valid():
-                divisions = Division.objects.filter(number=form.cleaned_data['number'])
+                divisions = Division.objects.filter(name=form.cleaned_data['name'])
                 if(len(divisions) > 0):
-                    messages.error(request, "division number in use") #prepare error message, will display on submit.
+                    messages.error(request, "division name in use") #prepare error message, will display on submit.
                     return redirect('divisions', showdate)
                 post = form.save(commit=False)
                 post.author = request.user
