@@ -18,7 +18,7 @@
                       <table class="table">
                         <thead>
                           <th>Class</th>
-                          <th>Remove</th>
+                          <th>Scratch</th>
                           <th>Edit</th>
                         </thead>
                          <tbody>
@@ -28,7 +28,7 @@
                                 {{ c.number }}
                               </td>
                               <td>
-                                <button><a href="{% url 'delete_class' showdate=showdate divisionname=division classnumber=c.number %}">Remove</a></button>
+                                <button><a href="{% url 'delete_class' showdate=showdate divisionname=division classnumber=c.number %}">Scratch</a></button>
                               </td>
                               <td>
                                 <button><a href="{% url 'edit_class' showdate=showdate divisionname=division classnumber=c.number %}">Edit Class</a></button>
