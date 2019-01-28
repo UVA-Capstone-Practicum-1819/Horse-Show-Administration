@@ -22,7 +22,6 @@ class Classes(models.Model):
 # champion and champion reserve for the division as well as the points they earned in that division
 class Division(models.Model):
     name = models.CharField(max_length=100, default="")
-    number = models.IntegerField(default=0)
     champion = models.IntegerField(default=0)
     champion_pts = models.IntegerField(default=0)
     champion_reserve = models.IntegerField(default=0)
@@ -53,7 +52,7 @@ class Horse(models.Model):
     coggins_date = models.DateField(default=datetime.date.today,  verbose_name="Coggins Date", )
     owner = models.CharField(max_length=200, verbose_name="Owner")
     type = models.CharField(max_length=200, choices=type_choices, default="Horse", verbose_name="Type")
-    size = models.CharField(max_length=200, choices=size_choices, default="N/A", verbose_name="Size")
+    size = models.CharField(max_length=200, choices=size_choices, default="N/A", verbose_name="Size (if pony)")
     def __str__(self):
         return self.name
 

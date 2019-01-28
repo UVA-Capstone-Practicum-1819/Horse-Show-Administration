@@ -1,18 +1,17 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
-{% block content %}
+ {% block content %}
 <h3>Division {{name}}</h3>
-
  <div class="row">
-    <form class="form" action="" method="post">
+    <form class="form" method="post">
         {% csrf_token %}
         <!-- {{ form | crispy}} -->
         <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
       <table class="table">
         <thead>
           <th>Class</th>
-          <th>Scratch</th>
+          <th>Remove</th>
           <th>Edit</th>
         </thead>
          <tbody>
@@ -22,7 +21,7 @@
                 {{ c.name }}
               </td>
               <td>
-                <button><a href="{% url 'delete_class' divisionname=name classname=c.name %}">Scratch</a></button>
+                <button><a href="{% url 'delete_class' show_date=date division_name=name class_num=c.num %}">Remove</a></button>
               </td>
               <td>
                 <button><a href="">Edit Class</a></button>
@@ -39,7 +38,7 @@
         <h1>Champion Points: {{champ_pts}}</h1>
         <h1>Champion Reserve: {{champ_reseve_pts}}</h1>
         <h1>Champion Reserve Points: {{champ_reserve}}</h1>-->
-  </form>
+     </form>
 </div>
 <!-- {{ form.media }} -->
 {% endblock %}

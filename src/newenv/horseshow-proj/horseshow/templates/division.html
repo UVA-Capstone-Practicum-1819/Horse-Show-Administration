@@ -56,17 +56,18 @@
 
     {{ message }}
 
-  </div>
-  {% endfor %}
-  {% if form %}
-  <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
-  </form>
-  {% else %}
-  <p>Division contains maximum of 3 classes</p>
-  {% endif %}
+
+                    </div>
+            {% endfor %}
+            {% if form %}
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success">Add Class</button>
+            </form>
+            {% else %}
+            <p>Division contains maximum of 3 classes</p>
+            {% endif %}
 
 </div>
 {% endblock %}

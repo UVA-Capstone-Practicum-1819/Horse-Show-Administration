@@ -215,7 +215,7 @@ class DivisionForm(forms.ModelForm):
     #create new division
     class Meta:
         model = Division
-        fields = ('name', 'number')
+        fields = ('name',)
 
 #This form provides information for the division champion of a specific division, recording the
 #champion/champion reserve and their respective points
