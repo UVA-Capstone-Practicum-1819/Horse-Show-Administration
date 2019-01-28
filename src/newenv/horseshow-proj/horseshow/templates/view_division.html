@@ -57,7 +57,7 @@
             <form method="POST">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit" class="btn btn-success">Add Class</button>
+                <button type="submit">Submit</button>
             </form>
             {% else %}
             <p>Division contains maximum of 3 classes</p>
@@ -65,3 +65,4 @@
 
 </div>
 {% endblock %}
+
