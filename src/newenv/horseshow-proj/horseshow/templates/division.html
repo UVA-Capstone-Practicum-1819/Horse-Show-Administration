@@ -4,65 +4,69 @@
 {% block content %}
 
 <div class="content container">
-    <div class="row">
-        <div class="col-md-8">
+  <div class="row">
+    <div class="col-md-8">
 
-            <h2>Show: <a href = "{% url 'showpage' showdate=showdate %}">{{showname}}</a></h2>
-            <h4>Division: {{division}}</h4>
-            <h5>Classes:</h5>
-                <div class="row">
-                    <form class="remove_form" action="" method="patch">
-                        {% csrf_token %}
-                        <!-- {{ form | crispy}} -->
-                        <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
-                      <table class="table">
-                        <thead>
-                          <th>Class</th>
-                          <th>Remove</th>
-                          <th>Edit</th>
-                        </thead>
-                         <tbody>
-                          {% for c in classes %}
-                            <tr>
-                              <td>
-                                {{ c.number }}
-                              </td>
-                              <td>
-                                <button><a href="{% url 'delete_class' showdate=showdate divisionname=division classnumber=c.number %}">Remove</a></button>
-                              </td>
-                              <td>
-                                <button><a href="{% url 'edit_class' showdate=showdate divisionname=division classnumber=c.number %}">Edit Class</a></button>
-                              </td>
-                               <td>
-                                {{ remove_form | crispy}}
-                               </td>
-                            </tr>
-                           {% endfor %}
-                        </tbody>
-                      </table>
-                    </form>
-                </div>
-        </div>
+      <h2>Show: <a href="{% url 'showpage' showdate=showdate %}">{{showname}}</a></h2>
+      <h4>Division: {{division}}</h4>
+      <h5>Classes:</h5>
+      <div class="row">
+        <form class="remove_form" action="" method="patch">
+          {% csrf_token %}
+          <!-- {{ form | crispy}} -->
+          <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
+          <table class="table">
+            <thead>
+              <th>#</th>
+              <th>Class</th>
+              <th>Remove</th>
+              <th>Edit</th>
+            </thead>
+            <tbody>
+              {% for c in classes %}
+              <tr>
+                <td>
+                  {{ c.number }}
+                </td>
+                <td>
+                  {{ c.name }}
+                </td>
+                <td>
+                  <button><a href="{% url 'delete_class' showdate=showdate divisionname=division classnumber=c.number %}">Remove</a></button>
+                </td>
+                <td>
+                  <button><a href="{% url 'edit_class' showdate=showdate divisionname=division classnumber=c.number %}">Edit
+                      Class</a></button>
+                </td>
+                <td>
+                  {{ remove_form | crispy}}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </form>
+      </div>
     </div>
-            {% for message in messages %}
+  </div>
+  {% for message in messages %}
 
-                    <div class="alert alert-success">
-                        <a class="close" href="#" data-dismiss="alert">×</a>
+  <div class="alert alert-success">
+    <a class="close" href="#" data-dismiss="alert">×</a>
 
-                        {{ message }}
+    {{ message }}
 
-                    </div>
-            {% endfor %}
-            {% if form %}
-            <form method="POST">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Submit</button>
-            </form>
-            {% else %}
-            <p>Division contains maximum of 3 classes</p>
-            {% endif %}
+  </div>
+  {% endfor %}
+  {% if form %}
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+  </form>
+  {% else %}
+  <p>Division contains maximum of 3 classes</p>
+  {% endif %}
 
 </div>
 {% endblock %}
-
