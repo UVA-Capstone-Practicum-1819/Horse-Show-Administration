@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
- {% block content %}
+{% block content %}
 <h3>Division {{name}}</h3>
+
  <div class="row">
     <form class="form" action="" method="post">
         {% csrf_token %}
@@ -38,7 +39,7 @@
         <h1>Champion Points: {{champ_pts}}</h1>
         <h1>Champion Reserve: {{champ_reseve_pts}}</h1>
         <h1>Champion Reserve Points: {{champ_reserve}}</h1>-->
-     </form>
+  </form>
 </div>
 <!-- {{ form.media }} -->
 {% endblock %}
