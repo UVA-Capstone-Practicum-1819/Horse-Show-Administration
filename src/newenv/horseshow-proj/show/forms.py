@@ -14,8 +14,8 @@ class ShowForm(forms.Form):
     date = forms.DateField(initial=datetime.date.today)
     location = forms.CharField(
         max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
-    dayOfPrice = forms.IntegerField()
-    preRegistrationPrice = forms.IntegerField()
+    dayOfPrice = forms.IntegerField(label = "Day Of Price")
+    preRegistrationPrice = forms.IntegerField(label = "Pre-registration Price")
 
 #This allows you to check whether they were preregistered, or if they entered certain classes the day of
 class RegistrationBillForm(forms.Form):
