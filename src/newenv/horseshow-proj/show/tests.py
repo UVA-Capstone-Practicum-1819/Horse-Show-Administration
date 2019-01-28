@@ -736,3 +736,9 @@ class ButtonChanges(TestCase):
         horse = {'name': "Smokey Mountain", 'coggins_date': '2011-10-11', 'accession_no': 48, 'owner': "Tina",
                       'type': "horse", 'size': "N/A"}
         self.assertEqual(horse.get('size'), "N/A")
+
+class AddDivisionsToShow(TestCase):
+    def test_add(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10, preRegistrationPrice=5)
+        self.client.post(reverse('divisions', kwargs={'showdate':show.date}),{'name':'test'})
+        self.assertEqual(len(show.divisions.all()),1)
