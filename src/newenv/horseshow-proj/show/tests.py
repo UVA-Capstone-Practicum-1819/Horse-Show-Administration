@@ -720,3 +720,19 @@ class AddClassToDivision(TestCase):
         self.client.post(reverse('division_info', kwargs={'showdate':show.date, 'divisionname':division.name}), {'name':'test', 'number':0})
         self.client.patch(reverse('delete_class', kwargs={'showdate':show.date, 'divisionname':division.name, 'classnumber':0}), {'number':0})
         self.assertEqual(len(division.classes.all()),0)
+
+class ButtonChanges(TestCase):
+    def test_new_div(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", dayOfPrice=10,
+                                   preRegistrationPrice=5)
+        division = Division.objects.create(name="div1", number=1)
+        c = Classes.objects.create(name="class1", number="1")
+        response = self.client.post(
+            reverse('division_info', kwargs={'showdate': show.date, 'divisionname': division.name}),
+            {'name': 'test', 'number': 0})
+        self.assertTrue(len(division.classes.all()) == 1)
+
+    def test_horse_size(self):
+        horse = {'name': "Smokey Mountain", 'coggins_date': '2011-10-11', 'accession_no': 48, 'owner': "Tina",
+                      'type': "horse", 'size': "N/A"}
+        self.assertEqual(horse.get('size'), "N/A")
