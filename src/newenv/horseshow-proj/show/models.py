@@ -64,7 +64,6 @@ class Rider (models.Model):
     email = models.EmailField(primary_key=True, max_length=200, validators=[EmailValidator()], verbose_name="Email")
     birth_date = models.DateField(blank=True, null=True, verbose_name="Birth Date", )
     member_VHSA = models.BooleanField(default=False, blank=True, verbose_name="Member of the VHSA")	    
-    member_VHSA = models.BooleanField(default=False, blank=True) #, verbose_name="Member of the VHSA")
     county = models.CharField(max_length=200, blank=True, verbose_name="If member of 4H, specify county")
     horses = models.ManyToManyField(Horse, through='HorseRiderCombo')
     def __str__(self):
