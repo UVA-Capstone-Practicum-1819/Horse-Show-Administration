@@ -392,7 +392,7 @@ def new_division(request, showdate):
         if 'class_add' in request.POST:
             form = DivisionForm(request.POST)
             if form.is_valid():
-                divisions = Division.objects.filter(number=form.cleaned_data['number'])
+                divisions = Division.objects.filter(name=form.cleaned_data['name'])
                 if(len(divisions) > 0):
                     messages.error(request, "division number in use") #prepare error message, will display on submit.
                     return redirect('divisions', showdate)
@@ -441,22 +441,14 @@ def division(request, showdate, divisionname):
             division.save()
             return redirect('division_info', showdate, divisionname) #render page with new division
     else:
-        if(len(division.classes.all()) < 3): #each division only has a max of 3 classes, no input form if 3 classes present
-            form = AddClassForm() 
-            context = {
-                "form": form,
-                "showdate" : showdate,
-                "showname": show.name,
-                "division": division.name,
-                "classes": division.classes.all(),
-            }
-        else:
-            context = {
-                "showdate":show.date,
-                "showname": show.name,
-                "division": division.name,
-                "classes": division.classes.all(),
-            }
+        form = AddClassForm() 
+        context = {
+            "form": form,
+            "showdate" : showdate,
+            "showname": show.name,
+            "division": division.name,
+            "classes": division.classes.all(),
+        }
         return render(request, 'division.html', context)
 
 def class_info(request, showdate, divisionname, classnumber):  #render class info including combos in class
