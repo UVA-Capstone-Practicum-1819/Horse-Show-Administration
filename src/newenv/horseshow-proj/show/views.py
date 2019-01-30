@@ -19,6 +19,7 @@ from .populatepdf import write_fillable_pdf
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class AuthRequiredMiddleware(object):
@@ -172,6 +173,7 @@ def view_division_scores(request, show_date, division_name):
     """ displays list of classes in division, hrc winners of each of those classes from 1st-6th places, and form to enter champion info """
     show = Show.objects.get(date=show_date)
     # get the division object from the name of the divison that was passed in
+    # I don't think this will work right with multiple shows...
     division = show.divisions.filter(name=division_name)[0]
     form = DivisionChampForm()
     if request.method == "POST":
@@ -294,21 +296,76 @@ def add_division(request, show_date):
     show = Show.objects.get(date=show_date)
 
     if request.method == "POST":
-        form = DivisionForm(request.POST)
-        if form.is_valid():
-            divisions = Division.objects.filter(name=form.cleaned_data['name'])
-            if(len(divisions) > 0):
-                # prepare error message, will display on submit.
-                messages.error(request, "division number in use")
-                return redirect('add_division', show_date=show_date)
-            division_form = DivisionForm(request.POST)
-            division = division_form.save(commit=False)
-            division.show = show
-            division.save()
+# <<<<<<< HEAD
+#         form = DivisionForm(request.POST)
+#         if form.is_valid():
+#             divisions = Division.objects.filter(name=form.cleaned_data['name'])
+#             if(len(divisions) > 0):
+#                 # prepare error message, will display on submit.
+#                 messages.error(request, "division number in use")
+#                 return redirect('add_division', show_date=show_date)
+#             division_form = DivisionForm(request.POST)
+#             division = division_form.save(commit=False)
+#             division.show = show
+#             division.save()
+#         if 'another' in request.POST:
+#             return redirect('add_division', show_date)
+#         elif 'exit' in request.POST:
+#             return redirect('view_show', show_date)
+# =======
+        if 'exit' in request.POST:
+            form = DivisionForm(request.POST)
+            if form.is_valid():
+                divisions = Division.objects.filter(name=form.cleaned_data['name'])
+                if(len(divisions) > 0):
+                    messages.error(request, "division name in use") #prepare error message, will display on submit.
+                    return redirect('divisions', showdate)
+                post = form.save(commit=False)
+                post.author = request.user
+                post.published_date = timezone.now()
+                post.save()
+                division = Division.objects.get(
+                    name=form.cleaned_data['name'])
+                divisions = show.divisions
+                divisions.add(division)
+                show.save()
+                return redirect('showpage', date)
         if 'another' in request.POST:
-            return redirect('add_division', show_date)
-        elif 'exit' in request.POST:
-            return redirect('view_show', show_date)
+            form = DivisionForm(request.POST)
+            if form.is_valid():
+                divisions = Division.objects.filter(name=form.cleaned_data['name'])
+                if(len(divisions) > 0):
+                    messages.error(request, "division name in use") #prepare error message, will display on submit.
+                    return redirect('divisions', showdate)
+                post = form.save(commit=False)
+                post.author = request.user
+                post.published_date = timezone.now()
+                post.save()
+                division = Division.objects.get(
+                    name=form.cleaned_data['name'])
+                divisions = show.divisions
+                divisions.add(division)
+                show.save()
+                return redirect('divisions', showdate)
+
+        if 'class_add' in request.POST:
+            form = DivisionForm(request.POST)
+            if form.is_valid():
+                divisions = Division.objects.filter(name=form.cleaned_data['name'])
+                if(len(divisions) > 0):
+                    messages.error(request, "division number in use") #prepare error message, will display on submit.
+                    return redirect('divisions', showdate)
+                post = form.save(commit=False)
+                post.author = request.user
+                post.published_date = timezone.now()
+                post.save()
+                division = Division.objects.get(
+                    name=form.cleaned_data['name'])
+                divisions = show.divisions
+                divisions.add(division)
+                show.save()
+                return redirect('division_info', showdate, division)
+            return redirect('add_division', showdate)
     else:
         form = DivisionForm()
 
@@ -366,6 +423,25 @@ def view_class(request, show_date, division_name, class_num):
     class_obj = division.classes.filter(num=class_num)[0]
     combos = class_obj.combos.all()
     """ for combo in combos:  # iterate through combos to find matches//perhaps make a manytomany field later, but was told not to change models
+=======
+        form = AddClassForm() 
+        context = {
+            "form": form,
+            "showdate" : showdate,
+            "showname": show.name,
+            "division": division.name,
+            "classes": division.classes.all(),
+        }
+        return render(request, 'division.html', context)
+
+def class_info(request, showdate, divisionname, classnumber):  #render class info including combos in class
+    show = Show.objects.get(date=showdate)
+    division = Division.objects.get(name=divisionname)
+    this_class = Classes.objects.get(number = classnumber)
+    this_combos = [] #will hold combos of class
+    combos = HorseRiderCombo.objects.all()
+    for combo in combos: #iterate through combos to find matches//perhaps make a manytomany field later, but was told not to change models 
+>>>>>>> 33eab3d2095c2aad5a11233b4d2c59e252f85505
         classes = combo.classes.all()
         for c in classes:
             if c == class_obj:
@@ -659,9 +735,139 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
     """ fills in form automatically based on value entered by user """
-
     def get_queryset(self):
-        qs = Division.objects.all()
+        qs = Division.objects.all().order_by('number')
         if self.q:
             qs = qs.filter(division_name__istartswith=self.q)
         return qs
+        
+# def new_class(request):
+#     print(request.method)
+#     if request.method == "POST":
+#         form = ClassesForm(request.POST)
+#         if form.is_valid():
+#             post = form.save(commit=False)
+#             post.author = request.user
+#             post.published_date = timezone.now()
+#             post.save()
+#             # return redirect('horse_detail', pk=post.pk)
+#             return render(request, 'classes.html', {'form': form})
+#     else:
+#         form = ClassesForm()
+#     return render(request, 'classes.html', {'form': form})
+#
+
+def populate_pdf(request, showdate): # populates text fields of PDF
+    """ populate pdf for VHSA horse show reports """
+    show = Show.objects.get(date=showdate) # get the show by its date
+    d = {
+        'p2_show_name': show.name,
+        'p2_show_date': showdate,
+    } #populate the 2nd page of pdf with the show name and show time. 
+    
+    try: # p4 Amateur Hunter
+        # if the division name in the database contains "Amateur Hunter"
+        div_amateur = show.divisions.get(name__icontains="Amateur Hunter")
+        # fill in show name and show date
+        d["p4_show_name"] = show.name
+        d["p4_show_date"] = showdate
+        int = 1 #start int value at 1
+        for c in div_amateur.classes.all(): # for all the classes in "Amateur Hunter"
+            s = 'p4_c' + str(int) # set the key to the right class (initially c1) text field
+            d[s] = c.number # add to the dictionary the class number
+            e = 'p4_e' + str(int) # set the key to the right entry (initially c1) text field
+            # d[e] =  # system does not keep track of entry yep need to update then fix this line
+            list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
+            for i in range(1,7): # for i range from 1st place to 6th place
+                # set the keys to the right combo, owner and rider text fields
+                scombo = s + '_combo' + str(i)
+                sowner = s + '_owner' + str(i)
+                srider = s + '_rider' + str(i)
+                if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
+                    d[scombo] = list[i-1] # write to pdf the correct combo to that rank
+                try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                    combo = HorseRiderCombo.objects.get(num=list[i-1])
+                    d[srider] = combo.rider
+                    d[sowner] = combo.horse.owner
+                except ObjectDoesNotExist:
+                    print("")
+            print(scombo)
+            int += 1 # increment to write to the next class section
+    except ObjectDoesNotExist:
+        print("")
+        
+    #p5 Small/Medium Pony Hunter
+    #p6 Large Pony Hunter
+    #p7 green hunter pony, p8 green hunter horse
+    
+    try: # p9 Thoroughbred Hunter
+        # if the division name in the database contains "Thoroughbred"
+        div_amateur = show.divisions.get(name__icontains="Thoroughbred")
+        # fill in show name and show date
+        d["p9_show_name"] = show.name
+        d["p9_show_date"] = showdate
+        int = 1 #start int value at 1
+        for c in div_amateur.classes.all(): # for all the classes in "Thoroughbred"
+            s = 'p9_c' + str(int) # set the key to the right class (initially c1) text field
+            d[s] = c.number # add to the dictionary the class number
+            e = 'p9_e' + str(int) # set the key to the right entry (initially c1) text field
+            # d[e] =  # system does not keep track of entry yep need to update then fix this line
+            list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
+            for i in range(1,7): # for i range from 1st place to 6th place
+                # set the keys to the right combo, owner and rider text fields
+                scombo = s + '_combo' + str(i)
+                sowner = s + '_owner' + str(i)
+                srider = s + '_rider' + str(i)
+                if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
+                    d[scombo] = list[i-1] # write to pdf the correct combo to that rank
+                try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                    combo = HorseRiderCombo.objects.get(num=list[i-1])
+                    d[srider] = combo.rider
+                    d[sowner] = combo.horse.owner
+                except ObjectDoesNotExist:
+                    print("")
+            print(scombo)
+            int += 1 # increment to write to the next class section
+    except ObjectDoesNotExist:
+        print("")
+
+    #p10 working hunter
+    try: # p9 Thoroughbred Hunter
+        # if the division name in the database contains "Thoroughbred"
+        div_amateur = show.divisions.get(name__icontains="Thoroughbred")
+        # fill in show name and show date
+        d["p9_show_name"] = show.name
+        d["p9_show_date"] = showdate
+        int = 1 #start int value at 1
+        for c in div_amateur.classes.all(): # for all the classes in "Thoroughbred"
+            s = 'p9_c' + str(int) # set the key to the right class (initially c1) text field
+            d[s] = c.number # add to the dictionary the class number
+            e = 'p9_e' + str(int) # set the key to the right entry (initially c1) text field
+            # d[e] =  # system does not keep track of entry yep need to update then fix this line
+            list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
+            for i in range(1,7): # for i range from 1st place to 6th place
+                # set the keys to the right combo, owner and rider text fields
+                scombo = s + '_combo' + str(i)
+                sowner = s + '_owner' + str(i)
+                srider = s + '_rider' + str(i)
+                if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
+                    d[scombo] = list[i-1] # write to pdf the correct combo to that rank
+                try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                    combo = HorseRiderCombo.objects.get(num=list[i-1])
+                    d[srider] = combo.rider
+                    d[sowner] = combo.horse.owner
+                except ObjectDoesNotExist:
+                    print("")
+            print(scombo)
+            int += 1 # increment to write to the next class section
+    except ObjectDoesNotExist:
+        print("")
+    #p11 Hunter Pleasure Pony
+    #p12 Junior Hunter Pleasure Horse
+    #p13 Adult Hunter Pleasure Horse
+    #p14 Hunter Short Stirrup
+    #p15 Associate Equitation Classes (adult/children/pony)
+    #p16 Associate Equitation On the Flat Classes (adult/children)
+    #p17 
+    write_fillable_pdf("show/static/VHSA_Results_2015.pdf",
+                       "show/static/VHSA_Final_Results.pdf", d) #uses "VHSA_Results_2015.pdf" and populates it's fields with the info in data dict, then it saves this new populated pdf to "VHSA_Final_Results.pdf"

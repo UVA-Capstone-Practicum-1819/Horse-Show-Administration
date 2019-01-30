@@ -19,7 +19,6 @@ class ShowForm(forms.Form):
     day_of_price = forms.IntegerField(label="Day-of Price")
     pre_reg_price = forms.IntegerField(label="Preregistration Price")
 
-
 class RegistrationBillForm(forms.Form):
     """
     This allows you to check whether they were preregistered, or if they entered certain classes the day of
@@ -239,8 +238,7 @@ class DivisionForm(forms.ModelForm):
 
     class Meta:
         model = Division
-        fields = ('name', )
-
+        fields = ('name',)
 
 class DivisionChampForm(forms.ModelForm):
     """
