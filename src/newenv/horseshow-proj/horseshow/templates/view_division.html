@@ -6,8 +6,8 @@
 <div class="content container">
   <div class="row">
     <div class="col-md-8">
-      <h2>Show: <a href="{% url 'showpage' showdate=showdate %}">{{showname}}</a></h2>
-      <h4>Division: {{division}}</h4>
+      <h2>Show: <a href="{% url 'view_show' show_date=show_date %}">{{show_name}}</a></h2>
+      <h4>Division: {{division_name}}</h4>
       <h5>Classes:</h5>
       <div class="row">
         <form class="remove_form" action="" method="patch">
@@ -25,13 +25,16 @@
               {% for c in classes %}
               <tr>
                 <td>
-                  {{ c.number }}. {{ c.name }}
+                  {{ c.num }}.
                 </td>
                 <td>
-                  <button><a href="{% url 'delete_class' showdate=showdate divisionname=division classnumber=c.number %}">Scratch</a></button>
+                  {{c.name}}
                 </td>
                 <td>
-                  <button><a href="{% url 'edit_class' showdate=showdate divisionname=division classnumber=c.number %}">Edit
+                  <button><a href="{% url 'delete_class' show_date=show_date division_name=division_name class_num=c.num %}">Scratch</a></button>
+                </td>
+                <td>
+                  <button><a href="{% url 'view_class' show_date=show_date division_name=division_name class_num=c.num %}">Edit
                       Class</a></button>
                 </td>
                 <td>

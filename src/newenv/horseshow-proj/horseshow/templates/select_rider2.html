@@ -5,7 +5,7 @@
 {% block content %}
 <h3>Rider Select</h3>
 <div>
-  <form class="form" action="{% url 'select_rider2' show_date=date %}" method="post">
+  <form class="form" action="{% url 'select_rider2' show_date=show_date %}" method="post">
     {% csrf_token %} {{ form | crispy }} <button class="btn btn-success" type="submit">Select Rider</button>
   </form>
   

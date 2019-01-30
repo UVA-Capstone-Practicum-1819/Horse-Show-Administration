@@ -90,7 +90,7 @@ class RiderForm(forms.ModelForm):
 
     class Meta:
         model = Rider
-        fields = ('name', 'address', 'email',
+        fields = ('name', 'address','city', 'state', 'zip_code','email',
                   'birth_date', 'member_VHSA', 'county',)
 
 
@@ -205,7 +205,7 @@ class ClassForm(forms.ModelForm):
     """ # This form is a model form for Class. """
     class Meta:
         model = Class
-        fields = ('num',)
+        fields = ('num', 'name')
 
 
 class RemoveClassForm(forms.Form):

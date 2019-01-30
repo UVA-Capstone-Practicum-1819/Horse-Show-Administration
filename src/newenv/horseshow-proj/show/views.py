@@ -329,7 +329,7 @@ def add_division(request, show_date):
                 divisions = show.divisions
                 divisions.add(division)
                 show.save()
-                return redirect('showpage', date)
+                return redirect('view_show', show_date)
         if 'another' in request.POST:
             form = DivisionForm(request.POST)
             if form.is_valid():
@@ -346,7 +346,7 @@ def add_division(request, show_date):
                 divisions = show.divisions
                 divisions.add(division)
                 show.save()
-                return redirect('divisions', showdate)
+                return redirect('add_division', show_date)
 
         if 'class_add' in request.POST:
             form = DivisionForm(request.POST)
@@ -364,8 +364,8 @@ def add_division(request, show_date):
                 divisions = show.divisions
                 divisions.add(division)
                 show.save()
-                return redirect('division_info', showdate, division)
-            return redirect('add_division', showdate)
+                return redirect('view_division', show_date, division.name)
+            return redirect('add_division', show_date)
     else:
         form = DivisionForm()
 
@@ -392,7 +392,7 @@ def view_division(request, show_date, division_name):
             if existing_classes_count > 0:
                 # prepare error message, will display on submit.
                 messages.error(request, "class number in use")
-                return redirect('division_info', show_date, division_name)
+                return redirect('view_division', show_date, division_name)
 
             class_form = ClassForm(request.POST)
             class_obj = class_form.save(commit=False)
@@ -403,16 +403,15 @@ def view_division(request, show_date, division_name):
     else:
         # each division only has a max of 3 classes, no input form if 3 classes present
         division_classes = division.classes.all()
+        form = ClassForm()
         context = {
-            "date": show_date,
+            "show_date": show_date,
             "show_name": show.name,
-            "name": division_name,
+            "division_name": division_name,
             "classes": division_classes,
-        }
-        if(len(division_classes) < 3):
-            form = ClassForm()
-            context['form'] = form
-        print("THIS IS THE DIVISION: " + division_name)
+            "form": form,
+            }
+        # print("THIS IS THE DIVISION: " + division_name)
         return render(request, 'view_division.html', context)
 
 
@@ -606,7 +605,7 @@ def add_combo(request, show_date):
             horse = get_object_or_404(Horse, pk=horse_pk)
             HorseRiderCombo.objects.create(
                 num=num, rider=rider, horse=horse, cell=cell, email=email, show=show)
-            return redirect('edit_combo', show_date=show_date, combo_num=num)
+            return redirect('edit_combo', show_date=show.date, combo_num=num)
         else:
             return redirect('view_show', show_date=show_date)
     rider_pk = request.session['rider_pk']
@@ -661,7 +660,7 @@ def edit_combo(request, show_date, combo_num):
     number_registered_classes = len(registered_classes)
     price = number_registered_classes * 10
 
-    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_selection_form': class_selection_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+    return render(request, 'edit_combo.html', {'combo_num': combo, 'edit_form': edit_form, 'class_selection_form': class_selection_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'show_date': show_date})
 
 
 def populate_pdf(request, show_date):
@@ -740,7 +739,7 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
         if self.q:
             qs = qs.filter(division_name__istartswith=self.q)
         return qs
-        
+
 # def new_class(request):
 #     print(request.method)
 #     if request.method == "POST":

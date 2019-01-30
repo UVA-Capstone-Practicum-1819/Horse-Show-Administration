@@ -52,20 +52,9 @@ class Class(models.Model):
         unique_together = ('division', 'num')
 
     num = models.IntegerField(default=0)
+    name = models.CharField(max_length=100, default="")
     division = models.ForeignKey(
         Division, on_delete=models.CASCADE, related_name="classes", null=True)
-
-#Model for a Show, includes basic information such as name/date/location and a preRegistrationPrice
-#for riders who sign up for classes early. There is a dayof price for riders who sign up the day of the show.
-class Show(models.Model):
-    name = models.CharField(max_length=100)
-    date = models.CharField(max_length=100, primary_key=True)
-    location = models.CharField(max_length=100)
-    dayOfPrice = models.IntegerField(blank=True, null=True, default=0, verbose_name='Day Of Price')
-    preRegistrationPrice = models.IntegerField(blank=True, null=True, default=0, verbose_name='Pre-registration Price')
-    divisions = models.ManyToManyField(Division, blank=True)
-    def __str__(self):
-        return f"Show: {self.division.show.date}, Division: {self.division.name}, Class: {self.num}"
 
 
 class Horse(models.Model):
