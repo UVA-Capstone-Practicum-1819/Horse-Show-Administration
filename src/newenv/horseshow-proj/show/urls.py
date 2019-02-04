@@ -37,8 +37,7 @@ division_patterns = [
     path('classes',
          views.view_division_classes, name="view_division_classes"),
 
-    path('class-autocomplete', views.ClassAutocomplete.as_view(),
-         name="classes_autocomplete"),
+    
 ]
 
 combo_patterns = [
@@ -80,19 +79,26 @@ show_patterns = [
     path('horse/select2', views.select_horse2, name="select_horse2"),
 
     path('horse/<horse_pk>/edit', views.edit_horse, name="edit_horse"),
-
-    path('combo-autocomplete', views.ComboAutocomplete.as_view(),
-         name="combo_autocomplete"),
-
-    path('division-autocomplete', views.DivisionAutocomplete.as_view(),
-         name="division_autocomplete"),
-
+         
     path('populate-pdf', views.populate_pdf, name="populate_pdf"),
 ]
 
 urlpatterns = [
     path('', views.select_show, name="select_show"),
+     path('show-autocomplete', views.ShowAutocomplete.as_view(),
+         name="show_autocomplete"),
 
+    path('rider-autocomplete', views.RiderAutocomplete.as_view(),
+         name="rider_autocomplete"),
+
+    path('horse-autocomplete', views.HorseAutocomplete.as_view(),
+         name="horse_autocomplete"),
+    path('combo-autocomplete', views.ComboAutocomplete.as_view(), name="combo_autocomplete"),
+
+   path('division-autocomplete', views.DivisionAutocomplete.as_view(),
+         name="division_autocomplete"),
+     path('class-autocomplete', views.ClassAutocomplete.as_view(),
+         name="classes_autocomplete"),
     path('add', views.add_show, name='add_show'),
 
     path('<show_date>/', include(show_patterns)),
@@ -104,14 +110,7 @@ urlpatterns = [
 
     path('logout', auth_views.LogoutView.as_view(), name='log_out'),
 
-    path('show-autocomplete', views.ShowAutocomplete.as_view(),
-         name="show_autocomplete"),
-
-    path('rider-autocomplete', views.RiderAutocomplete.as_view(),
-         name="rider_autocomplete"),
-
-    path('horse-autocomplete', views.HorseAutocomplete.as_view(),
-         name="horse_autocomplete"),
+    
 
 ]
 urlpatterns += staticfiles_urlpatterns()
