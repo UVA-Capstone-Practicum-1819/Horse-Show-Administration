@@ -3,12 +3,12 @@
 {% load static %}
 {% block content %}
 <h2>Show: <a href = "{% url 'view_show' show_date=date %}">{{show_name}}</a></h2>
-<h3>Class: {{class_num}}</h3>
+<h2>Division: <a href = "{% url 'view_division' show_date=date division_name=name%}">{{name}}</a></h2>
+<h3>Class {{class.num}}: {{class.name}}</h3>
  <div class="row">
-    <form class="form" action="" method="post">
+    <form class="form" method="post">
         {% csrf_token %}
-        <!-- {{ form | crispy}} -->
-        <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
+        
       <table class="table">
         <thead>
           <th>Combo</th>
@@ -21,7 +21,7 @@
                 {{combo.num}}: {{combo.rider}}, {{combo.horse}}
               </td>
               <td>
-                <button><a href="{% url 'delete_combo' show_date=date division_name=name class_num=class_num combo_num=combo.num %}">Scratch</a></button>
+                <button><a href="{% url 'delete_combo' show_date=date division_name=name class_num=num combo_num=combo.num %}">Scratch</a></button>
 
               </td>
                <td>
