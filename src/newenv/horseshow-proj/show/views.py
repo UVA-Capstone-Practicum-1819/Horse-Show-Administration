@@ -208,7 +208,7 @@ def view_division_scores(request, show_date, division_name):
     context = {'classes': division.classes.all(),
                'name': division_name, 'form': form}
     # passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
-    return render(request, 'division_score.html', context)
+    return render(request, 'view_division_scores.html', context)
 
 
 def delete_class(request, show_date, division_name, class_num):
@@ -417,8 +417,12 @@ def select_division(request, show_date):
         if 'score' in request.POST:  # if a division is selected and the "See Divison Scores" button is clicked
             form = DivisionSelectForm(request.POST)
             if form.is_valid():
-                # redirects to divisionscore and passes in the division_name
-                return redirect('view_division_scores', show_date=show_date, division_name=form.cleaned_data['name'])
+                division_obj = form.cleaned_data['division']
+                divisions = Division.objects.all()
+                for division in divisions:
+                    if division_obj == division:
+                        # redirects to divisionscore and passes in the division_name
+                        return redirect('view_division_scores', show_date=show_date, division_name=division.name)
 
     else:
         form = DivisionSelectForm()
@@ -629,7 +633,7 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
     """ This is the autocomplete functionality for selecting a class """
 
     def get_queryset(self):
-        qs = Class.objects.all().order_by('number')
+        qs = Class.objects.all().order_by('num')
         if self.q:
             qs = qs.filter(class_name__istartswith=self.q)
         return qs
