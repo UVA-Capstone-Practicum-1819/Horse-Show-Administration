@@ -662,7 +662,7 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
     """ fills in form automatically based on value entered by user """
     def get_queryset(self):
-        qs = Division.objects.all().order_by('number')
+        qs = Division.objects.all().order_by('name')
         if self.q:
             qs = qs.filter(division_name__istartswith=self.q)
         return qs
