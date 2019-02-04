@@ -9,11 +9,8 @@
             <p> <b>Number:</b> {{ combo.num }} </p>
             <p> <b>Rider Name:</b> {{ combo.rider.name }} </p>
             <p> <b>Horse Name:</b> {{ combo.horse.name }} </p>
-<!-- <<<<<<< HEAD
-            <form class="form" method="post">
-                {% csrf_token %}    
-======= -->
-            <form class="form" action="{% url 'edit_combo' combo.num %}" method="post">
+
+            <form class="form"  method="post">
                 {% csrf_token %}
                 {{ edit_form | crispy }}
                 <button type="submit" name="edit" value="Edit" class="btn btn-success">Edit Information</button>
@@ -21,13 +18,9 @@
         </div>
 
         <div class="col-lg-6">
-<!-- <<<<<<< HEAD
-            
-            <form class="form" method="post">
-                {% csrf_token %}    
-======= -->
 
-            <form class="form" action="{% url 'edit_combo' combo.num %}" method="post">
+
+            <form class="form" method="post">
                 {% csrf_token %}
                 {{ class_selection_form | crispy }}
                 {{ class_selection_form.media}}
