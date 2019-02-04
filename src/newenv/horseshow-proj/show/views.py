@@ -42,7 +42,7 @@ class AuthRequiredMiddleware(object):
             if not is_user_authenticated:
                 return response
             else:
-                return redirect('')
+                return redirect('show:select_show')
         # if the user is not authenticated, redirect the user from any horseshow page to the login page
         if not is_user_authenticated:
             return redirect('log_in')
@@ -305,34 +305,31 @@ def add_division(request, show_date):
     show = Show.objects.get(date=show_date)
 
     if request.method == "POST":
-# <<<<<<< HEAD
-#         form = DivisionForm(request.POST)
-#         if form.is_valid():
-#             divisions = Division.objects.filter(name=form.cleaned_data['name'])
-#             if(len(divisions) > 0):
-#                 # prepare error message, will display on submit.
-#                 messages.error(request, "division number in use")
-#                 return redirect('add_division', show_date=show_date)
-#             division_form = DivisionForm(request.POST)
-#             division = division_form.save(commit=False)
-#             division.show = show
-#             division.save()
-#         if 'another' in request.POST:
-#             return redirect('add_division', show_date)
-#         elif 'exit' in request.POST:
-#             return redirect('view_show', show_date)
-# =======
+
+        form = DivisionForm(request.POST)
+        if form.is_valid():
+            divisions = Division.objects.filter(name=form.cleaned_date['name'])
+            if(len(divisions) > 0):
+                # prepare error message, will display on submit.
+                messages.error(request, "division number in use")
+                return redirect('add_division', show_date=show_date)
+             division_form = DivisionForm(request.POST)
+             division = division_form.save(commit=False)
+             division.show = show
+             division.save()
+         if 'another' in request.POST:
+             return redirect('add_division', show_date)
+         elif 'exit' in request.POST:
+             return redirect('view_show', show_date)
+
         if 'exit' in request.POST:
             form = DivisionForm(request.POST)
             if form.is_valid():
                 divisions = Division.objects.filter(name=form.cleaned_data['name'])
                 if(len(divisions) > 0):
                     messages.error(request, "division name in use") #prepare error message, will display on submit.
-                    return redirect('divisions', showdate)
-                post = form.save(commit=False)
-                post.author = request.user
-                post.published_date = timezone.now()
-                post.save()
+                    return redirect('divisions', show_date)
+                
                 division = Division.objects.get(
                     name=form.cleaned_data['name'])
                 divisions = show.divisions
@@ -345,7 +342,7 @@ def add_division(request, show_date):
                 divisions = Division.objects.filter(name=form.cleaned_data['name'])
                 if(len(divisions) > 0):
                     messages.error(request, "division name in use") #prepare error message, will display on submit.
-                    return redirect('divisions', showdate)
+                    return redirect('divisions', show_date)
                 post = form.save(commit=False)
                 post.author = request.user
                 post.published_date = timezone.now()
@@ -363,7 +360,7 @@ def add_division(request, show_date):
                 divisions = Division.objects.filter(name=form.cleaned_data['name'])
                 if(len(divisions) > 0):
                     messages.error(request, "division number in use") #prepare error message, will display on submit.
-                    return redirect('divisions', showdate)
+                    return redirect('divisions', show_date)
                 post = form.save(commit=False)
                 post.author = request.user
                 post.published_date = timezone.now()
@@ -420,7 +417,6 @@ def view_division(request, show_date, division_name):
             "classes": division_classes,
             "form": form,
             }
-        # print("THIS IS THE DIVISION: " + division_name)
         return render(request, 'view_division.html', context)
 
 
@@ -430,30 +426,7 @@ def view_class(request, show_date, division_name, class_num):
     division = show.divisions.filter(name=division_name)[0]
     class_obj = division.classes.filter(num=class_num)[0]
     combos = class_obj.combos.all()
-    """ for combo in combos:  # iterate through combos to find matches//perhaps make a manytomany field later, but was told not to change models
-=======
-        form = AddClassForm() 
-        context = {
-            "form": form,
-            "showdate" : showdate,
-            "showname": show.name,
-            "division": division.name,
-            "classes": division.classes.all(),
-        }
-        return render(request, 'division.html', context)
-
-def class_info(request, showdate, divisionname, classnumber):  #render class info including combos in class
-    show = Show.objects.get(date=showdate)
-    division = Division.objects.get(name=divisionname)
-    this_class = Classes.objects.get(number = classnumber)
-    this_combos = [] #will hold combos of class
-    combos = HorseRiderCombo.objects.all()
-    for combo in combos: #iterate through combos to find matches//perhaps make a manytomany field later, but was told not to change models 
->>>>>>> 33eab3d2095c2aad5a11233b4d2c59e252f85505
-        classes = combo.classes.all()
-        for c in classes:
-            if c == class_obj:
-                this_combos.append(combo)  # add if class in combo.classes """
+    
     context = {
         "combos": combos,
         "number": class_num,
@@ -749,28 +722,14 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(division_name__istartswith=self.q)
         return qs
 
-# def new_class(request):
-#     print(request.method)
-#     if request.method == "POST":
-#         form = ClassesForm(request.POST)
-#         if form.is_valid():
-#             post = form.save(commit=False)
-#             post.author = request.user
-#             post.published_date = timezone.now()
-#             post.save()
-#             # return redirect('horse_detail', pk=post.pk)
-#             return render(request, 'classes.html', {'form': form})
-#     else:
-#         form = ClassesForm()
-#     return render(request, 'classes.html', {'form': form})
-#
 
-def populate_pdf(request, showdate): # populates text fields of PDF
+
+def populate_pdf(request, show_date): # populates text fields of PDF
     """ populate pdf for VHSA horse show reports """
-    show = Show.objects.get(date=showdate) # get the show by its date
+    show = Show.objects.get(date=show_date) # get the show by its date
     d = {
         'p2_show_name': show.name,
-        'p2_show_date': showdate,
+        'p2_show_date': show_date,
     } #populate the 2nd page of pdf with the show name and show time. 
     
     try: # p4 Amateur Hunter
@@ -778,7 +737,7 @@ def populate_pdf(request, showdate): # populates text fields of PDF
         div_amateur = show.divisions.get(name__icontains="Amateur Hunter")
         # fill in show name and show date
         d["p4_show_name"] = show.name
-        d["p4_show_date"] = showdate
+        d["p4_show_date"] = show_date
         int = 1 #start int value at 1
         for c in div_amateur.classes.all(): # for all the classes in "Amateur Hunter"
             s = 'p4_c' + str(int) # set the key to the right class (initially c1) text field
@@ -813,7 +772,7 @@ def populate_pdf(request, showdate): # populates text fields of PDF
         div_amateur = show.divisions.get(name__icontains="Thoroughbred")
         # fill in show name and show date
         d["p9_show_name"] = show.name
-        d["p9_show_date"] = showdate
+        d["p9_show_date"] = show_date
         int = 1 #start int value at 1
         for c in div_amateur.classes.all(): # for all the classes in "Thoroughbred"
             s = 'p9_c' + str(int) # set the key to the right class (initially c1) text field
@@ -845,7 +804,7 @@ def populate_pdf(request, showdate): # populates text fields of PDF
         div_amateur = show.divisions.get(name__icontains="Thoroughbred")
         # fill in show name and show date
         d["p9_show_name"] = show.name
-        d["p9_show_date"] = showdate
+        d["p9_show_date"] = show_date
         int = 1 #start int value at 1
         for c in div_amateur.classes.all(): # for all the classes in "Thoroughbred"
             s = 'p9_c' + str(int) # set the key to the right class (initially c1) text field
