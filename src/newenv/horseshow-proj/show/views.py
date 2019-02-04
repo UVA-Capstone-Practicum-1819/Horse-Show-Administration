@@ -36,7 +36,7 @@ class AuthRequiredMiddleware(object):
         response = self.get_response(request)
         requested_path = request.path
         is_user_authenticated = request.user.is_authenticated
-        
+
         # if the user is already authenticated, redirect user from login or signup to the index page, otherwise allow them to proceed as normal
         if re.match(r'/show/(login|signup)/?', requested_path):
             if not is_user_authenticated:
@@ -267,8 +267,8 @@ def select_class(request, show_date, division_name):
 
 
 def rank_class(request, show_date, division_name, class_num):
-    """ 
-        This method ranks classes from 1st through 6th and stores the winning scores under    
+    """
+        This method ranks classes from 1st through 6th and stores the winning scores under
         specific horse rider combos that competed in that class and were awarded points
         points are always starting from 10, then 6, and so on
     """
@@ -298,7 +298,7 @@ def rank_class(request, show_date, division_name, class_num):
 
             return redirect('view_class', show_date=show_date, division_name=division_name, class_num=class_num)
 
-            
+
     else:
         form = RankingForm()
         return render(request, 'rank_class.html', {'form': form})
@@ -325,6 +325,8 @@ def add_division(request, show_date):
                 return redirect('add_division', show_date=show_date)
             elif 'exit' in request.POST:
                 return redirect('view_division', show_date=show_date, division_name=division.name)
+            elif 'class_add' in request.POST:
+                return redirect('add_class', show_date=show_date, division_name=division.name)
 
     else:
         form = DivisionForm()
@@ -382,7 +384,7 @@ def view_class(request, show_date, division_name, class_num):
     division = show.divisions.get(name=division_name)
     class_obj = division.classes.get(num=class_num)
     combos = class_obj.combos.all()
-    
+
     context = {
         "combos": combos,
         "number": class_num,
@@ -673,8 +675,8 @@ def populate_pdf(request, show_date): # populates text fields of PDF
     d = {
         'p2_show_name': show.name,
         'p2_show_date': show_date,
-    } #populate the 2nd page of pdf with the show name and show time. 
-    
+    } #populate the 2nd page of pdf with the show name and show time.
+
     try: # p4 Amateur Hunter
         # if the division name in the database contains "Amateur Hunter"
         div_amateur = show.divisions.get(name__icontains="Amateur Hunter")
@@ -705,11 +707,11 @@ def populate_pdf(request, show_date): # populates text fields of PDF
             int += 1 # increment to write to the next class section
     except ObjectDoesNotExist:
         print("")
-        
+
     #p5 Small/Medium Pony Hunter
     #p6 Large Pony Hunter
     #p7 green hunter pony, p8 green hunter horse
-    
+
     try: # p9 Thoroughbred Hunter
         # if the division name in the database contains "Thoroughbred"
         div_amateur = show.divisions.get(name__icontains="Thoroughbred")
@@ -778,6 +780,6 @@ def populate_pdf(request, show_date): # populates text fields of PDF
     #p14 Hunter Short Stirrup
     #p15 Associate Equitation Classes (adult/children/pony)
     #p16 Associate Equitation On the Flat Classes (adult/children)
-    #p17 
+    #p17
     write_fillable_pdf("show/static/VHSA_Results_2015.pdf",
                        "show/static/VHSA_Final_Results.pdf", d) #uses "VHSA_Results_2015.pdf" and populates it's fields with the info in data dict, then it saves this new populated pdf to "VHSA_Final_Results.pdf"
