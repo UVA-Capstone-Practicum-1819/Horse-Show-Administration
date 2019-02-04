@@ -42,7 +42,7 @@ class AuthRequiredMiddleware(object):
             if not is_user_authenticated:
                 return response
             else:
-                return redirect('show:select_show')
+                return redirect('select_show')
         # if the user is not authenticated, redirect the user from any horseshow page to the login page
         if not is_user_authenticated:
             return redirect('log_in')
@@ -56,7 +56,7 @@ def view_show(request, show_date):
         form = ComboNumForm(request.POST)
         if form.is_valid():
             num = form.cleaned_data['num']
-            return redirect('edit_combo', num=num)
+            return redirect('edit_combo', combo_num=num, show_date=show_date)
     if 'navigation' in request.session:
         del request.session['navigation']
     if 'rider_pk' in request.session:
@@ -106,6 +106,7 @@ def select_show(request):
         form = ShowSelectForm(request.POST)
         if form.is_valid():
             show = form.cleaned_data['date']
+            # for some reason, the regular show select autocompletion menu doesn't work, so to fix that, we need to add a few characters ("foo") to the show date and then strip them away (as they are here)
             show.date = show.date[:-3]
             show_date = show.date
             request.session['show_date'] = show_date
@@ -148,13 +149,13 @@ def select_combo(request, show_date):
 def view_billing(request, show_date, combo_num):
     """ Billing list shows what horse rider combos need to be billed for and their total price """
     show = Show.objects.get(date=show_date)
-    combo = show.combos.filter(num=combo_num)[0]
+    combo = show.combos.get(num=combo_num)
     classes = combo.classes
-    tot = classes.count()
-    price = show.pre_reg_price * tot
+    total = classes.count()
+    price = show.pre_reg_price * total
     # for minimum requirements, only calculates price based on pre-registration price
-    context = {'name': combo.rider, 'show_date': show_date,
-               'classes': classes.all(), 'combo_num': combo_num, 'tot': tot, 'price': price}
+    context = {'name': combo.rider, 'date': show_date,
+               'classes': classes.all(), 'combo_num': combo_num, 'tot': total, 'price': price}
     # the context will help create the table for the list of classes a user is currently in
     return render(request, 'view_billing.html', context)
 
@@ -162,17 +163,17 @@ def view_billing(request, show_date, combo_num):
 def scratch_combo(request, show_date, combo_num):
     """ This view allows you to scratch from a show """
     show = Show.objects.get(date=show_date)
-    combo = show.combos.filter(num=combo_num)[0]
+    combo = show.combos.get(num=combo_num)
     cls = request.GET["cname"]
     dcls = combo.classes.get(name=cls)
     combo.classes.remove(dcls)
     # this line allows for a classes to be scratched (or removed) at no additional cost
     # the list will be changed based on what classes were removed
     # classes will only be removed from the horse-rider combo object, not from the entire database
-    tot = combo.classes.count()
-    price = show.pre_reg_price * tot
-    context = {'name': combo.rider, 'show_date': show_date,
-               'classes': combo.classes.all(), 'combo_num': combo_num, 'tot': tot, 'price': price}
+    total = combo.classes.count()
+    price = show.pre_reg_price * total
+    context = {'name': combo.rider, 'date': show_date,
+               'classes': combo.classes.all(), 'combo_num': combo_num, 'tot': total, 'price': price}
     # context information need to populate table
     return render(request, 'view_billing.html', context)
     # rendered to the same html page
@@ -183,7 +184,7 @@ def view_division_scores(request, show_date, division_name):
     show = Show.objects.get(date=show_date)
     # get the division object from the name of the divison that was passed in
     # I don't think this will work right with multiple shows...
-    division = show.divisions.filter(name=division_name)[0]
+    division = show.divisions.get(name=division_name)
     form = DivisionChampForm()
     if request.method == "POST":
         form = DivisionChampForm(request.POST)
@@ -205,7 +206,7 @@ def view_division_scores(request, show_date, division_name):
     else:
         form = DivisionChampForm()
     context = {'classes': division.classes.all(),
-               'name': division.name, 'form': form}
+               'name': division_name, 'form': form}
     # passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
     return render(request, 'division_score.html', context)
 
@@ -213,8 +214,8 @@ def view_division_scores(request, show_date, division_name):
 def delete_class(request, show_date, division_name, class_num):
     """ deletes a class from a division """
     show = Show.objects.get(date=show_date)
-    division = show.divisions.filter(name=division_name)[0]
-    class_obj = division.classes.filter(num=class_num)[0]
+    division = show.divisions.get(name=division_name)
+    class_obj = division.classes.get(num=class_num)
     # gets the division object from the division name that was passed in
     class_obj.delete()  # removes the class object
     # redirects to division_classes and passes in the division's name
@@ -224,7 +225,7 @@ def delete_class(request, show_date, division_name, class_num):
 def view_division_classes(request, show_date, division_name):
     """ lists the classes in a division """
     show = Show.objects.get(date=show_date)
-    division = show.divisions.filter(name=division_name)[0]
+    division = show.divisions.get(name=division_name)
     context = {'classes': division.classes.all(), 'name': division_name}
     # passes the division's name and classes to the "division_classes.html" and renders that page
     return render(request, 'view_division_classes.html', context)
@@ -236,14 +237,17 @@ def add_class(request, show_date, division_name):
         form = ClassForm(request.POST)
         if form.is_valid():
             show = Show.objects.get(date=show_date)
-            division = show.divisions.filter(name=division_name)[0]
+            division = show.divisions.get(name=division_name)
             existing_classes = division.classes.filter(
                 num=form.cleaned_data['num'])
             if existing_classes:
                 messages.error(request, "class number in use")
                 return redirect('view_division_classes', show_date=show_date, division_name=division_name)
-
-            return redirect('/show/class')
+            class_form = ClassForm(request.POST)
+            class_obj = class_form.save(commit=False)
+            class_obj.division = division
+            class_obj.save()
+            return redirect('view_class', show_date=show_date, division_name=division_name, class_num=class_obj.num)
     else:
         form = ClassForm()
     return render(request, 'add_class.html', {'form': form})
@@ -255,8 +259,8 @@ def select_class(request, show_date, division_name):
         form = ClassSelectForm(request.POST)
         if form.is_valid():
             class_num = form.cleaned_data['num']
-            #request.session['class_obj'] = class_name
-            return redirect('rank_class', class_num)
+            request.session['class_obj'] = class_name
+            return redirect('rank_class', show_date=show_date, division_name=division_name, class_num=class_num)
     else:
         form = ClassSelectForm()
     return render(request, 'select_class.html', {'form': form})
@@ -281,8 +285,8 @@ def rank_class(request, show_date, division_name, class_num):
                 form.cleaned_data['sixth']: 0.5,
             }
             show = Show.objects.get(date=show_date)
-            division = show.divisions.filter(name=division_name)[0]
-            class_obj = division.classes.filter(num=class_num)[0]
+            division = show.divisions.get(name=division_name)
+            class_obj = division.classes.get(num=class_num)
 
             participations = class_obj.participations.all()
 
@@ -294,7 +298,7 @@ def rank_class(request, show_date, division_name, class_num):
 
             return redirect('view_class', show_date=show_date, division_name=division_name, class_num=class_num)
 
-            # will redirect with a class rank page
+            
     else:
         form = RankingForm()
         return render(request, 'rank_class.html', {'form': form})
@@ -308,70 +312,20 @@ def add_division(request, show_date):
 
         form = DivisionForm(request.POST)
         if form.is_valid():
-            divisions = Division.objects.filter(name=form.cleaned_date['name'])
+            divisions = show.divisions.filter(name=form.cleaned_data['name'])
             if(len(divisions) > 0):
                 # prepare error message, will display on submit.
-                messages.error(request, "division number in use")
+                messages.error(request, "The division name is in use. Please pick another division name.")
                 return redirect('add_division', show_date=show_date)
-             division_form = DivisionForm(request.POST)
-             division = division_form.save(commit=False)
-             division.show = show
-             division.save()
-         if 'another' in request.POST:
-             return redirect('add_division', show_date)
-         elif 'exit' in request.POST:
-             return redirect('view_show', show_date)
+            division_form = DivisionForm(request.POST)
+            division = division_form.save(commit=False)
+            division.show = show
+            division.save()
+            if 'another' in request.POST:
+                return redirect('add_division', show_date=show_date)
+            elif 'exit' in request.POST:
+                return redirect('view_division', show_date=show_date, division_name=division.name)
 
-        if 'exit' in request.POST:
-            form = DivisionForm(request.POST)
-            if form.is_valid():
-                divisions = Division.objects.filter(name=form.cleaned_data['name'])
-                if(len(divisions) > 0):
-                    messages.error(request, "division name in use") #prepare error message, will display on submit.
-                    return redirect('divisions', show_date)
-                
-                division = Division.objects.get(
-                    name=form.cleaned_data['name'])
-                divisions = show.divisions
-                divisions.add(division)
-                show.save()
-                return redirect('view_show', show_date)
-        if 'another' in request.POST:
-            form = DivisionForm(request.POST)
-            if form.is_valid():
-                divisions = Division.objects.filter(name=form.cleaned_data['name'])
-                if(len(divisions) > 0):
-                    messages.error(request, "division name in use") #prepare error message, will display on submit.
-                    return redirect('divisions', show_date)
-                post = form.save(commit=False)
-                post.author = request.user
-                post.published_date = timezone.now()
-                post.save()
-                division = Division.objects.get(
-                    name=form.cleaned_data['name'])
-                divisions = show.divisions
-                divisions.add(division)
-                show.save()
-                return redirect('add_division', show_date)
-
-        if 'class_add' in request.POST:
-            form = DivisionForm(request.POST)
-            if form.is_valid():
-                divisions = Division.objects.filter(name=form.cleaned_data['name'])
-                if(len(divisions) > 0):
-                    messages.error(request, "division number in use") #prepare error message, will display on submit.
-                    return redirect('divisions', show_date)
-                post = form.save(commit=False)
-                post.author = request.user
-                post.published_date = timezone.now()
-                post.save()
-                division = Division.objects.get(
-                    name=form.cleaned_data['name'])
-                divisions = show.divisions
-                divisions.add(division)
-                show.save()
-                return redirect('view_division', show_date, division.name)
-            return redirect('add_division', show_date)
     else:
         form = DivisionForm()
 
@@ -388,7 +342,7 @@ def add_division(request, show_date):
 def view_division(request, show_date, division_name):
     """ Info about divisions/classes in a show """
     show = Show.objects.get(date=show_date)
-    division = show.divisions.filter(name=division_name)[0]
+    division = show.divisions.get(name=division_name)
     if request.method == 'POST':  # if POST, create a new class for this division
         form = ClassForm(request.POST)
         if form.is_valid():
@@ -398,7 +352,7 @@ def view_division(request, show_date, division_name):
             if existing_classes_count > 0:
                 # prepare error message, will display on submit.
                 messages.error(request, "class number in use")
-                return redirect('view_division', show_date, division_name)
+                return redirect('view_division', show_date=show_date, division_name=division_name)
 
             class_form = ClassForm(request.POST)
             class_obj = class_form.save(commit=False)
@@ -409,22 +363,24 @@ def view_division(request, show_date, division_name):
     else:
         # each division only has a max of 3 classes, no input form if 3 classes present
         division_classes = division.classes.all()
-        form = ClassForm()
         context = {
-            "show_date": show_date,
+            "date": show_date,
             "show_name": show.name,
-            "division_name": division_name,
+            "name": division_name,
             "classes": division_classes,
-            "form": form,
-            }
+        }
+        if(len(division_classes) < 3):
+            form = ClassForm()
+            context['form'] = form
         return render(request, 'view_division.html', context)
+
 
 
 def view_class(request, show_date, division_name, class_num):
     """ render class info including combos in class """
     show = Show.objects.get(date=show_date)
-    division = show.divisions.filter(name=division_name)[0]
-    class_obj = division.classes.filter(num=class_num)[0]
+    division = show.divisions.get(name=division_name)
+    class_obj = division.classes.get(num=class_num)
     combos = class_obj.combos.all()
     
     context = {
@@ -441,10 +397,10 @@ def delete_combo(request, show_date, division_name, class_num, combo):
     """ scratch a combo from the class page so that it reflects in the combo's billing """
     combo = HorseRiderCombo.objects.get(num=combo)
     show = Show.objects.get(date=show_date)
-    division = show.divisions.filter(name=division_name)[0]
-    class_obj = division.classes.filter(num=class_num)[0]
+    division = show.divisions.get(name=division_name)
+    class_obj = division.classes.get(num=class_num)
     combo.classes.remove(class_obj)
-    return redirect('view_class', date=show_date, division_name=division_name, class_num=class_num)
+    return redirect('view_class', show_date=show_date, division_name=division_name, class_num=class_num)
 
 
 def select_division(request, show_date):
@@ -482,7 +438,7 @@ def select_rider2(request, show_date):
         rider_pk = request.POST['rider']
         return redirect('edit_rider', rider_pk=rider_pk, show_date=show_date)
     form = RiderSelectForm()
-    return render(request, 'select_rider2.html', {'form': form, 'show_date': show_date})
+    return render(request, 'select_rider2.html', {'form': form, 'date': show_date})
 
 
 def edit_rider(request, show_date, rider_pk):
@@ -532,7 +488,7 @@ def edit_horse(request, horse_pk, show_date):
     if request.method == "POST":
         edit_form = HorseEditForm(request.POST)
         if edit_form.is_valid():
-            horse.accession_no = edit_form.cleaned_data['accession_no']
+            horse.accession_num = edit_form.cleaned_data['accession_num']
             horse.coggins_date = edit_form.cleaned_data['coggins_date']
             horse.owner = edit_form.cleaned_data['owner']
             horse.type = edit_form.cleaned_data['type']
@@ -540,7 +496,7 @@ def edit_horse(request, horse_pk, show_date):
             horse.save()
 
     edit_horse_form = HorseEditForm(
-        {'accession_no': horse.accession_no, 'coggins_date': horse.coggins_date,
+        {'accession_num': horse.accession_num, 'coggins_date': horse.coggins_date,
          'owner': horse.owner, 'type': horse.type, 'size': horse.size},
         instance=horse)
     return render(request, 'edit_horse.html', {'horse': horse, 'edit_horse_form': edit_horse_form, 'date': show_date})
@@ -608,7 +564,7 @@ def edit_combo(request, show_date, combo_num):
     also handles the addition/removal of classes and the calculation of price
      """
     show = Show.objects.get(date=show_date)
-    combo = show.combos.filter(num=combo_num)[0]
+    combo = show.combos.get(num=combo_num)
     if request.method == "POST":
         if request.POST.get('remove_class'):
             num = request.POST['remove_class']
@@ -642,20 +598,7 @@ def edit_combo(request, show_date, combo_num):
     number_registered_classes = len(registered_classes)
     price = number_registered_classes * 10
 
-    return render(request, 'edit_combo.html', {'combo_num': combo, 'edit_form': edit_form, 'class_selection_form': class_selection_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'show_date': show_date})
-
-
-def populate_pdf(request, show_date):
-    """ This function will be implemented later for desired requirements. Used to populate pdfs for horse show reports """
-    data_dict = {
-        'show': '11/7/2018',
-        'judge': 'Bertha',
-    }  # info to populate the pdf's "show" and "judge" text fields
-    write_fillable_pdf("show/static/VHSA_Results_2015.pdf",
-                       "show/static/VHSA_Final_Results.pdf", data_dict)  # uses "VHSA_Results_2015.pdf" and populates it's fields with the info in data dict, then it saves this new populated pdf to "VHSA_Final_Results.pdf"
-
-    # returns the populated pdf
-    return render(request, 'final_results.html', {"filename": "show/static/VHSA_Final_Results.pdf"})
+    return render(request, 'edit_combo.html', {'combo_num': combo, 'edit_form': edit_form, 'class_selection_form': class_selection_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
 
 
 class ShowAutocomplete(autocomplete.Select2QuerySetView):
