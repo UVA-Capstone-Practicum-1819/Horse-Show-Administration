@@ -205,7 +205,7 @@ def view_division_scores(request, show_date, division_name):
 
     else:
         form = DivisionChampForm()
-    context = {'classes': division.classes.all(),
+    context = {'classes': division.classes.all(), 'date':show_date,
                'name': division_name, 'form': form}
     # passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
     return render(request, 'view_division_scores.html', context)
