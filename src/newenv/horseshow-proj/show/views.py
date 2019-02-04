@@ -387,7 +387,7 @@ def view_class(request, show_date, division_name, class_num):
 
     context = {
         "combos": combos,
-        "number": class_num,
+        "class": class_obj,
         "date": show_date,
         "name": division_name,
         "show_name": show.name,
