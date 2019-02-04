@@ -35,7 +35,16 @@ class AuthRequiredMiddleware(object):
 
         response = self.get_response(request)
         requested_path = request.path
-        if re.match(r'/show.*', requested_path) and not requested_path == "/show/login" and not request.user.is_authenticated:
+        is_user_authenticated = request.user.is_authenticated
+        
+        # if the user is already authenticated, redirect user from login or signup to the index page, otherwise allow them to proceed as normal
+        if re.match(r'/show/(login|signup)/?', requested_path):
+            if not is_user_authenticated:
+                return response
+            else:
+                return redirect('')
+        # if the user is not authenticated, redirect the user from any horseshow page to the login page
+        if not is_user_authenticated:
             return redirect('log_in')
 
         return response
