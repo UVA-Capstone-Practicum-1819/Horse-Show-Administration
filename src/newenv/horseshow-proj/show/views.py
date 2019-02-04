@@ -324,9 +324,9 @@ def add_division(request, show_date):
             if 'another' in request.POST:
                 return redirect('add_division', show_date=show_date)
             elif 'exit' in request.POST:
-                return redirect('view_division', show_date=show_date, division_name=division.name)
+                return redirect('view_show', show_date=show_date)
             elif 'class_add' in request.POST:
-                return redirect('add_class', show_date=show_date, division_name=division.name)
+                return redirect('view_division', show_date=show_date, division_name=division.name)
 
     else:
         form = DivisionForm()
