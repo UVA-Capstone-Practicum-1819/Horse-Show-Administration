@@ -86,7 +86,7 @@ class RiderForm(forms.ModelForm):
     This allows you to enter information for an individual Rider. Birth date is necessary for people who are 18 or younger. Form for a rider with name, address, email, birth date, whether it is a member of the VHSA, and its county
     """
     birth_date = forms.DateField(help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(
-        years=range(1900, 2016)))
+        years=range(1980, 2016)))
 
     class Meta:
         model = Rider
