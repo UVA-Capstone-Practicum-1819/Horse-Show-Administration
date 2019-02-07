@@ -15,7 +15,7 @@
 {% endif %}
 {% endif %}
 
-<form class="form"  method="post" action="{% url 'login' %}">
+<form class="form"  method="post">
     {% csrf_token %}
     <table>
         <tr>
@@ -34,6 +34,6 @@
 
 {% comment %} {# Assumes you setup the password_reset view in your URLconf #}
 <p><a href="{% url 'password_reset' %}">Lost password?</a></p> {% endcomment %}
-<p><a href="{% url 'signup' %}">Sign Up</a></p>
+<p><a href="{% url 'sign_up' %}">Sign Up</a></p>
 
 {% endblock %}

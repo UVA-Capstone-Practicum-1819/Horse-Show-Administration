@@ -3,11 +3,9 @@
 {% block content %}
 {% load crispy_forms_tags %}
 
-<h3>Add Rider</h3>
-<form class="form" action="{% url 'add_rider' %}" method="POST" class="post-form">
-
+<h3>Edit Rider</h3>
+<form method="POST" class="post-form">
   {% csrf_token %} {{ form | crispy}} <button type="submit" class="btn btn-success">Save</button>
-
 </form>
 
 
