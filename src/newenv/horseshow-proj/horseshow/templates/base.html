@@ -8,32 +8,40 @@
 
    <div id="wrapper">
 
-        <!-- Sidebar -->
-        <!-- This is used for navigating the different functionality options of the database ---------->
+        {% comment %} Sidebar {% endcomment %}
+        {% comment %} This is used for navigating the different functionality options of the database {% endcomment %}
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
+
                 <li class="sidebar-brand">
                     <a
                         href="{% url 'select_show' %}">Hoof N' Woof</a>
                 </li>
-                <li>
-                    <a href="{% url 'view_show' show_date=date %}">Show Home Page</a>
-                </li>
-                <li>
-                    <a href="{% url 'add_division' show_date=date %}">Add Division</a>
-                </li>
-                <li>
-                    <a href="{% url 'select_division' show_date=date %}">Edit Division/View Division Score</a>
-                </li>
-                <li>
-                    <a href="{% url 'select_rider' show_date=date %}">Add Horse-Rider Combo to the Database</a>
-                </li>
-                <li>
-                    <a href="{% url 'select_rider2' show_date=date %}">Edit Rider Information</a>
-                </li>
-                <li>
-                    <a href="{% url 'select_horse2' show_date=date %}">Edit Horse Information</a>
-                </li>
+                {% comment %} if a show is currently selected {% endcomment %}
+                {% if date %}
+                
+                    <li>
+                    
+                        <a href="{% url 'view_show' show_date=date %}">Show Home Page</a>
+
+                    </li>
+                    
+                    <li>
+                        <a href="{% url 'add_division' show_date=date %}">Add Division</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'select_division' show_date=date %}">Edit Division/View Division Score</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'select_rider' show_date=date %}">Add Horse-Rider Combo to the Database</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'select_rider2' show_date=date %}">Edit Rider Information</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'select_horse2' show_date=date %}">Edit Horse Information</a>
+                    </li>
+                {% endif %}
                 <li>
                   <form action="{% url 'log_out' %}" method="post" class="form">{% csrf_token %}
                   <button class="btn btn-sm btn-danger" type="submit" >Log Out</button>
