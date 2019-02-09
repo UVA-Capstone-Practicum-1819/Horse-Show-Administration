@@ -49,13 +49,14 @@ class Class(models.Model):
     Model for a single class. Because class is recognized in coding, we changed the name of a 
     """
     class Meta:
-        unique_together = ('division', 'num')
+        unique_together = ('show', 'num')
 
     num = models.IntegerField(default=0)
     name = models.CharField(max_length=100, default="")
     division = models.ForeignKey(
         Division, on_delete=models.CASCADE, related_name="classes", null=True)
-
+    show = models.ForeignKey(
+        Show, on_delete=models.CASCADE, related_name="classes", null=True)
 
 class Horse(models.Model):
     """ 
