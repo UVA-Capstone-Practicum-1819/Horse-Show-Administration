@@ -149,13 +149,21 @@ def select_combo(request, show_date):
 def view_billing(request, show_date, combo_num):
     """ Billing list shows what horse rider combos need to be billed for and their total price """
     show = Show.objects.get(date=show_date)
-    combo = show.combos.get(num=combo_num)
-    classes = combo.classes
+    combo = show.combos.filter(show=show_date).get(num=combo_num)
+    classes = combo.classes.all()
     total = classes.count()
-    price = show.pre_reg_price * total
+    price = 0
+    for classe in classes:
+        class_pre_reg = ClassParticipation.objects.filter(combo=combo).get(participated_class=classe.num)
+        if class_pre_reg.is_preregistered == True:
+            price += show.pre_reg_price
+        else:
+            price += show.day_of_price
+    #total = classes.count()
+    #price = show.pre_reg_price * total
     # for minimum requirements, only calculates price based on pre-registration price
     context = {'name': combo.rider, 'date': show_date,
-               'classes': classes.all(), 'combo_num': combo_num, 'tot': total, 'price': price}
+               'classes': classes.all(), 'combo_num': combo_num, 'tot': total, 'price':price}
     # the context will help create the table for the list of classes a user is currently in
     return render(request, 'view_billing.html', context)
 
@@ -246,6 +254,7 @@ def add_class(request, show_date, division_name):
             class_form = ClassForm(request.POST)
             class_obj = class_form.save(commit=False)
             class_obj.division = division
+            class_obj.show = show_date
             class_obj.save()
             return redirect('view_class', show_date=show_date, division_name=division_name, class_num=class_obj.num)
     else:
@@ -574,17 +583,18 @@ def edit_combo(request, show_date, combo_num):
     if request.method == "POST":
         if request.POST.get('remove_class'):
             num = request.POST['remove_class']
-            selected_class = Class.objects.get(pk=num)
-            combo.classes.remove(selected_class)
-            combo.save()
+            selected_class = ClassParticipation.objects.filter(combo=combo).get(participated_class=num)
+            selected_class.delete()
 
         if request.POST.get('add_class'):
-            class_selection_form = ClassSelectForm(request.POST)
+            class_combo_form = ClassComboForm(request.POST)
 
-            if class_selection_form.is_valid():
-                selected_class = class_selection_form.cleaned_data['selected_class']
-                combo.classes.add(selected_class)
-                combo.save()
+            if class_combo_form.is_valid():
+                selected_class = class_combo_form.cleaned_data['num']
+                is_prereg = class_combo_form.cleaned_data['is_preregistered']
+                class_obj = Class.objects.filter(show=show_date).get(num=selected_class)
+                classParticipation = ClassParticipation(participated_class=class_obj, combo=combo, is_preregistered=is_prereg)
+                classParticipation.save()
 
         elif request.POST.get('edit'):
             edit_form = HorseRiderEditForm(request.POST)
@@ -598,13 +608,13 @@ def edit_combo(request, show_date, combo_num):
     edit_form = HorseRiderEditForm(
         {'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
 
-    class_selection_form = ClassSelectForm()
+    class_combo_form = ClassComboForm()
 
     registered_classes = combo.classes.all()
     number_registered_classes = len(registered_classes)
     price = number_registered_classes * 10
 
-    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_selection_form': class_selection_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
 
 
 class ShowAutocomplete(autocomplete.Select2QuerySetView):

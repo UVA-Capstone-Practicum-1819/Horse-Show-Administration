@@ -22,8 +22,8 @@
 
             <form class="form" method="post">
                 {% csrf_token %}
-                {{ class_selection_form | crispy }}
-                {{ class_selection_form.media}}
+                {{ class_combo_form | crispy }}
+                {{ class_combo_form.media}}
                 <button class="btn bn-default" name="add_class" value="Add" type="submit">Add Class</button>
 
             </form>
