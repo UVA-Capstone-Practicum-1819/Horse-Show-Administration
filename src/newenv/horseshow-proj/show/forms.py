@@ -1,4 +1,5 @@
 from django import forms
+
 from show.models import *
 from .models import *
 import datetime
@@ -13,7 +14,7 @@ class ShowForm(forms.Form):
     """
     name = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'autocomplete': 'off', }))
-    date = forms.DateField(widget=SelectDateWidget())
+    date = forms.DateField(widget=forms.SelectDateWidget())
     location = forms.CharField(
         max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
     day_of_price = forms.IntegerField(label="Day-of Price")
@@ -86,8 +87,9 @@ class RiderForm(forms.ModelForm):
     """
     This allows you to enter information for an individual Rider. Birth date is necessary for people who are 18 or younger. Form for a rider with name, address, email, birth date, whether it is a member of the VHSA, and its county
     """
-    birth_date = forms.DateField(help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(
-        years=range(1980, 2016)))
+
+    birth_date = forms.DateField(
+        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=reversed(range(1920, datetime.date.today().day))))
 
     class Meta:
         model = Rider
@@ -159,9 +161,13 @@ class HorseRiderEditForm(forms.ModelForm):
 
 class RiderEditForm(forms.ModelForm):
     """ for updating a rider """
+    birth_date = forms.DateField(
+        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=reversed(range(1920, datetime.date.today().day))))
+
     class Meta:
         model = Rider
-        fields = ('name', 'address', 'birth_date', 'member_VHSA', 'county')
+        fields = ('name', 'address', 'city', 'state', 'zip_code',
+                  'birth_date', 'member_VHSA', 'county')
 
 
 class HorseEditForm(forms.ModelForm):
