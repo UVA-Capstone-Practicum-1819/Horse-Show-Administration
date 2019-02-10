@@ -5,9 +5,9 @@ import datetime
 
 
 class Show(models.Model):
-    """ 
+    """
     Model for a Show, includes basic information such as name/date/location and a pre_reg_price
-    for riders who sign up for classes early. There is a dayof price for riders who sign up the day of the show. 
+    for riders who sign up for classes early. There is a dayof price for riders who sign up the day of the show.
     """
 
     date = models.CharField(max_length=200, primary_key=True)
@@ -27,8 +27,8 @@ class Show(models.Model):
 
 
 class Division(models.Model):
-    """ 
-    Model for a single division. Includes a name, number for the division, and a champion and champion reserve for the division as well as the points they earned in that division 
+    """
+    Model for a single division. Includes a name, number for the division, and a champion and champion reserve for the division as well as the points they earned in that division
     """
     class Meta:
         unique_together = ('show', 'name')
@@ -45,21 +45,22 @@ class Division(models.Model):
 
 
 class Class(models.Model):
-    """ 
-    Model for a single class. Because class is recognized in coding, we changed the name of a 
+    """
+    Model for a single class. Because class is recognized in coding, we changed the name of a
     """
     class Meta:
-        unique_together = ('division', 'num')
+        unique_together = ('show', 'num')
 
     num = models.IntegerField(default=0)
     name = models.CharField(max_length=100, default="")
+    show = models.CharField(max_length=100, default="")
     division = models.ForeignKey(
         Division, on_delete=models.CASCADE, related_name="classes", null=True)
 
 
 class Horse(models.Model):
-    """ 
-    Model for a horse, includes possible sizes of the horse and the choice to refer to it as a horse or a Pony coggins date is important for health consideration and the owner is not necessarily the riders 
+    """
+    Model for a horse, includes possible sizes of the horse and the choice to refer to it as a horse or a Pony coggins date is important for health consideration and the owner is not necessarily the riders
     """
     alphanumeric_validator = RegexValidator(
         r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
@@ -102,10 +103,10 @@ class Rider(models.Model):
 
 
 class HorseRiderCombo(models.Model):
-    """ 
+    """
     Model that contains information about the HRC. Used to describe the
     relationship between a specific horse and specific rider for the day of the show
-    Class scores are recorded for each class they compete in 
+    Class scores are recorded for each class they compete in
     """
     class Meta:
         unique_together = (('rider', 'horse', 'show'), ('num', 'show'))
@@ -135,8 +136,8 @@ class HorseRiderCombo(models.Model):
 
 
 class ClassParticipation(models.Model):
-    """ 
-    Model for a ClassParticipation. Includes a participating class and a score for that class to be placed under a HorseRider Combo 
+    """
+    Model for a ClassParticipation. Includes a participating class and a score for that class to be placed under a HorseRider Combo
     """
     class Meta:
         unique_together = ('participated_class', 'combo')

@@ -6,7 +6,7 @@
 <div class="row">
     <form method="post">
         {% csrf_token %}
-        
+
       <table class="table">
         <thead>
           <th>Class Name</th>
@@ -27,9 +27,8 @@
               <td>
                 <a
                 class="btn btn-primary btn-sm"
-                href="{% url 'scratch' show_date=date combo_num=num%}?next={{request.path}}&cname={{c.num}}"
                 name="scratch">
-                
+
                 Scratch</a>
               </td>
             </tr>
