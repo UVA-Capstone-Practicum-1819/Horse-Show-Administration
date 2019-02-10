@@ -13,11 +13,12 @@ class ShowForm(forms.Form):
     """
     name = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'autocomplete': 'off', }))
-    date = forms.DateField(initial=datetime.date.today)
+    date = forms.DateField(widget=SelectDateWidget())
     location = forms.CharField(
         max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
     day_of_price = forms.IntegerField(label="Day-of Price")
     pre_reg_price = forms.IntegerField(label="Preregistration Price")
+
 
 class RegistrationBillForm(forms.Form):
     """
@@ -90,7 +91,7 @@ class RiderForm(forms.ModelForm):
 
     class Meta:
         model = Rider
-        fields = ('name', 'address','city', 'state', 'zip_code','email',
+        fields = ('name', 'address', 'city', 'state', 'zip_code', 'email',
                   'birth_date', 'member_VHSA', 'county',)
 
 
@@ -246,6 +247,7 @@ class DivisionForm(forms.ModelForm):
     class Meta:
         model = Division
         fields = ('name',)
+
 
 class DivisionChampForm(forms.ModelForm):
     """
