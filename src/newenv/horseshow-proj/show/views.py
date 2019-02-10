@@ -149,13 +149,21 @@ def select_combo(request, show_date):
 def view_billing(request, show_date, combo_num):
     """ Billing list shows what horse rider combos need to be billed for and their total price """
     show = Show.objects.get(date=show_date)
-    combo = show.combos.get(num=combo_num)
-    classes = combo.classes
+    combo = show.combos.filter(show=show_date).get(num=combo_num)
+    classes = combo.classes.all()
     total = classes.count()
-    price = show.pre_reg_price * total
+    price = 0
+    for classe in classes:
+        class_pre_reg = ClassParticipation.objects.filter(combo=combo).get(participated_class=classe.num)
+        if class_pre_reg.is_preregistered == True:
+            price += show.pre_reg_price
+        else:
+            price += show.day_of_price
+    #total = classes.count()
+    #price = show.pre_reg_price * total
     # for minimum requirements, only calculates price based on pre-registration price
     context = {'name': combo.rider, 'date': show_date,
-               'classes': classes.all(), 'combo_num': combo_num, 'tot': total, 'price': price}
+               'classes': classes.all(), 'combo_num': combo_num, 'tot': total, 'price':price}
     # the context will help create the table for the list of classes a user is currently in
     return render(request, 'view_billing.html', context)
 
@@ -583,8 +591,9 @@ def edit_combo(request, show_date, combo_num):
 
             if class_combo_form.is_valid():
                 selected_class = class_combo_form.cleaned_data['num']
+                is_prereg = class_combo_form.cleaned_data['is_preregistered']
                 class_obj = Class.objects.filter(show=show_date).get(num=selected_class)
-                classParticipation = ClassParticipation(participated_class=class_obj, combo=combo)
+                classParticipation = ClassParticipation(participated_class=class_obj, combo=combo, is_preregistered=is_prereg)
                 classParticipation.save()
 
         elif request.POST.get('edit'):
