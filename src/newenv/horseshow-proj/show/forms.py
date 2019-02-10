@@ -6,6 +6,7 @@ import datetime
 from django.forms import HiddenInput, formset_factory
 from dal import autocomplete
 from django.core.exceptions import ValidationError
+from localflavor.us.forms import USStateField, USZipCodeField, USStateSelect
 
 
 class ShowForm(forms.Form):
@@ -90,6 +91,9 @@ class RiderForm(forms.ModelForm):
 
     birth_date = forms.DateField(
         help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=reversed(range(1920, datetime.date.today().day))))
+    state = USStateField(widget=USStateSelect)
+
+    zip_code = USZipCodeField()
 
     class Meta:
         model = Rider
@@ -154,6 +158,7 @@ class HorseRiderComboCreateForm(forms.ModelForm):
 
 class HorseRiderEditForm(forms.ModelForm):
     """ for updating a horse-rider combo """
+
     class Meta:
         model = HorseRiderCombo
         fields = ('contact', 'email', 'cell')
@@ -163,6 +168,10 @@ class RiderEditForm(forms.ModelForm):
     """ for updating a rider """
     birth_date = forms.DateField(
         help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=reversed(range(1920, datetime.date.today().day))))
+
+    state = USStateField(widget=USStateSelect)
+
+    zip_code = USZipCodeField()
 
     class Meta:
         model = Rider
@@ -219,9 +228,11 @@ class RemoveClassForm(forms.Form):
     """ # This allows the user to remove classes by entering the class number """
     num = models.IntegerField()
 
+
 class ClassComboForm(forms.ModelForm):
     """ # This allows the user to add classes for a specific combo by entering the class number """
     is_preregistered = forms.BooleanField()
+
     class Meta:
         model = Class
         fields = ('num',)
