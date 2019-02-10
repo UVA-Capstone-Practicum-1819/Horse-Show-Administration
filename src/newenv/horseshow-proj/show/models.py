@@ -10,7 +10,7 @@ class Show(models.Model):
     for riders who sign up for classes early. There is a dayof price for riders who sign up the day of the show.
     """
 
-    date = models.CharField(max_length=200, primary_key=True)
+    date = models.CharField(primary_key=True, max_length=100)
 
     name = models.CharField(max_length=100)
 
@@ -59,6 +59,7 @@ class Class(models.Model):
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, related_name="classes", null=True)
 
+
 class Horse(models.Model):
     """
     Model for a horse, includes possible sizes of the horse and the choice to refer to it as a horse or a Pony coggins date is important for health consideration and the owner is not necessarily the riders
@@ -76,8 +77,11 @@ class Horse(models.Model):
     coggins_date = models.DateField(
         default=datetime.date.today,  verbose_name="Coggins Date", )
     owner = models.CharField(max_length=200, verbose_name="Owner")
-    type = models.CharField(max_length=200, choices=type_choices, default="Horse", verbose_name="Type")
-    size = models.CharField(max_length=200, choices=size_choices, default="N/A", verbose_name="Size (if pony)")
+    type = models.CharField(
+        max_length=200, choices=type_choices, default="Horse", verbose_name="Type")
+    size = models.CharField(max_length=200, choices=size_choices,
+                            default="N/A", verbose_name="Size (if pony)")
+
     def __str__(self):
         return self.name
 
