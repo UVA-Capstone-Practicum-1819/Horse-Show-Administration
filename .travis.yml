@@ -8,6 +8,7 @@ install:
   - pip3 install django-autocomplete-light
   - pip3 install pdfrw
   - pip3 install django-crispy-forms
+  - pip3 install django-localflavor
 
 script:
   - python3 src/newenv/horseshow-proj/manage.py makemigrations
