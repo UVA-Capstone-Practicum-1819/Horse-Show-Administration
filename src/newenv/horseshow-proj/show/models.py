@@ -2,7 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, EmailValidator, RegexValidator
 import random
 import datetime
-
+from localflavor.us.models import USStateField, USZipCodeField
 
 class Show(models.Model):
     """
@@ -93,8 +93,8 @@ class Rider(models.Model):
     name = models.CharField(max_length=200, verbose_name="Name")
     address = models.CharField(max_length=200, verbose_name="Street Address")
     city = models.CharField(default="", max_length=200)
-    state = models.CharField(default="", max_length=200)
-    zip_code = models.IntegerField(default=0)
+    state = models.USStateField(default="VA")
+    zip_code = models.USZipCodeField()
     birth_date = models.DateField(
         blank=True, null=True, verbose_name="Birth Date", )
     member_VHSA = models.BooleanField(
