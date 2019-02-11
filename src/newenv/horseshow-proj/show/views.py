@@ -147,7 +147,8 @@ def select_combo(request, show_date):
 
 
 def view_billing(request, show_date, combo_num):
-    """ Billing list shows what horse rider combos need to be billed for and their total price """
+    """ Billing list shows what horse rider combos need to be billed for and their total price based on
+    whether or not they are pregistered for each class """
     show = Show.objects.get(date=show_date)
     combo = show.combos.filter(show=show_date).get(num=combo_num)
     classes = combo.classes.all()
@@ -155,7 +156,7 @@ def view_billing(request, show_date, combo_num):
     price = 0
     for classe in classes:
         class_pre_reg = ClassParticipation.objects.filter(combo=combo).get(participated_class=classe.num)
-        if class_pre_reg.is_preregistered == True:
+        if class_pre_reg.is_prereg == True:
             price += show.pre_reg_price
         else:
             price += show.day_of_price
@@ -576,7 +577,7 @@ def add_combo(request, show_date):
 def edit_combo(request, show_date, combo_num):
     """
     edits the combination that was specified by num
-    also handles the addition/removal of classes and the calculation of price
+    also handles the addition/removal of classes based on num and the calculation of price
      """
     show = Show.objects.get(date=show_date)
     combo = show.combos.get(num=combo_num)
