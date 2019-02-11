@@ -14,16 +14,11 @@ class Show(models.Model):
     Model for a Show, includes basic information such as name/date/location and a pre_reg_price
     for riders who sign up for classes early. There is a dayof price for riders who sign up the day of the show.
     """
-
     date = models.CharField(primary_key=True, max_length=100)
-
     name = models.CharField(max_length=100)
-
     location = models.CharField(max_length=100)
-
     day_of_price = models.IntegerField(
         blank=True, null=True, default=0, verbose_name="Day-of Price")
-
     pre_reg_price = models.IntegerField(
         blank=True, null=True, default=0, verbose_name="Preregistration Price")
 
@@ -63,6 +58,13 @@ class Class(models.Model):
         Division, on_delete=models.CASCADE, related_name="classes", null=True)
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, related_name="classes", null=True)
+    first = models.IntegerField(default=0)
+    second = models.IntegerField(default=0)
+    third = models.IntegerField(default=0)
+    fourth = models.IntegerField(default=0)
+    fifth = models.IntegerField(default=0)
+    sixth = models.IntegerField(default=0)
+
 
 
 class Horse(models.Model):
@@ -100,6 +102,8 @@ class Rider(models.Model):
     city = models.CharField(default="", max_length=200)
     state = USStateField(default="VA")
     zip_code = USZipCodeField()
+    adult = models.BooleanField(
+        default=False, verbose_name="Adult")
     birth_date = models.DateField(
         blank=True, null=True, verbose_name="Birth Date", )
     member_VHSA = models.BooleanField(

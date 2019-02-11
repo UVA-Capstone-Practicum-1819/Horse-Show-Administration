@@ -97,7 +97,7 @@ class RiderForm(forms.ModelForm):
     class Meta:
         model = Rider
         fields = ('name', 'address', 'city', 'state', 'zip_code', 'email',
-                  'birth_date', 'member_VHSA', 'county',)
+                  'adult', 'birth_date', 'member_VHSA', 'county',)
 
 
 class RiderSelectForm(forms.ModelForm):
