@@ -9,16 +9,11 @@ class Show(models.Model):
     Model for a Show, includes basic information such as name/date/location and a pre_reg_price
     for riders who sign up for classes early. There is a dayof price for riders who sign up the day of the show. 
     """
-
     date = models.CharField(max_length=200, primary_key=True)
-
     name = models.CharField(max_length=100)
-
     location = models.CharField(max_length=100)
-
     day_of_price = models.IntegerField(
         blank=True, null=True, default=0, verbose_name="Day-of Price")
-
     pre_reg_price = models.IntegerField(
         blank=True, null=True, default=0, verbose_name="Preregistration Price")
 
@@ -57,6 +52,13 @@ class Class(models.Model):
         Division, on_delete=models.CASCADE, related_name="classes", null=True)
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, related_name="classes", null=True)
+    first = models.IntegerField(default=0)
+    second = models.IntegerField(default=0)
+    third = models.IntegerField(default=0)
+    fourth = models.IntegerField(default=0)
+    fifth = models.IntegerField(default=0)
+    sixth = models.IntegerField(default=0)
+
 
 class Horse(models.Model):
     """ 
@@ -75,8 +77,11 @@ class Horse(models.Model):
     coggins_date = models.DateField(
         default=datetime.date.today,  verbose_name="Coggins Date", )
     owner = models.CharField(max_length=200, verbose_name="Owner")
-    type = models.CharField(max_length=200, choices=type_choices, default="Horse", verbose_name="Type")
-    size = models.CharField(max_length=200, choices=size_choices, default="N/A", verbose_name="Size (if pony)")
+    type = models.CharField(
+        max_length=200, choices=type_choices, default="Horse", verbose_name="Type")
+    size = models.CharField(max_length=200, choices=size_choices,
+                            default="N/A", verbose_name="Size (if pony)")
+
     def __str__(self):
         return self.name
 
@@ -90,6 +95,8 @@ class Rider(models.Model):
     city = models.CharField(default="", max_length=200)
     state = models.CharField(default="", max_length=200)
     zip_code = models.IntegerField(default=0)
+    adult = models.BooleanField(
+        default=False, verbose_name="Adult")
     birth_date = models.DateField(
         blank=True, null=True, verbose_name="Birth Date", )
     member_VHSA = models.BooleanField(
