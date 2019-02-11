@@ -2,7 +2,7 @@ fix models so there can be multiple shows, modify urls - Tarun (fully done)
 
 Readjusting functionality/queries to handle multiple shows - everyone (done)
 
-UI and pricing - Shannon
+UI and pricing - Shannon (done)
 
 Pricing - Shivani
 
