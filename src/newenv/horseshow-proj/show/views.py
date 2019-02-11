@@ -4,6 +4,9 @@ import os
 import json
 import pdfrw
 import datetime
+import io
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
@@ -246,6 +249,7 @@ def add_class(request, show_date, division_name):
             class_form = ClassForm(request.POST)
             class_obj = class_form.save(commit=False)
             class_obj.division = division
+            class_obj.show = show
             class_obj.save()
             return redirect('view_class', show_date=show_date, division_name=division_name, class_num=class_obj.num)
     else:
@@ -671,7 +675,194 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(division_name__istartswith=self.q)
         return qs
 
+def populate_pdf_division(division_name, page, show, d):
+    for division in Division.objects.filter(name__icontains=division_name):
+        if division.show.date == show.date:
+            # print(division.name)
+            dp = "p" + str(page)
+            d[dp + "_show_name"] = show.name
+            d[dp + "_show_date"] = show.date
+            int = 1
+            for c in Class.objects.filter(division__name__icontains=division_name):
+                if c.show.date == show.date:
+                    # print(c.num)
+                    s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
+                    d[s] = c.num # add to the dictionary the class number
+                    e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
+    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                    # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
+                        # print(combo.horse.name)
+                        # print(combo.rider.name)
+                        # print(combo.horse.owner)
+                    list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
+                    for i in range(1,7): # for i range from 1st place to 6th place
+                        # set the keys to the right combo, owner and rider text fields
+                        shorse = s + '_combo' + str(i)
+                        sowner = s + '_owner' + str(i)
+                        srider = s + '_rider' + str(i)
+                        if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
+                            try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                                combo = HorseRiderCombo.objects.get(num=list[i-1])
+                                d[shorse] = combo.horse # write to pdf the correct combo to that rank
+                                d[srider] = combo.rider.name
+                                d[sowner] = combo.horse.owner
+                            except ObjectDoesNotExist:
+                                print("")
+                int += 1
 
+def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, bool_combine):
+    for division in Division.objects.filter(name__icontains=division_name):
+        if division.show.date == show.date:
+            # print(division.name)
+            dp = "p" + str(page1)
+            dp2 = "p" + str(page2)
+            d[dp + "_show_name"] = show.name
+            d[dp + "_show_date"] = show.date
+            int = 1
+            for c in Class.objects.filter(division__name__icontains=division_name):
+                if c.show.date == show.date:
+                    s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
+                    d[s] = c.num # add to the dictionary the class number
+                    e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
+    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                    # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
+                        # print(combo.horse.name)
+                        # print(combo.rider.name)
+                        # print(combo.horse.owner)
+                    list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
+                    for i in range(1,7): # for i range from 1st place to 6th place
+                        # set the keys to the right combo, owner and rider text fields
+                        shorse = s + '_combo' + str(i)
+                        sowner = s + '_owner' + str(i)
+                        srider = s + '_rider' + str(i)
+                        if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
+                            try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                                combo = HorseRiderCombo.objects.get(num=list[i-1])
+                                if combo.rider.adult is False:
+                                    d[shorse] = combo.horse # write to pdf the correct combo to that rank
+                                    d[srider] = combo.rider.name
+                                    d[sowner] = combo.horse.owner
+                                else:
+                                    bool_combine = True
+                                    d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
+                                    d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.rider.name
+                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.horse.owner
+                                
+                            except ObjectDoesNotExist:
+                                print("")
+                    if bool_combine is True:
+                        # print(c.num)
+                        d[dp2 + "_show_name"] = show.name
+                        d[dp2 + "_show_date"] = show.date
+                        s = dp2 + '_c' + str(int) # set the key to the right class (initially c1) text field
+                        d[s] = c.num # add to the dictionary the class number
+                        e = dp2 + '_e' + str(int) # set the key to the right entry (initially c1) text field
+        #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                int += 1
+    return bool_combine
+
+def populate_pdf_division_combine_by_hsize(division_name, page1, page2, show, d, bool_combine):
+    for division in Division.objects.filter(name__icontains=division_name):
+        if division.show.date == show.date:
+            # print(division.name)
+            dp = "p" + str(page1)
+            dp2 = "p" + str(page2)
+            d[dp + "_show_name"] = show.name
+            d[dp + "_show_date"] = show.date
+            int = 1
+            for c in Class.objects.filter(division__name__icontains=division_name):
+                if c.show.date == show.date:
+                    s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
+                    d[s] = c.num # add to the dictionary the class number
+                    e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
+    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                    # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
+                        # print(combo.horse.name)
+                        # print(combo.rider.name)
+                        # print(combo.horse.owner)
+                    list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
+                    for i in range(1,7): # for i range from 1st place to 6th place
+                        # set the keys to the right combo, owner and rider text fields
+                        shorse = s + '_combo' + str(i)
+                        sowner = s + '_owner' + str(i)
+                        srider = s + '_rider' + str(i)
+                        if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
+                            try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                                combo = HorseRiderCombo.objects.get(num=list[i-1])
+                                print(combo.horse.size)
+                                if combo.horse.type == "pony":
+                                    if combo.horse.size == "large":
+                                        d[shorse] = combo.horse # write to pdf the correct combo to that rank
+                                        d[srider] = combo.rider.name
+                                        d[sowner] = combo.horse.owner
+                                    elif combo.horse.size == "medium" or combo.horse.size == "small":
+                                        bool_combine = True
+                                        d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
+                                        d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.rider.name
+                                        d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.horse.owner
+                            except ObjectDoesNotExist:
+                                print("")
+                    if bool_combine is True:
+                        # print(c.num)
+                        d[dp2 + "_show_name"] = show.name
+                        d[dp2 + "_show_date"] = show.date
+                        s = dp2 + '_c' + str(int) # set the key to the right class (initially c1) text field
+                        d[s] = c.num # add to the dictionary the class number
+                        e = dp2 + '_e' + str(int) # set the key to the right entry (initially c1) text field
+        #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                int += 1
+    return bool_combine
+
+def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d, bool_combine):
+    for division in Division.objects.filter(name__icontains=division_name):
+        if division.show.date == show.date:
+            # print(division.name)
+            dp = "p" + str(page1)
+            dp2 = "p" + str(page2)
+            d[dp + "_show_name"] = show.name
+            d[dp + "_show_date"] = show.date
+            int = 1
+            for c in Class.objects.filter(division__name__icontains=division_name):
+                if c.show.date == show.date:
+                    s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
+                    d[s] = c.num # add to the dictionary the class number
+                    e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
+    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                    # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
+                        # print(combo.horse.name)
+                        # print(combo.rider.name)
+                        # print(combo.horse.owner)
+                    list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
+                    for i in range(1,7): # for i range from 1st place to 6th place
+                        # set the keys to the right combo, owner and rider text fields
+                        shorse = s + '_combo' + str(i)
+                        sowner = s + '_owner' + str(i)
+                        srider = s + '_rider' + str(i)
+                        if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
+                            try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                                combo = HorseRiderCombo.objects.get(num=list[i-1])
+                                print(combo.horse.type)
+                                if combo.horse.type == "pony":
+                                    d[shorse] = combo.horse # write to pdf the correct combo to that rank
+                                    d[srider] = combo.rider.name
+                                    d[sowner] = combo.horse.owner
+                                else:
+                                    bool_combine = True
+                                    d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
+                                    d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.rider.name
+                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.horse.owner
+                            except ObjectDoesNotExist:
+                                print("")
+                    if bool_combine is True:
+                        # print(c.num)
+                        d[dp2 + "_show_name"] = show.name
+                        d[dp2 + "_show_date"] = show.date
+                        s = dp2 + '_c' + str(int) # set the key to the right class (initially c1) text field
+                        d[s] = c.num # add to the dictionary the class number
+                        e = dp2 + '_e' + str(int) # set the key to the right entry (initially c1) text field
+        #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                int += 1
+    return bool_combine
 
 def populate_pdf(request, show_date): # populates text fields of PDF
     """ populate pdf for VHSA horse show reports """
@@ -680,110 +871,72 @@ def populate_pdf(request, show_date): # populates text fields of PDF
         'p2_show_name': show.name,
         'p2_show_date': show_date,
     } #populate the 2nd page of pdf with the show name and show time.
+    p3_combine = False
+    p4_combine = False
+    p5_combine = False
+    p6_combine = False
+    p7_combine = False
+    p8_combine = False
 
-    try: # p4 Amateur Hunter
-        # if the division name in the database contains "Amateur Hunter"
-        div_amateur = show.divisions.get(name__icontains="Amateur Hunter")
-        # fill in show name and show date
-        d["p4_show_name"] = show.name
-        d["p4_show_date"] = show_date
-        int = 1 #start int value at 1
-        for c in div_amateur.classes.all(): # for all the classes in "Amateur Hunter"
-            s = 'p4_c' + str(int) # set the key to the right class (initially c1) text field
-            d[s] = c.number # add to the dictionary the class number
-            e = 'p4_e' + str(int) # set the key to the right entry (initially c1) text field
-            # d[e] =  # system does not keep track of entry yep need to update then fix this line
-            list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
-            for i in range(1,7): # for i range from 1st place to 6th place
-                # set the keys to the right combo, owner and rider text fields
-                scombo = s + '_combo' + str(i)
-                sowner = s + '_owner' + str(i)
-                srider = s + '_rider' + str(i)
-                if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
-                    d[scombo] = list[i-1] # write to pdf the correct combo to that rank
-                try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
-                    combo = HorseRiderCombo.objects.get(num=list[i-1])
-                    d[srider] = combo.rider
-                    d[sowner] = combo.horse.owner
-                except ObjectDoesNotExist:
-                    print("")
-            print(scombo)
-            int += 1 # increment to write to the next class section
+    # p3 Junior/Children's Hunter
+    # p4 Amateur Hunter
+    try: 
+        p3_combine = populate_pdf_division_combine_by_age("Amateur", 3, 4, show, d, p3_combine)
+        print(p3_combine)
+
     except ObjectDoesNotExist:
         print("")
-
+                    
     #p5 Small/Medium Pony Hunter
     #p6 Large Pony Hunter
-    #p7 green hunter pony, p8 green hunter horse
-
-    try: # p9 Thoroughbred Hunter
-        # if the division name in the database contains "Thoroughbred"
-        div_amateur = show.divisions.get(name__icontains="Thoroughbred")
-        # fill in show name and show date
-        d["p9_show_name"] = show.name
-        d["p9_show_date"] = show_date
-        int = 1 #start int value at 1
-        for c in div_amateur.classes.all(): # for all the classes in "Thoroughbred"
-            s = 'p9_c' + str(int) # set the key to the right class (initially c1) text field
-            d[s] = c.number # add to the dictionary the class number
-            e = 'p9_e' + str(int) # set the key to the right entry (initially c1) text field
-            # d[e] =  # system does not keep track of entry yep need to update then fix this line
-            list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
-            for i in range(1,7): # for i range from 1st place to 6th place
-                # set the keys to the right combo, owner and rider text fields
-                scombo = s + '_combo' + str(i)
-                sowner = s + '_owner' + str(i)
-                srider = s + '_rider' + str(i)
-                if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
-                    d[scombo] = list[i-1] # write to pdf the correct combo to that rank
-                try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
-                    combo = HorseRiderCombo.objects.get(num=list[i-1])
-                    d[srider] = combo.rider
-                    d[sowner] = combo.horse.owner
-                except ObjectDoesNotExist:
-                    print("")
-            print(scombo)
-            int += 1 # increment to write to the next class section
+    try: 
+        p5_combine = populate_pdf_division_combine_by_hsize("Pony Hunter", 5, 6, show, d, p5_combine)
+        print(p5_combine)
     except ObjectDoesNotExist:
         print("")
 
-    #p10 working hunter
-    try: # p9 Thoroughbred Hunter
-        # if the division name in the database contains "Thoroughbred"
-        div_amateur = show.divisions.get(name__icontains="Thoroughbred")
-        # fill in show name and show date
-        d["p9_show_name"] = show.name
-        d["p9_show_date"] = show_date
-        int = 1 #start int value at 1
-        for c in div_amateur.classes.all(): # for all the classes in "Thoroughbred"
-            s = 'p9_c' + str(int) # set the key to the right class (initially c1) text field
-            d[s] = c.number # add to the dictionary the class number
-            e = 'p9_e' + str(int) # set the key to the right entry (initially c1) text field
-            # d[e] =  # system does not keep track of entry yep need to update then fix this line
-            list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
-            for i in range(1,7): # for i range from 1st place to 6th place
-                # set the keys to the right combo, owner and rider text fields
-                scombo = s + '_combo' + str(i)
-                sowner = s + '_owner' + str(i)
-                srider = s + '_rider' + str(i)
-                if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
-                    d[scombo] = list[i-1] # write to pdf the correct combo to that rank
-                try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
-                    combo = HorseRiderCombo.objects.get(num=list[i-1])
-                    d[srider] = combo.rider
-                    d[sowner] = combo.horse.owner
-                except ObjectDoesNotExist:
-                    print("")
-            print(scombo)
-            int += 1 # increment to write to the next class section
+    # p7 green hunter pony
+    # p8 green hunter horse
+    try: 
+        p7_combine = populate_pdf_division_combine_by_htype("Green Hunter", 7, 8, show, d, p7_combine)
+        print(p7_combine)
     except ObjectDoesNotExist:
         print("")
-    #p11 Hunter Pleasure Pony
-    #p12 Junior Hunter Pleasure Horse
-    #p13 Adult Hunter Pleasure Horse
-    #p14 Hunter Short Stirrup
-    #p15 Associate Equitation Classes (adult/children/pony)
-    #p16 Associate Equitation On the Flat Classes (adult/children)
-    #p17
+
+    # #p15 Associate Equitation Classes (adult/children/pony)
+    # #p16 Associate Equitation On the Flat Classes (adult/children)
+    # #p17
+
+    try: # p9 Thoroughbred Hunter
+        populate_pdf_division("Thoroughbred Hunter", 9, show, d)
+    except ObjectDoesNotExist:
+        print("")
+   
+    try: # p10 working Hunter
+        populate_pdf_division("Working", 10, show, d)
+    except ObjectDoesNotExist:
+        print("")
+    
+    try: #p11 Hunter Pleasure Pony
+        populate_pdf_division("Hunter Pleasure Pony", 11, show, d)
+    except ObjectDoesNotExist:
+        print("")
+
+    try: #p12 Junior Hunter Pleasure Horse
+        populate_pdf_division("Junior Hunter Pleasure", 12, show, d)
+    except ObjectDoesNotExist:
+        print("")
+
+    try: #p13 Adult Hunter Pleasure Horse
+        populate_pdf_division("Adult Hunter Pleasure", 13, show, d)
+    except ObjectDoesNotExist:
+        print("")
+
+    try: #p14 Hunter Short Stirrup
+        populate_pdf_division("Short Stirrup", 14, show, d)
+    except ObjectDoesNotExist:
+        print("")
     write_fillable_pdf("show/static/VHSA_Results_2015.pdf",
                        "show/static/VHSA_Final_Results.pdf", d) #uses "VHSA_Results_2015.pdf" and populates it's fields with the info in data dict, then it saves this new populated pdf to "VHSA_Final_Results.pdf"
+
+    return render(request, 'final_results.html', {"filename": "show/static/VHSA_Final_Results.pdf"}) #returns the populated pdf
