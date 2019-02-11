@@ -3,13 +3,18 @@ from django.core.validators import MinValueValidator, MaxValueValidator, EmailVa
 import random
 import datetime
 
+from localflavor.us.models import USStateField, USZipCodeField
+
+from django.core.exceptions import ValidationError
+
+
 
 class Show(models.Model):
-    """ 
-    Model for a Show, includes basic information such as name/date/location and a pre_reg_price
-    for riders who sign up for classes early. There is a dayof price for riders who sign up the day of the show. 
     """
-    date = models.CharField(max_length=200, primary_key=True)
+    Model for a Show, includes basic information such as name/date/location and a pre_reg_price
+    for riders who sign up for classes early. There is a dayof price for riders who sign up the day of the show.
+    """
+    date = models.CharField(primary_key=True, max_length=100)
     name = models.CharField(max_length=100)
     location = models.CharField(max_length=100)
     day_of_price = models.IntegerField(
@@ -22,8 +27,8 @@ class Show(models.Model):
 
 
 class Division(models.Model):
-    """ 
-    Model for a single division. Includes a name, number for the division, and a champion and champion reserve for the division as well as the points they earned in that division 
+    """
+    Model for a single division. Includes a name, number for the division, and a champion and champion reserve for the division as well as the points they earned in that division
     """
     class Meta:
         unique_together = ('show', 'name')
@@ -40,14 +45,15 @@ class Division(models.Model):
 
 
 class Class(models.Model):
-    """ 
-    Model for a single class. Because class is recognized in coding, we changed the name of a 
+    """
+    Model for a single class. Because class is recognized in coding, we changed the name of a
     """
     class Meta:
         unique_together = ('show', 'num')
 
     num = models.IntegerField(default=0)
     name = models.CharField(max_length=100, default="")
+    show = models.CharField(max_length=100, default="")
     division = models.ForeignKey(
         Division, on_delete=models.CASCADE, related_name="classes", null=True)
     show = models.ForeignKey(
@@ -60,9 +66,10 @@ class Class(models.Model):
     sixth = models.IntegerField(default=0)
 
 
+
 class Horse(models.Model):
-    """ 
-    Model for a horse, includes possible sizes of the horse and the choice to refer to it as a horse or a Pony coggins date is important for health consideration and the owner is not necessarily the riders 
+    """
+    Model for a horse, includes possible sizes of the horse and the choice to refer to it as a horse or a Pony coggins date is important for health consideration and the owner is not necessarily the riders
     """
     alphanumeric_validator = RegexValidator(
         r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
@@ -73,7 +80,7 @@ class Horse(models.Model):
     name = models.CharField(primary_key=True, max_length=200,
                             verbose_name="Name (Barn Name)")
     accession_num = models.CharField(
-        max_length=200, verbose_name="Accession Number", validators=[alphanumeric_validator])
+        max_length=20, verbose_name="Accession Number", validators=[alphanumeric_validator])
     coggins_date = models.DateField(
         default=datetime.date.today,  verbose_name="Coggins Date", )
     owner = models.CharField(max_length=200, verbose_name="Owner")
@@ -93,8 +100,8 @@ class Rider(models.Model):
     name = models.CharField(max_length=200, verbose_name="Name")
     address = models.CharField(max_length=200, verbose_name="Street Address")
     city = models.CharField(default="", max_length=200)
-    state = models.CharField(default="", max_length=200)
-    zip_code = models.IntegerField(default=0)
+    state = USStateField(default="VA")
+    zip_code = USZipCodeField()
     adult = models.BooleanField(
         default=False, verbose_name="Adult")
     birth_date = models.DateField(
@@ -110,10 +117,10 @@ class Rider(models.Model):
 
 
 class HorseRiderCombo(models.Model):
-    """ 
+    """
     Model that contains information about the HRC. Used to describe the
     relationship between a specific horse and specific rider for the day of the show
-    Class scores are recorded for each class they compete in 
+    Class scores are recorded for each class they compete in
     """
     class Meta:
         unique_together = (('rider', 'horse', 'show'), ('num', 'show'))
@@ -138,13 +145,19 @@ class HorseRiderCombo(models.Model):
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, null=True, related_name='combos')
 
+
     def __str__(self):
         return f"Show: {str(self.show.date)}, Number: {self.num}, Rider: {self.rider.name}, Horse: {self.horse.name}"
 
+def validate_unique(self, exclude=None):
+    qs = HorseRiderCombo.objects.filter(rider=self.rider, horse=self.horse)
+    if self.pk is None:
+        if qs.filter(r=self.rider).exists() and qs.filter(h=self.horse.exists()):
+            raise ValidationError("HRC already exists")
 
 class ClassParticipation(models.Model):
-    """ 
-    Model for a ClassParticipation. Includes a participating class and a score for that class to be placed under a HorseRider Combo 
+    """
+    Model for a ClassParticipation. Includes a participating class and a score for that class to be placed under a HorseRider Combo
     """
     class Meta:
         unique_together = ('participated_class', 'combo')

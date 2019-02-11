@@ -24,6 +24,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 
 
 class AuthRequiredMiddleware(object):
@@ -153,13 +154,21 @@ def select_combo(request, show_date):
 def view_billing(request, show_date, combo_num):
     """ Billing list shows what horse rider combos need to be billed for and their total price """
     show = Show.objects.get(date=show_date)
-    combo = show.combos.get(num=combo_num)
-    classes = combo.classes
+    combo = show.combos.filter(show=show_date).get(num=combo_num)
+    classes = combo.classes.all()
     total = classes.count()
-    price = show.pre_reg_price * total
+    price = 0
+    for classe in classes:
+        class_pre_reg = ClassParticipation.objects.filter(combo=combo).get(participated_class=classe.num)
+        if class_pre_reg.is_preregistered == True:
+            price += show.pre_reg_price
+        else:
+            price += show.day_of_price
+    #total = classes.count()
+    #price = show.pre_reg_price * total
     # for minimum requirements, only calculates price based on pre-registration price
     context = {'name': combo.rider, 'date': show_date,
-               'classes': classes.all(), 'combo_num': combo_num, 'tot': total, 'price': price}
+               'classes': classes.all(), 'combo_num': combo_num, 'tot': total, 'price':price}
     # the context will help create the table for the list of classes a user is currently in
     return render(request, 'view_billing.html', context)
 
@@ -250,7 +259,7 @@ def add_class(request, show_date, division_name):
             class_form = ClassForm(request.POST)
             class_obj = class_form.save(commit=False)
             class_obj.division = division
-            class_obj.show = show
+            class_obj.show = show_date
             class_obj.save()
             return redirect('view_class', show_date=show_date, division_name=division_name, class_num=class_obj.num)
     else:
@@ -277,6 +286,9 @@ def rank_class(request, show_date, division_name, class_num):
         specific horse rider combos that competed in that class and were awarded points
         points are always starting from 10, then 6, and so on
     """
+    show = Show.objects.get(date=show_date)
+    division = show.divisions.get(name=division_name)
+    class_obj = division.classes.get(num=class_num)
     if request.method == 'POST':
 
         form = RankingForm(request.POST)
@@ -289,9 +301,7 @@ def rank_class(request, show_date, division_name, class_num):
                 form.cleaned_data['fifth']: 1,
                 form.cleaned_data['sixth']: 0.5,
             }
-            show = Show.objects.get(date=show_date)
-            division = show.divisions.get(name=division_name)
-            class_obj = division.classes.get(num=class_num)
+            
 
             participations = class_obj.participations.all()
 
@@ -305,8 +315,9 @@ def rank_class(request, show_date, division_name, class_num):
 
 
     else:
-        form = RankingForm()
-        return render(request, 'rank_class.html', {'form': form})
+        form = RankingForm(show_date=show_date)
+        context = {'form': form }
+        return render(request, 'rank_class.html', context)
 
 
 def add_division(request, show_date):
@@ -460,16 +471,20 @@ def edit_rider(request, show_date, rider_pk):
         if edit_form.is_valid():
             rider.name = edit_form.cleaned_data['name']
             rider.address = edit_form.cleaned_data['address']
+            rider.city = edit_form.cleaned_data['city']
+            rider.state = edit_form.cleaned_data['state']
+            rider.zip_code = edit_form.cleaned_data['zip_code']
             rider.birth_date = edit_form.cleaned_data['birth_date']
             rider.member_VHSA = edit_form.cleaned_data['member_VHSA']
             rider.county = edit_form.cleaned_data['county']
+            
             rider.save()
-
-    edit_rider_form = RiderEditForm(
-        {'name': rider.name, 'address': rider.address,
+    else:
+        edit_form = RiderEditForm(
+        {'name': rider.name, 'address': rider.address, 'city': rider.city, 'state': rider.state, 'zip_code': rider.zip_code,
          'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'county': rider.county},
         instance=rider)
-    return render(request, 'edit_rider.html', {'rider': rider, 'edit_rider_form': edit_rider_form, 'date': show_date})
+    return render(request, 'edit_rider.html', {'rider': rider, 'edit_rider_form': edit_form, 'date': show_date})
 
 
 def add_rider(request, show_date):
@@ -552,8 +567,13 @@ def add_combo(request, show_date):
             horse_pk = request.session['horse_pk']
             rider = get_object_or_404(Rider, pk=rider_pk)
             horse = get_object_or_404(Horse, pk=horse_pk)
-            HorseRiderCombo.objects.create(
-                num=num, rider=rider, horse=horse, cell=cell, email=email, show=show)
+            try:
+                HorseRiderCombo.objects.create(num=num, rider=rider, horse=horse,
+                                               cell=cell, email=email, show=show)
+            except IntegrityError:
+                #messages.error(request, "HRC already exists!")
+                messages.info(request, 'Combo for selected horse and rider already exists!')
+                return redirect('select_rider', show_date=show.date)
             return redirect('edit_combo', show_date=show.date, combo_num=num)
         else:
             return redirect('view_show', show_date=show_date)
@@ -579,17 +599,18 @@ def edit_combo(request, show_date, combo_num):
     if request.method == "POST":
         if request.POST.get('remove_class'):
             num = request.POST['remove_class']
-            selected_class = Class.objects.get(pk=num)
-            combo.classes.remove(selected_class)
-            combo.save()
+            selected_class = ClassParticipation.objects.filter(combo=combo).get(participated_class=num)
+            selected_class.delete()
 
         if request.POST.get('add_class'):
-            class_selection_form = ClassSelectForm(request.POST)
+            class_combo_form = ClassComboForm(request.POST)
 
-            if class_selection_form.is_valid():
-                selected_class = class_selection_form.cleaned_data['selected_class']
-                combo.classes.add(selected_class)
-                combo.save()
+            if class_combo_form.is_valid():
+                selected_class = class_combo_form.cleaned_data['num']
+                is_prereg = class_combo_form.cleaned_data['is_preregistered']
+                class_obj = Class.objects.filter(show=show_date).get(num=selected_class)
+                classParticipation = ClassParticipation(participated_class=class_obj, combo=combo, is_preregistered=is_prereg)
+                classParticipation.save()
 
         elif request.POST.get('edit'):
             edit_form = HorseRiderEditForm(request.POST)
@@ -603,13 +624,13 @@ def edit_combo(request, show_date, combo_num):
     edit_form = HorseRiderEditForm(
         {'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
 
-    class_selection_form = ClassSelectForm()
+    class_combo_form = ClassComboForm()
 
     registered_classes = combo.classes.all()
     number_registered_classes = len(registered_classes)
     price = number_registered_classes * 10
 
-    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_selection_form': class_selection_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
 
 
 class ShowAutocomplete(autocomplete.Select2QuerySetView):

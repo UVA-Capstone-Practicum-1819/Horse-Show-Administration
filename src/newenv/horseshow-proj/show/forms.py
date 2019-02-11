@@ -1,10 +1,12 @@
 from django import forms
+
 from show.models import *
 from .models import *
 import datetime
 from django.forms import HiddenInput, formset_factory
 from dal import autocomplete
 from django.core.exceptions import ValidationError
+from localflavor.us.forms import USStateField, USZipCodeField, USStateSelect
 
 
 class ShowForm(forms.Form):
@@ -13,7 +15,7 @@ class ShowForm(forms.Form):
     """
     name = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'autocomplete': 'off', }))
-    date = forms.DateField(initial=datetime.date.today)
+    date = forms.DateField(widget=forms.SelectDateWidget())
     location = forms.CharField(
         max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
     day_of_price = forms.IntegerField(label="Day-of Price")
@@ -33,37 +35,33 @@ class RankingForm(forms.Form):
     This allows you to rank classes from 1st through 6th and store those rankings in the specific Class
     """
 
-    def __init__(self, *args, **kwargs):
-        show_date = kwargs.pop('show_date')
-        super(RankingForm, self).__init__(*args, **kwargs)
-        self.fields['show_date'] = show_date
+    class ComboNumValidator:
+        def __init__(self, num, show=None):
+            self.num = num
+            self.show = show
 
-    def is_valid_combo_num(num):
-        if num < 100 or num > 999:
-            raise ValidationError(
-                _('Number must be between 100 and 999,inclusive'), code="invalid")
-        show = Show.objects.get(date=self.show_date)
-        if show.combos.filter(num=num).count() == 0:
-            raise ValidationError(
-                _('Combination must be in the show'), code="invalid")
+        def __call__(self, value):
+            if value < 100 or value > 999:
+                raise ValidationError(
+                    _('Number must be between 100 and 999,inclusive'), code="invalid")
 
-    first = forms.IntegerField(
-        validators=[is_valid_combo_num])
+            if show.combos.filter(num=num).count() == 0:
+                raise ValidationError(
+                    _('Combination must be in the show'), code="invalid")
 
-    second = forms.IntegerField(
-        validators=[is_valid_combo_num])
+    show_field = forms.CharField(max_length=100)
 
-    third = forms.IntegerField(
-        validators=[is_valid_combo_num])
+    first = forms.IntegerField()
 
-    fourth = forms.IntegerField(
-        validators=[is_valid_combo_num])
+    second = forms.IntegerField()
 
-    fifth = forms.IntegerField(
-        validators=[is_valid_combo_num])
+    third = forms.IntegerField()
 
-    sixth = forms.IntegerField(
-        validators=[is_valid_combo_num])
+    fourth = forms.IntegerField()
+
+    fifth = forms.IntegerField()
+
+    sixth = forms.IntegerField()
 
     fields = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
 
@@ -75,6 +73,7 @@ class RankingForm(forms.Form):
         fourth = cleaned_data['fourth']
         fifth = cleaned_data['fifth']
         sixth = cleaned_data['sixth']
+
         if first and second and third and fourth and fifth and sixth:
             field_list = [first, second, third, fourth, fifth, sixth]
             if len(set(field_list)) != len(field_list):
@@ -86,8 +85,14 @@ class RiderForm(forms.ModelForm):
     """
     This allows you to enter information for an individual Rider. Birth date is necessary for people who are 18 or younger. Form for a rider with name, address, email, birth date, whether it is a member of the VHSA, and its county
     """
-    birth_date = forms.DateField(help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(
-        years=range(1980, 2016)))
+
+    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
+
+    birth_date = forms.DateField(
+        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range))
+    state = USStateField(widget=USStateSelect(), initial="VA")
+
+    zip_code = USZipCodeField()
 
     class Meta:
         model = Rider
@@ -115,8 +120,10 @@ class HorseForm(forms.ModelForm):
     """
     This form allows you to enter information about an individual Horse. The form for a horse, which has a coggins_date, name, accession number, owner, type, and size
     """
-    coggins_date = forms.DateField(widget=forms.SelectDateWidget(
-        years=range(2010, 2019)))
+    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
+
+    coggins_date = forms.DateField(
+        widget=forms.SelectDateWidget(years=year_range))
 
     class Meta:
         model = Horse
@@ -150,8 +157,10 @@ class HorseRiderComboCreateForm(forms.ModelForm):
         fields = ('num', 'contact', 'email', 'cell')
 
 
+
 class HorseRiderEditForm(forms.ModelForm):
     """ for updating a horse-rider combo """
+
     class Meta:
         model = HorseRiderCombo
         fields = ('contact', 'email', 'cell')
@@ -159,13 +168,29 @@ class HorseRiderEditForm(forms.ModelForm):
 
 class RiderEditForm(forms.ModelForm):
     """ for updating a rider """
+    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
+
+    birth_date = forms.DateField(
+        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range))
+
+    state = USStateField(widget=USStateSelect())
+
+    zip_code = USZipCodeField()
+
     class Meta:
         model = Rider
-        fields = ('name', 'address', 'birth_date', 'member_VHSA', 'county')
+        fields = ('name', 'address', 'city', 'state', 'zip_code',
+                  'birth_date', 'member_VHSA', 'county')
 
 
 class HorseEditForm(forms.ModelForm):
     """ for editing a horse """
+
+    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
+
+    coggins_date = forms.DateField(
+        widget=forms.SelectDateWidget(years=year_range))
+
     class Meta:
         model = Horse
         fields = ('accession_num', 'coggins_date',
@@ -212,6 +237,15 @@ class ClassForm(forms.ModelForm):
 class RemoveClassForm(forms.Form):
     """ # This allows the user to remove classes by entering the class number """
     num = models.IntegerField()
+
+
+class ClassComboForm(forms.ModelForm):
+    """ # This allows the user to add classes for a specific combo by entering the class number """
+    is_preregistered = forms.BooleanField()
+
+    class Meta:
+        model = Class
+        fields = ('num',)
 
 
 class ClassSelectForm(forms.ModelForm):
