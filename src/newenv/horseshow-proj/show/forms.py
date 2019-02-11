@@ -89,9 +89,11 @@ class RiderForm(forms.ModelForm):
     This allows you to enter information for an individual Rider. Birth date is necessary for people who are 18 or younger. Form for a rider with name, address, email, birth date, whether it is a member of the VHSA, and its county
     """
 
+    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
+
     birth_date = forms.DateField(
-        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=reversed(range(1920, datetime.date.today().day))))
-    state = USStateField(widget=USStateSelect)
+        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range))
+    state = USStateField(widget=USStateSelect(), initial="VA")
 
     zip_code = USZipCodeField()
 
@@ -121,8 +123,10 @@ class HorseForm(forms.ModelForm):
     """
     This form allows you to enter information about an individual Horse. The form for a horse, which has a coggins_date, name, accession number, owner, type, and size
     """
-    coggins_date = forms.DateField(widget=forms.SelectDateWidget(
-        years=range(2010, 2019)))
+    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
+
+    coggins_date = forms.DateField(
+        widget=forms.SelectDateWidget(years=year_range))
 
     class Meta:
         model = Horse
@@ -166,10 +170,12 @@ class HorseRiderEditForm(forms.ModelForm):
 
 class RiderEditForm(forms.ModelForm):
     """ for updating a rider """
-    birth_date = forms.DateField(
-        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=reversed(range(1920, datetime.date.today().day))))
+    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
 
-    state = USStateField(widget=USStateSelect)
+    birth_date = forms.DateField(
+        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range))
+
+    state = USStateField(widget=USStateSelect())
 
     zip_code = USZipCodeField()
 
@@ -181,6 +187,12 @@ class RiderEditForm(forms.ModelForm):
 
 class HorseEditForm(forms.ModelForm):
     """ for editing a horse """
+
+    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
+
+    coggins_date = forms.DateField(
+        widget=forms.SelectDateWidget(years=year_range))
+
     class Meta:
         model = Horse
         fields = ('accession_num', 'coggins_date',
