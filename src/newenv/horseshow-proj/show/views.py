@@ -20,6 +20,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 
 
 class AuthRequiredMiddleware(object):
@@ -562,8 +563,13 @@ def add_combo(request, show_date):
             horse_pk = request.session['horse_pk']
             rider = get_object_or_404(Rider, pk=rider_pk)
             horse = get_object_or_404(Horse, pk=horse_pk)
-            HorseRiderCombo.objects.create(
-                num=num, rider=rider, horse=horse, cell=cell, email=email, show=show)
+            try:
+                HorseRiderCombo.objects.create(num=num, rider=rider, horse=horse,
+                                               cell=cell, email=email, show=show)
+            except IntegrityError:
+                #messages.error(request, "HRC already exists!")
+                messages.info(request, 'Combo for selected horse and rider already exists!')
+                return redirect('select_rider', show_date=show.date)
             return redirect('edit_combo', show_date=show.date, combo_num=num)
         else:
             return redirect('view_show', show_date=show_date)

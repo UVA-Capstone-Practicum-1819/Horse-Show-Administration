@@ -2,7 +2,11 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, EmailValidator, RegexValidator
 import random
 import datetime
+
 from localflavor.us.models import USStateField, USZipCodeField
+
+from django.core.exceptions import ValidationError
+
 
 
 class Show(models.Model):
@@ -74,7 +78,7 @@ class Horse(models.Model):
     name = models.CharField(primary_key=True, max_length=200,
                             verbose_name="Name (Barn Name)")
     accession_num = models.CharField(
-        max_length=200, verbose_name="Accession Number", validators=[alphanumeric_validator])
+        max_length=20, verbose_name="Accession Number", validators=[alphanumeric_validator])
     coggins_date = models.DateField(
         default=datetime.date.today,  verbose_name="Coggins Date", )
     owner = models.CharField(max_length=200, verbose_name="Owner")
@@ -137,9 +141,15 @@ class HorseRiderCombo(models.Model):
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, null=True, related_name='combos')
 
+
     def __str__(self):
         return f"Show: {str(self.show.date)}, Number: {self.num}, Rider: {self.rider.name}, Horse: {self.horse.name}"
 
+def validate_unique(self, exclude=None):
+    qs = HorseRiderCombo.objects.filter(rider=self.rider, horse=self.horse)
+    if self.pk is None:
+        if qs.filter(r=self.rider).exists() and qs.filter(h=self.horse.exists()):
+            raise ValidationError("HRC already exists")
 
 class ClassParticipation(models.Model):
     """

@@ -157,6 +157,7 @@ class HorseRiderComboCreateForm(forms.ModelForm):
         fields = ('num', 'contact', 'email', 'cell')
 
 
+
 class HorseRiderEditForm(forms.ModelForm):
     """ for updating a horse-rider combo """
 
