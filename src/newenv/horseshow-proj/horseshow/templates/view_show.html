@@ -4,28 +4,32 @@
 {% block content %}
 
 <h3>Show: {{ show_name }}</h3>
+
 <body>
   <h5><b>Date:</b> {{ date }}
-  <br><b>Location:</b> {{ location }}</h5>
+    <br><b>Location:</b> {{ location }}</h5>
   <h5><b>Divisions:</b></h5>
-    {% for division in divisions %}
-        <li><a href = "{% url 'view_division' show_date=date division_name=division.name %}">{{division.name}}</a></li>
-    {% endfor %}
+  {% for division in divisions %}
+  <li><a href="{% url 'view_division' show_date=date division_name=division.name %}">{{division.name}}</a></li>
+  {% endfor %}
   <p>
 
 
-    <p><a class="btn btn-primary" href = "{% url 'add_division' show_date=date %}">Add Division</a></p>
-    <p><a class="btn btn-primary" href = "{% url 'select_division' show_date=date %}">Edit Division/ View Division Score</a></p>
+    <p><a class="btn btn-primary" href="{% url 'add_division' show_date=date %}">Add Division</a></p>
+    <p><a class="btn btn-primary" href="{% url 'select_division' show_date=date %}">Edit Division/ View Division Score</a></p>
     <p><a class="btn btn-primary" href="{% url 'select_rider' show_date=date %}">Add Horse-Rider Combo to the Database</a></p>
-    <p><form method="POST" class="form" >
-      {% csrf_token %}
-      <button class="btn btn-primary" type="submit">Edit Horse Rider Combo</button>
-      {{ form.as_table }}
-      
-    </form></p>
+    <p>
+      <form method="POST" class="form">
+        {% csrf_token %}
+        <button class="btn btn-primary" type="submit">Edit Horse Rider Combo</button>
+        {{ form.as_table }}
+
+      </form>
+    </p>
     <p><a class="btn btn-primary" href="{% url 'select_combo' show_date=date %}">Bill a Rider</a></p>
-<p><a class="btn btn-primary" href="{% url 'select_rider2' show_date=date%}">Edit Rider Information</a></p>
-  <p><a class="btn btn-primary" href="{% url 'select_horse2' show_date=date%}">Edit Horse Information</a></p>
+    <p><a class="btn btn-primary" href="{% url 'select_rider2' show_date=date%}">Edit Rider Information</a></p>
+    <p><a class="btn btn-primary" href="{% url 'select_horse2' show_date=date%}">Edit Horse Information</a></p>
+    <p><a class="btn btn-primary" href="{% url 'populate_pdf' show_date=date%}">Generate VHSA PDF</a></p>
 
   </p>
 
