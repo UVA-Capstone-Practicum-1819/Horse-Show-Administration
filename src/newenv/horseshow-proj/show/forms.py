@@ -19,6 +19,7 @@ class ShowForm(forms.Form):
     day_of_price = forms.IntegerField(label="Day-of Price")
     pre_reg_price = forms.IntegerField(label="Preregistration Price")
 
+
 class RegistrationBillForm(forms.Form):
     """
     This allows you to check whether they were preregistered, or if they entered certain classes the day of
@@ -90,8 +91,8 @@ class RiderForm(forms.ModelForm):
 
     class Meta:
         model = Rider
-        fields = ('name', 'address','city', 'state', 'zip_code','email',
-                  'birth_date', 'member_VHSA', 'county',)
+        fields = ('name', 'address', 'city', 'state', 'zip_code', 'email',
+                  'adult', 'birth_date', 'member_VHSA', 'county',)
 
 
 class RiderSelectForm(forms.ModelForm):
@@ -239,6 +240,7 @@ class DivisionForm(forms.ModelForm):
     class Meta:
         model = Division
         fields = ('name',)
+
 
 class DivisionChampForm(forms.ModelForm):
     """
