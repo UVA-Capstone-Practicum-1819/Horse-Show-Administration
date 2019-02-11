@@ -281,9 +281,12 @@ def rank_class(request, show_date, division_name, class_num):
         specific horse rider combos that competed in that class and were awarded points
         points are always starting from 10, then 6, and so on
     """
+    show = Show.objects.get(date=show_date)
+    division = show.divisions.get(name=division_name)
+    class_obj = division.classes.get(num=class_num)
     if request.method == 'POST':
 
-        form = RankingForm(request.POST)
+        form = RankingForm(request.POST, show_date=show_date)
         if form.is_valid():
             combo_map = {
                 form.cleaned_data['first']: 10,
@@ -293,9 +296,7 @@ def rank_class(request, show_date, division_name, class_num):
                 form.cleaned_data['fifth']: 1,
                 form.cleaned_data['sixth']: 0.5,
             }
-            show = Show.objects.get(date=show_date)
-            division = show.divisions.get(name=division_name)
-            class_obj = division.classes.get(num=class_num)
+            
 
             participations = class_obj.participations.all()
 
@@ -309,8 +310,9 @@ def rank_class(request, show_date, division_name, class_num):
 
 
     else:
-        form = RankingForm()
-        return render(request, 'rank_class.html', {'form': form})
+        form = RankingForm(show_date=show_date)
+        context = {'form': form }
+        return render(request, 'rank_class.html', context)
 
 
 def add_division(request, show_date):
@@ -477,7 +479,7 @@ def edit_rider(request, show_date, rider_pk):
         {'name': rider.name, 'address': rider.address, 'city': rider.city, 'state': rider.state, 'zip_code': rider.zip_code,
          'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'county': rider.county},
         instance=rider)
-    return render(request, 'edit_rider.html', {'rider': rider, 'edit_rider_form': edit_rider_form, 'date': show_date})
+    return render(request, 'edit_rider.html', {'rider': rider, 'edit_rider_form': edit_form, 'date': show_date})
 
 
 def add_rider(request, show_date):
