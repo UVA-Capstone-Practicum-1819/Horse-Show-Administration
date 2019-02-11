@@ -286,7 +286,7 @@ def rank_class(request, show_date, division_name, class_num):
     class_obj = division.classes.get(num=class_num)
     if request.method == 'POST':
 
-        form = RankingForm(request.POST, show_date=show_date)
+        form = RankingForm(request.POST)
         if form.is_valid():
             combo_map = {
                 form.cleaned_data['first']: 10,
