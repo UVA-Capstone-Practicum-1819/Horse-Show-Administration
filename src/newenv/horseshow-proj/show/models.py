@@ -4,6 +4,7 @@ import random
 import datetime
 from localflavor.us.models import USStateField, USZipCodeField
 
+
 class Show(models.Model):
     """
     Model for a Show, includes basic information such as name/date/location and a pre_reg_price
@@ -93,8 +94,8 @@ class Rider(models.Model):
     name = models.CharField(max_length=200, verbose_name="Name")
     address = models.CharField(max_length=200, verbose_name="Street Address")
     city = models.CharField(default="", max_length=200)
-    state = models.USStateField(default="VA")
-    zip_code = models.USZipCodeField()
+    state = USStateField(default="VA")
+    zip_code = USZipCodeField()
     birth_date = models.DateField(
         blank=True, null=True, verbose_name="Birth Date", )
     member_VHSA = models.BooleanField(
