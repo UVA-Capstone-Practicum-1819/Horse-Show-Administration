@@ -7,7 +7,6 @@ import datetime
 import io
 from datetime import date
 from django.http import FileResponse
-from reportlab.pdfgen import canvas
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
