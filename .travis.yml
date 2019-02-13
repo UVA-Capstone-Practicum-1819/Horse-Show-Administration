@@ -1,7 +1,6 @@
+dist: xenial
 language: python
-
-python:
-  - "3.7.2"
+python: 3.7
 
 install:
   - pip3 install Django==2.1
@@ -9,7 +8,6 @@ install:
   - pip3 install pdfrw
   - pip3 install django-crispy-forms
   - pip3 install django-localflavor
-  - pip3 install reportlab
 
 script:
   - python3 src/newenv/horseshow-proj/manage.py makemigrations
