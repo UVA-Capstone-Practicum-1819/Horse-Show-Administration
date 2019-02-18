@@ -450,10 +450,11 @@ def view_class(request, show_date, division_id, class_num):
             return redirect('view_billing', show_date=show_date, combo_num=combo.num)
     else:
         form = ComboSelectForm()
-    form = ComboSelectForm()
+    # form = ComboSelectForm()
     context = {
         "combos": combos,
         "class": class_obj,
+        "class_num": class_obj.num,
         "date": show_date,
         "id": division_id,
         "name": division.name,
@@ -463,13 +464,14 @@ def view_class(request, show_date, division_id, class_num):
     return render(request, "view_class.html", context)  # render info
 
 
-def delete_combo(request, show_date, division_id, class_num, combo):
+def delete_combo(request, show_date, division_id, class_num, combo_num):
     """ scratch a combo from the class page so that it reflects in the combo's billing """
-    combo = HorseRiderCombo.objects.get(num=combo)
+    combo = HorseRiderCombo.objects.get(num=combo_num)
     show = Show.objects.get(date=show_date)
     division = show.divisions.get(id=division_id)
     class_obj = division.classes.get(num=class_num)
-    combo.classes.remove(class_obj)
+    selected_class = ClassParticipation.objects.filter(combo=combo).get(participated_class=class_obj)
+    selected_class.delete()
     return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
 
 
