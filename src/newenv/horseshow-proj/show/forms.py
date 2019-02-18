@@ -269,7 +269,7 @@ class ClassSelectForm(forms.ModelForm):
 
 
 class DivisionForm(forms.ModelForm):
-    """ # This form allows info to be entered for a division """
+    """ # This form allows python info to be entered for a division """
 
     class Meta:
         model = Division

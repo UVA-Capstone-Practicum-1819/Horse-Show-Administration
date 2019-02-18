@@ -11,9 +11,7 @@
       {% comment %} Display the division title {% endcomment %}
       <h4>Division: {{name}}</h4>
       {% comment %} Show a list of all the classes {% endcomment %}
-      <h5>Classes:</h5>
       <div class="row">
-        {% comment %} Form for removing a class from the division {% endcomment %}
        
           <table class="table">
           {% comment %} The column heads {% endcomment %}
@@ -65,7 +63,7 @@
     <form method="POST">
       {% csrf_token %}
       {{ form.as_p }}
-      <button type="submit">Submit</button>
+      <button type="submit">Add Class</button>
     </form>
   {% endif %}
 

@@ -363,8 +363,10 @@ def view_division(request, show_date, division_name):
     if request.method == 'POST':  # if POST, create a new class for this division
         form = ClassForm(request.POST)
         if form.is_valid():
-            existing_classes_count = division.classes.filter(
-                num=form.cleaned_data['num']).count()
+            # existing_classes_count = division.classes.filter(
+                # num=form.cleaned_data['num']).count()
+            existing_classes_count = Class.objects.filter(show=show, num=form.cleaned_data['num']).count()
+
             # verify number doesnt already exist
             if existing_classes_count > 0:
                 # prepare error message, will display on submit.
@@ -374,21 +376,21 @@ def view_division(request, show_date, division_name):
             class_form = ClassForm(request.POST)
             class_obj = class_form.save(commit=False)
             class_obj.division = division
+            class_obj.show = show
             class_obj.save()
             # render page with new division
             return redirect('view_division', show_date=show_date, division_name=division_name)
     else:
         # each division only has a max of 3 classes, no input form if 3 classes present
         division_classes = division.classes.all()
+        form = ClassForm()
         context = {
             "date": show_date,
             "show_name": show.name,
             "name": division_name,
             "classes": division_classes,
+            "form": form,
         }
-        if(len(division_classes) < 3):
-            form = ClassForm()
-            context['form'] = form
         return render(request, 'view_division.html', context)
 
 
