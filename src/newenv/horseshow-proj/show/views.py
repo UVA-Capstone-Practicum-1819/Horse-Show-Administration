@@ -292,34 +292,37 @@ def rank_class(request, show_date, division_id, class_num):
     if request.method == 'POST':
         form = RankingForm(request.POST)
         if form.is_valid():
-            list = [form.cleaned_data['first'], form.cleaned_data['second'], form.cleaned_data['third'],form.cleaned_data['fourth'],form.cleaned_data['fifth'],form.cleaned_data['sixth']]
+            rank_list = [form.cleaned_data['first'], form.cleaned_data['second'], form.cleaned_data['third'],form.cleaned_data['fourth'],form.cleaned_data['fifth'],form.cleaned_data['sixth']]
             
-            for i in list:
-                if i < 100 or i > 999:
+            for i in rank_list:
+                if i is None:
+                    pass
+                elif i < 100 or i > 999:
                     messages.error(request, "Invalid combination number " + str(i) + ": combination number should be three digits: smallest 100, biggest 999")
                     bool_error = True
-                if show.combos.filter(num=i).count() == 0:
+                elif show.combos.filter(num=i).count() == 0:
                     messages.error(request, "Cannot rank combination number " + str(i) + ": it is not registered to the show")
                     bool_error = True
-            if len(set(list)) != len(list):
+            rank_list_without_none = [x for x in rank_list if x is not None]
+            if len(set(rank_list_without_none)) != len(rank_list_without_none):  
                 messages.error(request, "Same combination entered for more than one rank. Duplicates are not allowed in ranking.")
                 bool_error = True
             if bool_error is True:
-                # request.session['first'] = list[0]
-                # request.session['second'] = list[1]
-                # request.session['third'] = list[2]
-                # request.session['fourth'] = list[3]
-                # request.session['fifth'] = list[4]
-                # request.session['sixth'] = list[5]
+                # request.session['first'] = rank_list[0]
+                # request.session['second'] = rank_list[1]
+                # request.session['third'] = rank_list[2]
+                # request.session['fourth'] = rank_list[3]
+                # request.session['fifth'] = rank_list[4]
+                # request.session['sixth'] = rank_list[5]
                 # request.session['bool_error'] = True
                 return redirect('rank_class', show_date=show_date, division_id=division_id, class_num=class_num)
 
-            class_obj.first = list[0]
-            class_obj.second = list[1]
-            class_obj.third = list[2]
-            class_obj.fourth = list[3]
-            class_obj.fifth = list[4]
-            class_obj.sixth = list[5]
+            class_obj.first = rank_list[0]
+            class_obj.second = rank_list[1]
+            class_obj.third = rank_list[2]
+            class_obj.fourth = rank_list[3]
+            class_obj.fifth = rank_list[4]
+            class_obj.sixth = rank_list[5]
             class_obj.save(update_fields=["first", "second", "third", "fourth", "fifth", "sixth"])
 
             combo_map = {
