@@ -57,12 +57,12 @@ class Class(models.Model):
         Division, on_delete=models.CASCADE, related_name="classes", null=True)
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, related_name="classes", null=True)
-    first = models.IntegerField(default=0)
-    second = models.IntegerField(default=0)
-    third = models.IntegerField(default=0)
-    fourth = models.IntegerField(default=0)
-    fifth = models.IntegerField(default=0)
-    sixth = models.IntegerField(default=0)
+    first = models.IntegerField(blank=True, null=True)
+    second = models.IntegerField(blank=True, null=True)
+    third = models.IntegerField(blank=True, null=True)
+    fourth = models.IntegerField(blank=True, null=True)
+    fifth = models.IntegerField(blank=True, null=True)
+    sixth = models.IntegerField(blank=True, null=True)
 
 
 class Horse(models.Model):
