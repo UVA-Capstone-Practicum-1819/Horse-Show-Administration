@@ -314,8 +314,13 @@ def rank_class(request, show_date, division_id, class_num):
 
 
     else:
-        form = RankingForm(show_date=show_date)
+        form = RankingForm(initial={'show_field': show_date})
         context = {'form': form }
+        context = {
+            "name": division.name,
+            "class": class_obj,
+            'form': form
+        }
         return render(request, 'rank_class.html', context)
 
 
@@ -416,6 +421,7 @@ def view_class(request, show_date, division_id, class_num):
         "class": class_obj,
         "date": show_date,
         "id": division_id,
+        "name": division.name,
         "show_name": show.name,
         "add_form": form,
     }
