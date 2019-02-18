@@ -8,7 +8,39 @@
 <body>
   <h5><b>Date:</b> {{ date }}
     <br><b>Location:</b> {{ location }}</h5>
-  <h5><b>Divisions:</b></h5>
+  
+
+  {% with classes_per_division=3 %}
+  <table class="table">
+        <thead>
+          <th>Division</th>
+          <th colspan="{{classes_per_division}}">Classes</th>
+          
+        </thead>
+         <tbody>
+          {% for division in divisions %}
+            <tr>
+              <td>
+                <a class="btn" href="{% url 'view_division' show_date=date division_name=division.name %}">{{division.name}}</a> 
+              </td>
+              
+      
+              {% for class in division.classes.all %}
+                <td>
+                  <a class="btn" href="{% url 'view_class' show_date=date division_name=division.name class_num=class.num %}">{{class.num}} - {{class.name}}</a> 
+                </td>
+              {% endfor %}
+              
+               
+            </tr>
+           {% endfor %}
+        </tbody>
+      </table>
+    {% endwith %}
+
+  
+
+  {% comment %} 
   {% for division in divisions %}
   <li><a href="{% url 'view_division' show_date=date division_id=division.id %}">{{division.name}}</a></li>
   {% endfor %}
@@ -25,7 +57,7 @@
     <p><a class="btn btn-primary" href="{% url 'select_combo' show_date=date %}">Bill a Rider</a></p>
     <p><a class="btn btn-primary" href="{% url 'populate_pdf' show_date=date%}">Generate VHSA PDF</a></p>
 
-  </p>
+  </p> {% endcomment %}
 
 </body>
 {% endblock %}
