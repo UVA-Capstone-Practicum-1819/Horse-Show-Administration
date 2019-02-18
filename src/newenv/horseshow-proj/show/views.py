@@ -258,7 +258,7 @@ def add_class(request, show_date, division_id):
             class_form = ClassForm(request.POST)
             class_obj = class_form.save(commit=False)
             class_obj.division = division
-            class_obj.show = show_date
+            class_obj.show = show
             class_obj.save()
             return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_obj.num)
     else:
@@ -313,6 +313,15 @@ def rank_class(request, show_date, division_id, class_num):
                 # request.session['sixth'] = list[5]
                 # request.session['bool_error'] = True
                 return redirect('rank_class', show_date=show_date, division_id=division_id, class_num=class_num)
+
+            class_obj.first = list[0]
+            class_obj.second = list[1]
+            class_obj.third = list[2]
+            class_obj.fourth = list[3]
+            class_obj.fifth = list[4]
+            class_obj.sixth = list[5]
+            class_obj.save(update_fields=["first", "second", "third", "fourth", "fifth", "sixth"])
+
             combo_map = {
                 form.cleaned_data['first']: 10,
                 form.cleaned_data['second']: 6,
@@ -334,11 +343,11 @@ def rank_class(request, show_date, division_id, class_num):
 
 
     else:
-        print(bool_error)
+        # print(bool_error)
         # if 'bool_error' in request.session:
         #     form = RankingForm(initial={'show_field': show_date, 'first': request.session['first'], 'second': request.session['second'], 'third': request.session['third'], 'fourth': request.session['fourth'], 'fifth': request.session['fifth'], 'sixth': request.session['sixth']})
         # else:
-        form = RankingForm(initial={'show_field': show_date})
+        form = RankingForm(initial={'first': class_obj.first, 'second': class_obj.second, 'third': class_obj.third, 'fourth': class_obj.fourth,'fifth': class_obj.fifth,'sixth': class_obj.sixth})
         context = {
             "name": division.name,
             "class": class_obj,
@@ -403,6 +412,7 @@ def view_division(request, show_date, division_id):
             class_form = ClassForm(request.POST)
             class_obj = class_form.save(commit=False)
             class_obj.division = division
+            class_obj.show = show
             class_obj.save()
             # render page with new division
             return redirect('view_division', show_date=show_date, division_id=division_id)
