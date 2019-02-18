@@ -31,6 +31,12 @@
            {% endfor %}
         </tbody>
       </table>
+    <form class="form" method="post">
+        {% csrf_token %}
+        {{ add_form | crispy}}
+        <button type="submit" class="btn btn-success" >Submit</button>
+    </form>
+    {{ form.media }}
      <a href="{% url 'select_rider' show_date=date %}">Add a Combo</a>
      </form>
      <a href="{% url 'rank_class' show_date=date division_name=name class_num=class.num %}">Rank Class</a>

@@ -363,8 +363,7 @@ def view_division(request, show_date, division_name):
     if request.method == 'POST':  # if POST, create a new class for this division
         form = ClassForm(request.POST)
         if form.is_valid():
-            # existing_classes_count = division.classes.filter(
-                # num=form.cleaned_data['num']).count()
+            # filter ALL show classes so that there are no duplicates across divisions
             existing_classes_count = Class.objects.filter(show=show, num=form.cleaned_data['num']).count()
 
             # verify number doesnt already exist
@@ -401,13 +400,22 @@ def view_class(request, show_date, division_name, class_num):
     division = show.divisions.get(name=division_name)
     class_obj = division.classes.get(num=class_num)
     combos = class_obj.combos.all()
-
+    if request.method == "POST":
+        form = ComboSelectForm(request.POST)
+        # allows the user to select from the pre-existing horse-rider combos
+        if form.is_valid():
+            combo = form.cleaned_data['combo']
+            return redirect('view_billing', show_date=show_date, combo_num=combo.num)
+    else:
+        form = ComboSelectForm()
+    form = ComboSelectForm()
     context = {
         "combos": combos,
         "class": class_obj,
         "date": show_date,
         "name": division_name,
         "show_name": show.name,
+        "add_form": form,
     }
     return render(request, "view_class.html", context)  # render info
 
