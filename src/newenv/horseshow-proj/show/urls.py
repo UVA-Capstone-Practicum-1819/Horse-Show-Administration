@@ -37,7 +37,7 @@ division_patterns = [
     path('classes',
          views.view_division_classes, name="view_division_classes"),
 
-    
+
 ]
 
 combo_patterns = [
@@ -56,7 +56,7 @@ show_patterns = [
 
     path('division/select', views.select_division, name="select_division"),
 
-    path('division/<division_name>/', include(division_patterns)),
+    path('division/<division_id>/', include(division_patterns)),
 
     path('combo/add', views.add_combo, name="add_combo"),
 
@@ -79,13 +79,13 @@ show_patterns = [
     path('horse/select2', views.select_horse2, name="select_horse2"),
 
     path('horse/<horse_pk>/edit', views.edit_horse, name="edit_horse"),
-         
+
     path('populate-pdf', views.populate_pdf, name="populate_pdf"),
 ]
 
 urlpatterns = [
     path('', views.select_show, name="select_show"),
-     path('show-autocomplete', views.ShowAutocomplete.as_view(),
+    path('show-autocomplete', views.ShowAutocomplete.as_view(),
          name="show_autocomplete"),
 
     path('rider-autocomplete', views.RiderAutocomplete.as_view(),
@@ -93,11 +93,12 @@ urlpatterns = [
 
     path('horse-autocomplete', views.HorseAutocomplete.as_view(),
          name="horse_autocomplete"),
-    path('combo-autocomplete', views.ComboAutocomplete.as_view(), name="combo_autocomplete"),
+    path('combo-autocomplete', views.ComboAutocomplete.as_view(),
+         name="combo_autocomplete"),
 
-   path('division-autocomplete', views.DivisionAutocomplete.as_view(),
+    path('division-autocomplete', views.DivisionAutocomplete.as_view(),
          name="division_autocomplete"),
-     path('class-autocomplete', views.ClassAutocomplete.as_view(),
+    path('class-autocomplete', views.ClassAutocomplete.as_view(),
          name="classes_autocomplete"),
     path('add', views.add_show, name='add_show'),
 
@@ -110,7 +111,7 @@ urlpatterns = [
 
     path('logout', auth_views.LogoutView.as_view(), name='log_out'),
 
-    
+
 
 ]
 urlpatterns += staticfiles_urlpatterns()
