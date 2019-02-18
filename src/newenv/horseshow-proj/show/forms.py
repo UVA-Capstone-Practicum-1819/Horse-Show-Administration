@@ -30,7 +30,7 @@ class RegistrationBillForm(forms.Form):
     registrationtype = forms.ChoiceField(choices=types)
 
 
-class RankingForm(forms.Form):
+class RankingForm(forms.ModelForm):
     """
     This allows you to rank classes from 1st through 6th and store those rankings in the specific Class
     """
@@ -48,31 +48,33 @@ class RankingForm(forms.Form):
     #         if show.combos.filter(num=num).count() == 0:
     #             raise ValidationError(
     #                 _('Combination must be in the show'), code="invalid")
+    class Meta:
+        model = Class
+        fields = ('first', 'second', 'third', 'fourth', 'fifth', 'sixth',)
+    # show_field = forms.CharField(max_length=100)
 
-    show_field = forms.CharField(max_length=100)
+    # first = forms.IntegerField()
 
-    first = forms.IntegerField()
+    # second = forms.IntegerField()
 
-    second = forms.IntegerField()
+    # third = forms.IntegerField()
 
-    third = forms.IntegerField()
+    # fourth = forms.IntegerField()
 
-    fourth = forms.IntegerField()
+    # fifth = forms.IntegerField()
 
-    fifth = forms.IntegerField()
+    # sixth = forms.IntegerField()
 
-    sixth = forms.IntegerField()
+    # fields = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
 
-    fields = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
-
-    def clean(self):
-        cleaned_data = super().clean()
-        first = cleaned_data['first']
-        second = cleaned_data['second']
-        third = cleaned_data['third']
-        fourth = cleaned_data['fourth']
-        fifth = cleaned_data['fifth']
-        sixth = cleaned_data['sixth']
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     first = cleaned_data['first']
+    #     second = cleaned_data['second']
+    #     third = cleaned_data['third']
+    #     fourth = cleaned_data['fourth']
+    #     fifth = cleaned_data['fifth']
+    #     sixth = cleaned_data['sixth']
 
         # if first and second and third and fourth and fifth and sixth:
         #     field_list = [first, second, third, fourth, fifth, sixth]
