@@ -10,7 +10,7 @@
     <br><b>Location:</b> {{ location }}</h5>
   <h5><b>Divisions:</b></h5>
   {% for division in divisions %}
-  <li><a href="{% url 'view_division' show_date=date division_name=division.name %}">{{division.name}}</a></li>
+  <li><a href="{% url 'view_division' show_date=date division_id=division.id %}">{{division.name}}</a></li>
   {% endfor %}
   <p>
 
