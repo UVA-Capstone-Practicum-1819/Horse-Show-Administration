@@ -6,7 +6,7 @@
 <div class="content container">
   <div class="row">
     <div class="col-md-8">
-    {% comment %} Display the show title {% endcomment %}
+      {% comment %} Display the show title {% endcomment %}
       <h2>Show: <a href="{% url 'view_show' show_date=date %}">{{show_name}}</a></h2>
       {% comment %} Display the division title {% endcomment %}
       <h4>Division: {{name}}</h4>
@@ -14,40 +14,40 @@
       <h5>Classes:</h5>
       <div class="row">
         {% comment %} Form for removing a class from the division {% endcomment %}
-       
-          <table class="table">
+
+        <table class="table">
           {% comment %} The column heads {% endcomment %}
-            <thead>
-              <th>#</th>
-              <th>Class</th>
-              <th>Scratch</th>
-              <th>Edit</th>
-            </thead>
-            {% comment %} Each class {% endcomment %}
-            <tbody>
-              {% for class in classes %}
-              <tr>
-                <td>
-                  {{ class.num }}
-                </td>
-                <td>
-                  {{class.name}}
-                </td>
-                <td>
-                <a href="{% url 'delete_class' show_date=date division_name=name class_num=class.num %}" >Scratch</a>
-                </td>
-                <td>
-                  <a href="{% url 'view_class' show_date=date division_name=name class_num=class.num %}">Edit
-                      Class</a>
-                </td>
-                <td>
-                  {{ remove_form | crispy}}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
- 
+          <thead>
+            <th>#</th>
+            <th>Class</th>
+            <th>Scratch</th>
+            <th>Edit</th>
+          </thead>
+          {% comment %} Each class {% endcomment %}
+          <tbody>
+            {% for class in classes %}
+            <tr>
+              <td>
+                {{ class.num }}
+              </td>
+              <td>
+                {{class.name}}
+              </td>
+              <td>
+                <a href="{% url 'delete_class' show_date=date division_id=id class_num=class.num %}">Scratch</a>
+              </td>
+              <td>
+                <a href="{% url 'view_class' show_date=date division_id=id class_num=class.num %}">Edit
+                  Class</a>
+              </td>
+              <td>
+                {{ remove_form | crispy}}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
       </div>
     </div>
   </div>
@@ -62,13 +62,12 @@
   </div>
   {% endfor %}
   {% if form %}
-    <form method="POST">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">Submit</button>
-    </form>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+  </form>
   {% endif %}
 
 </div>
 {% endblock %}
-
