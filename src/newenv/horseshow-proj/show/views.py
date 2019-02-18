@@ -369,8 +369,9 @@ def view_division(request, show_date, division_id):
     if request.method == 'POST':  # if POST, create a new class for this division
         form = ClassForm(request.POST)
         if form.is_valid():
-            existing_classes_count = division.classes.filter(
-                num=form.cleaned_data['num']).count()
+            # filter ALL show classes so that there are no duplicates across divisions
+            existing_classes_count = Class.objects.filter(show=show, num=form.cleaned_data['num']).count()
+
             # verify number doesnt already exist
             if existing_classes_count > 0:
                 # prepare error message, will display on submit.
@@ -380,22 +381,22 @@ def view_division(request, show_date, division_id):
             class_form = ClassForm(request.POST)
             class_obj = class_form.save(commit=False)
             class_obj.division = division
+            class_obj.show = show
             class_obj.save()
             # render page with new division
             return redirect('view_division', show_date=show_date, division_id=division_id)
     else:
         # each division only has a max of 3 classes, no input form if 3 classes present
         division_classes = division.classes.all()
+        form = ClassForm()
         context = {
             "date": show_date,
             "show_name": show.name,
             "id": division_id,
             "name": division.name,
             "classes": division_classes,
+            "form": form,
         }
-        if(len(division_classes) < 3):
-            form = ClassForm()
-            context['form'] = form
         return render(request, 'view_division.html', context)
 
 
@@ -406,7 +407,15 @@ def view_class(request, show_date, division_id, class_num):
     division = show.divisions.get(id=division_id)
     class_obj = division.classes.get(num=class_num)
     combos = class_obj.combos.all()
-
+    if request.method == "POST":
+        form = ComboSelectForm(request.POST)
+        # allows the user to select from the pre-existing horse-rider combos
+        if form.is_valid():
+            combo = form.cleaned_data['combo']
+            return redirect('view_billing', show_date=show_date, combo_num=combo.num)
+    else:
+        form = ComboSelectForm()
+    form = ComboSelectForm()
     context = {
         "combos": combos,
         "class": class_obj,
@@ -414,6 +423,7 @@ def view_class(request, show_date, division_id, class_num):
         "id": division_id,
         "name": division.name,
         "show_name": show.name,
+        "add_form": form,
     }
     return render(request, "view_class.html", context)  # render info
 

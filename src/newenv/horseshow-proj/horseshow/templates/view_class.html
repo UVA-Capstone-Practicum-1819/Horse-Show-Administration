@@ -8,7 +8,6 @@
 <div class="row">
   <form class="form" method="post">
     {% csrf_token %}
-
     <table class="table">
       <thead>
         <th>Combo</th>
@@ -31,8 +30,14 @@
         {% endfor %}
       </tbody>
     </table>
-    <a href="{% url 'select_rider' show_date=date %}">Add a Combo</a>
-  </form>
-  <a href="{% url 'rank_class' show_date=date division_id=id class_num=class.num %}">Rank Class</a>
+    <form class="form" method="post">
+        {% csrf_token %}
+        {{ add_form | crispy}}
+        <button type="submit" class="btn btn-success" >Submit</button>
+    </form>
+    {{ form.media }}
+     <a href="{% url 'select_rider' show_date=date %}">Add a Combo</a>
+     </form>
+     <a href="{% url 'rank_class' show_date=date division_id=id class_num=class.num %}">Rank Class</a>
 </div>
 {% endblock %}
