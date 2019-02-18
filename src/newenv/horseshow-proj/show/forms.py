@@ -74,11 +74,11 @@ class RankingForm(forms.Form):
         fifth = cleaned_data['fifth']
         sixth = cleaned_data['sixth']
 
-        if first and second and third and fourth and fifth and sixth:
-            field_list = [first, second, third, fourth, fifth, sixth]
-            if len(set(field_list)) != len(field_list):
-                raise ValidationError(
-                    _('Cannot have duplicate combination numbers.'), code="invalid")
+        # if first and second and third and fourth and fifth and sixth:
+        #     field_list = [first, second, third, fourth, fifth, sixth]
+        #     if len(set(field_list)) != len(field_list):
+        #         raise ValidationError(
+        #             _('Cannot have duplicate combination numbers.'), code="invalid")
 
 
 class RiderForm(forms.ModelForm):
