@@ -766,8 +766,8 @@ def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, b
                                 else:
                                     bool_combine = True
                                     d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
-                                    d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.rider.name
-                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.horse.owner
+                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.rider.name
+                                    d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.horse.owner
                                 
                             except ObjectDoesNotExist:
                                 print("")
@@ -782,7 +782,7 @@ def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, b
                 int += 1
     return bool_combine
 
-def populate_pdf_division_combine_by_hsize(division_name, page1, page2, show, d, bool_combine):
+def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d, bool_combine):
     for division in Division.objects.filter(name__icontains=division_name):
         if division.show.date == show.date:
             # print(division.name)
@@ -819,8 +819,8 @@ def populate_pdf_division_combine_by_hsize(division_name, page1, page2, show, d,
                                     elif combo.horse.size == "medium" or combo.horse.size == "small":
                                         bool_combine = True
                                         d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
-                                        d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.rider.name
-                                        d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.horse.owner
+                                        d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.rider.name
+                                        d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.horse.owner
                             except ObjectDoesNotExist:
                                 print("")
                     if bool_combine is True:
@@ -870,58 +870,8 @@ def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d,
                                 else:
                                     bool_combine = True
                                     d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
-                                    d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.rider.name
-                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.horse.owner
-                            except ObjectDoesNotExist:
-                                print("")
-                    if bool_combine is True:
-                        # print(c.num)
-                        d[dp2 + "_show_name"] = show.name
-                        d[dp2 + "_show_date"] = show.date
-                        s = dp2 + '_c' + str(int) # set the key to the right class (initially c1) text field
-                        d[s] = c.num # add to the dictionary the class number
-                        e = dp2 + '_e' + str(int) # set the key to the right entry (initially c1) text field
-        #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
-                int += 1
-    return bool_combine
-
-def populate_pdf_division_combine_mis(division_name, page1, page2, show, d, bool_combine):
-    for division in Division.objects.filter(name__icontains=division_name):
-        if division.show.date == show.date:
-            # print(division.name)
-            dp = "p" + str(page1)
-            d[dp + "_show_name"] = show.name
-            d[dp + "_show_date"] = show.date
-            int = 1
-            for c in Class.objects.filter(division__name__icontains=division_name):
-                if c.show.date == show.date:
-                    s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
-                    d[s] = c.num # add to the dictionary the class number
-                    e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
-    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
-                    # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
-                        # print(combo.horse.name)
-                        # print(combo.rider.name)
-                        # print(combo.horse.owner)
-                    list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
-                    for i in range(1,7): # for i range from 1st place to 6th place
-                        # set the keys to the right combo, owner and rider text fields
-                        shorse = s + '_combo' + str(i)
-                        sowner = s + '_owner' + str(i)
-                        srider = s + '_rider' + str(i)
-                        if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
-                            try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
-                                combo = HorseRiderCombo.objects.get(num=list[i-1])
-                                print(combo.horse.type)
-                                if combo.horse.type == "pony":
-                                    d[shorse] = combo.horse # write to pdf the correct combo to that rank
-                                    d[srider] = combo.rider.name
-                                    d[sowner] = combo.horse.owner
-                                else:
-                                    bool_combine = True
-                                    d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
-                                    d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.rider.name
-                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.horse.owner
+                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.rider.name
+                                    d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.horse.owner
                             except ObjectDoesNotExist:
                                 print("")
                     if bool_combine is True:
