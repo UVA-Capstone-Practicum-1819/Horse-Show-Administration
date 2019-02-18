@@ -35,19 +35,19 @@ class RankingForm(forms.Form):
     This allows you to rank classes from 1st through 6th and store those rankings in the specific Class
     """
 
-    class ComboNumValidator:
-        def __init__(self, num, show=None):
-            self.num = num
-            self.show = show
+    # class ComboNumValidator:
+    #     def __init__(self, num, show=None):
+    #         self.num = num
+    #         self.show = show
 
-        def __call__(self, value):
-            if value < 100 or value > 999:
-                raise ValidationError(
-                    _('Number must be between 100 and 999,inclusive'), code="invalid")
+    #     def __call__(self, value):
+    #         if value < 100 or value > 999:
+    #             raise ValidationError(
+    #                 _('Number must be between 100 and 999,inclusive'), code="invalid")
 
-            if show.combos.filter(num=num).count() == 0:
-                raise ValidationError(
-                    _('Combination must be in the show'), code="invalid")
+    #         if show.combos.filter(num=num).count() == 0:
+    #             raise ValidationError(
+    #                 _('Combination must be in the show'), code="invalid")
 
     show_field = forms.CharField(max_length=100)
 
@@ -155,7 +155,6 @@ class HorseRiderComboCreateForm(forms.ModelForm):
     class Meta:
         model = HorseRiderCombo
         fields = ('num', 'contact', 'email', 'cell')
-
 
 
 class HorseRiderEditForm(forms.ModelForm):
