@@ -253,7 +253,7 @@ def add_class(request, show_date, division_id):
             existing_classes = division.classes.filter(
                 num=form.cleaned_data['num'])
             if existing_classes:
-                messages.error(request, "class number in use")
+                messages.info(request, 'Combo for selected horse and rider already exists!')
                 return redirect('view_division_classes', show_date=show_date, division_id=division_id)
             class_form = ClassForm(request.POST)
             class_obj = class_form.save(commit=False)
@@ -288,10 +288,31 @@ def rank_class(request, show_date, division_id, class_num):
     show = Show.objects.get(date=show_date)
     division = show.divisions.get(id=division_id)
     class_obj = division.classes.get(num=class_num)
+    bool_error = False
     if request.method == 'POST':
-
         form = RankingForm(request.POST)
         if form.is_valid():
+            list = [form.cleaned_data['first'], form.cleaned_data['second'], form.cleaned_data['third'],form.cleaned_data['fourth'],form.cleaned_data['fifth'],form.cleaned_data['sixth']]
+            
+            for i in list:
+                if i < 100 or i > 999:
+                    messages.error(request, "Invalid combination number " + str(i) + ": combination number should be three digits: smallest 100, biggest 999")
+                    bool_error = True
+                if show.combos.filter(num=i).count() == 0:
+                    messages.error(request, "Cannot rank combination number " + str(i) + ": it is not registered to the show")
+                    bool_error = True
+            if len(set(list)) != len(list):
+                messages.error(request, "Same combination entered for more than one rank. Duplicates are not allowed in ranking.")
+                bool_error = True
+            if bool_error is True:
+                # request.session['first'] = list[0]
+                # request.session['second'] = list[1]
+                # request.session['third'] = list[2]
+                # request.session['fourth'] = list[3]
+                # request.session['fifth'] = list[4]
+                # request.session['sixth'] = list[5]
+                # request.session['bool_error'] = True
+                return redirect('rank_class', show_date=show_date, division_id=division_id, class_num=class_num)
             combo_map = {
                 form.cleaned_data['first']: 10,
                 form.cleaned_data['second']: 6,
@@ -301,7 +322,6 @@ def rank_class(request, show_date, division_id, class_num):
                 form.cleaned_data['sixth']: 0.5,
             }
             
-
             participations = class_obj.participations.all()
 
             for participation in participations:
@@ -314,8 +334,11 @@ def rank_class(request, show_date, division_id, class_num):
 
 
     else:
+        print(bool_error)
+        # if 'bool_error' in request.session:
+        #     form = RankingForm(initial={'show_field': show_date, 'first': request.session['first'], 'second': request.session['second'], 'third': request.session['third'], 'fourth': request.session['fourth'], 'fifth': request.session['fifth'], 'sixth': request.session['sixth']})
+        # else:
         form = RankingForm(initial={'show_field': show_date})
-        context = {'form': form }
         context = {
             "name": division.name,
             "class": class_obj,
