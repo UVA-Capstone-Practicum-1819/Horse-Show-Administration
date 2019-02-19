@@ -58,6 +58,8 @@ show_patterns = [
 
     path('division/<division_id>/', include(division_patterns)),
 
+    #     path('division/<division_id>/class<class_num>', include(class_patterns)),
+
     path('combo/add', views.add_combo, name="add_combo"),
 
     path('combo/select', views.select_combo, name="select_combo"),

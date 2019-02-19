@@ -64,6 +64,9 @@ class Class(models.Model):
     fifth = models.IntegerField(blank=True, null=True)
     sixth = models.IntegerField(blank=True, null=True)
 
+    def __str__(self):
+        return str(self.num) + ". " + self.name
+
 
 class Horse(models.Model):
     """
