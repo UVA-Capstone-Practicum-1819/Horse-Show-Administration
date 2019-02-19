@@ -2,36 +2,43 @@
 {% load crispy_forms_tags %}
 {% load static %}
 {% block content %}
-<h2>Show: <a href = "{% url 'view_show' show_date=date %}">{{show_name}}</a></h2>
-<h2>Division: <a href = "{% url 'view_division' show_date=date division_name=name%}">{{name}}</a></h2>
+<h2>Show: <a href="{% url 'view_show' show_date=date %}">{{show_name}}</a></h2>
+<h2>Division: <a href="{% url 'view_division' show_date=date division_id=id%}">{{name}}</a></h2>
 <h3>Class {{class.num}}: {{class.name}}</h3>
- <div class="row">
-    <form class="form" method="post">
-        {% csrf_token %}
-        
-      <table class="table">
-        <thead>
-          <th>Combo</th>
-          <th>Scratch</th>
-        </thead>
-         <tbody>
-          {% for combo in combos %}
-            <tr>
-              <td>
-                {{combo.num}}: {{combo.rider}}, {{combo.horse}}
-              </td>
-              <td>
-                <button><a href="{% url 'delete_combo' show_date=date division_name=name class_num=num combo_num=combo.num %}">Scratch</a></button>
+<div class="row">
+  <form class="form" method="post">
+    {% csrf_token %}
+    <table class="table">
+      <thead>
+        <th>Combo</th>
+        <th>Scratch</th>
+      </thead>
+      <tbody>
+        {% for combo in combos %}
+        <tr>
+          <td>
+            {{combo.num}}: {{combo.rider}}, {{combo.horse}}
+          </td>
+          <td>
+            <button><a href="{% url 'delete_combo' show_date=date division_id=id class_num=class_num combo_num=combo.num %}">Scratch</a></button>
 
-              </td>
-               <td>
-                {{ form | crispy}}
-               </td>
-            </tr>
-           {% endfor %}
-        </tbody>
-      </table>
-     <a href="{% url 'select_rider' show_date=date %}">Add a Combo</a>
-     </form>
+          </td>
+          <td>
+            {{ form | crispy}}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <form class="form" method="post">
+      {% csrf_token %}
+      {{ add_form | crispy}}
+      <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+    {{ form.media }}
+    <a href="{% url 'select_rider' show_date=date %}">Add a Combo</a>
+  </form>
+  <a href="{% url 'rank_class' show_date=date division_id=id class_num=class.num %}">Rank Class</a>
 </div>
+{{ form.media }}
 {% endblock %}

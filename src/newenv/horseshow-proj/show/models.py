@@ -3,22 +3,21 @@ from django.core.validators import MinValueValidator, MaxValueValidator, EmailVa
 import random
 import datetime
 
+from localflavor.us.models import USStateField, USZipCodeField
+
+from django.core.exceptions import ValidationError
+
 
 class Show(models.Model):
     """
     Model for a Show, includes basic information such as name/date/location and a pre_reg_price
     for riders who sign up for classes early. There is a dayof price for riders who sign up the day of the show.
     """
-
-    date = models.CharField(max_length=200, primary_key=True)
-
+    date = models.CharField(primary_key=True, max_length=100)
     name = models.CharField(max_length=100)
-
     location = models.CharField(max_length=100)
-
     day_of_price = models.IntegerField(
         blank=True, null=True, default=0, verbose_name="Day-of Price")
-
     pre_reg_price = models.IntegerField(
         blank=True, null=True, default=0, verbose_name="Preregistration Price")
 
@@ -32,6 +31,7 @@ class Division(models.Model):
     """
     class Meta:
         unique_together = ('show', 'name')
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, default="")
     champion = models.IntegerField(default=0)
     champion_pts = models.IntegerField(default=0)
@@ -53,11 +53,20 @@ class Class(models.Model):
 
     num = models.IntegerField(default=0)
     name = models.CharField(max_length=100, default="")
-    show = models.CharField(max_length=100, default="")
     division = models.ForeignKey(
         Division, on_delete=models.CASCADE, related_name="classes", null=True)
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, related_name="classes", null=True)
+    first = models.IntegerField(blank=True, null=True)
+    second = models.IntegerField(blank=True, null=True)
+    third = models.IntegerField(blank=True, null=True)
+    fourth = models.IntegerField(blank=True, null=True)
+    fifth = models.IntegerField(blank=True, null=True)
+    sixth = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return str(self.num) + ". " + self.name
+
 
 class Horse(models.Model):
     """
@@ -72,12 +81,15 @@ class Horse(models.Model):
     name = models.CharField(primary_key=True, max_length=200,
                             verbose_name="Name (Barn Name)")
     accession_num = models.CharField(
-        max_length=200, verbose_name="Accession Number", validators=[alphanumeric_validator])
+        max_length=20, verbose_name="Accession Number", validators=[alphanumeric_validator])
     coggins_date = models.DateField(
         default=datetime.date.today,  verbose_name="Coggins Date", )
     owner = models.CharField(max_length=200, verbose_name="Owner")
-    type = models.CharField(max_length=200, choices=type_choices, default="Horse", verbose_name="Type")
-    size = models.CharField(max_length=200, choices=size_choices, default="N/A", verbose_name="Size (if pony)")
+    type = models.CharField(
+        max_length=200, choices=type_choices, default="Horse", verbose_name="Type")
+    size = models.CharField(max_length=200, choices=size_choices,
+                            default="N/A", verbose_name="Size (if pony)")
+
     def __str__(self):
         return self.name
 
@@ -89,8 +101,10 @@ class Rider(models.Model):
     name = models.CharField(max_length=200, verbose_name="Name")
     address = models.CharField(max_length=200, verbose_name="Street Address")
     city = models.CharField(default="", max_length=200)
-    state = models.CharField(default="", max_length=200)
-    zip_code = models.IntegerField(default=0)
+    state = USStateField(default="VA")
+    zip_code = USZipCodeField()
+    adult = models.BooleanField(
+        default=False, verbose_name="Adult")
     birth_date = models.DateField(
         blank=True, null=True, verbose_name="Birth Date", )
     member_VHSA = models.BooleanField(
@@ -134,6 +148,13 @@ class HorseRiderCombo(models.Model):
 
     def __str__(self):
         return f"Show: {str(self.show.date)}, Number: {self.num}, Rider: {self.rider.name}, Horse: {self.horse.name}"
+
+
+def validate_unique(self, exclude=None):
+    qs = HorseRiderCombo.objects.filter(rider=self.rider, horse=self.horse)
+    if self.pk is None:
+        if qs.filter(r=self.rider).exists() and qs.filter(h=self.horse.exists()):
+            raise ValidationError("HRC already exists")
 
 
 class ClassParticipation(models.Model):

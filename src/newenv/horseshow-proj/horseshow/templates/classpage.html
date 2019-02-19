@@ -2,35 +2,36 @@
 {% load crispy_forms_tags %}
 {% load static %}
 {% block content %}
-<h2>Show: <a href = "{% url 'view_show' show_date=date %}">{{showname}}</a></h2>
+<h2>Show: <a href="{% url 'view_show' show_date=date %}">{{showname}}</a></h2>
 <h3>Class: {{number}}</h3>
- <div class="row">
-    <form class="form" method="post">
-        {% csrf_token %}
-        <!-- {{ form | crispy}} -->
-        <!-- <button type="submit" class="btn btn-success" >Submit</button> -->
-      <table class="table">
-        <thead>
-          <th>Combo</th>
-          <th>Scratch</th>
-        </thead>
-         <tbody>
-          {% for c in combos %}
-            <tr>
-              <td>
-                {{c.num}}: {{c.rider}}, {{c.horse}}
-              </td>
-              <td>
-                <button><a href="{% url 'delete_combo' show_date=date division_name=name class_num=num combo=c.num %}">Scratch</a></button>
-              </td>
-               <td>
-                {{ form | crispy}}
-               </td>
-            </tr>
-           {% endfor %}
-        </tbody>
-      </table>
-     <a href="{% url 'select_rider' %}">Add a Combo</a>
-     </form>
+<div class="row">
+  <form class="form" method="post">
+    {% csrf_token %}
+    {{ form | crispy}}
+    <button type="submit" class="btn btn-success">Submit</button>
+    <table class="table">
+      <thead>
+        <th>Combo</th>
+        <th>Scratch</th>
+      </thead>
+      <tbody>
+        {% for c in combos %}
+        <tr>
+          <td>
+            {{c.num}}: {{c.rider}}, {{c.horse}}
+          </td>
+          <td>
+            <button><a href="{% url 'delete_combo' show_date=date division_id=id class_num=class_num combo_num=c.num %}">Scratch</a></button>
+          </td>
+          <td>
+            {{ form | crispy}}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="{% url 'select_rider' %}">Add a Combo</a>
+  </form>
 </div>
+{{ form.media }}
 {% endblock %}
