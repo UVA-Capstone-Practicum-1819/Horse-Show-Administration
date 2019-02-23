@@ -152,9 +152,9 @@
 <p id="n83" class="pln"><a href="#n83">83</a></p>
 <p id="n84" class="pln"><a href="#n84">84</a></p>
 <p id="n85" class="pln"><a href="#n85">85</a></p>
-<p id="n86" class="stm run hide_run"><a href="#n86">86</a></p>
+<p id="n86" class="pln"><a href="#n86">86</a></p>
 <p id="n87" class="pln"><a href="#n87">87</a></p>
-<p id="n88" class="pln"><a href="#n88">88</a></p>
+<p id="n88" class="stm run hide_run"><a href="#n88">88</a></p>
 <p id="n89" class="pln"><a href="#n89">89</a></p>
 <p id="n90" class="pln"><a href="#n90">90</a></p>
 <p id="n91" class="pln"><a href="#n91">91</a></p>
@@ -182,14 +182,14 @@
 <p id="n113" class="pln"><a href="#n113">113</a></p>
 <p id="n114" class="pln"><a href="#n114">114</a></p>
 <p id="n115" class="pln"><a href="#n115">115</a></p>
-<p id="n116" class="stm run hide_run"><a href="#n116">116</a></p>
-<p id="n117" class="stm run hide_run"><a href="#n117">117</a></p>
+<p id="n116" class="pln"><a href="#n116">116</a></p>
+<p id="n117" class="pln"><a href="#n117">117</a></p>
 <p id="n118" class="pln"><a href="#n118">118</a></p>
-<p id="n119" class="pln"><a href="#n119">119</a></p>
+<p id="n119" class="stm run hide_run"><a href="#n119">119</a></p>
 <p id="n120" class="stm run hide_run"><a href="#n120">120</a></p>
 <p id="n121" class="pln"><a href="#n121">121</a></p>
 <p id="n122" class="pln"><a href="#n122">122</a></p>
-<p id="n123" class="pln"><a href="#n123">123</a></p>
+<p id="n123" class="stm run hide_run"><a href="#n123">123</a></p>
 <p id="n124" class="pln"><a href="#n124">124</a></p>
 <p id="n125" class="pln"><a href="#n125">125</a></p>
 <p id="n126" class="pln"><a href="#n126">126</a></p>
@@ -208,6 +208,9 @@
 <p id="n139" class="pln"><a href="#n139">139</a></p>
 <p id="n140" class="pln"><a href="#n140">140</a></p>
 <p id="n141" class="pln"><a href="#n141">141</a></p>
+<p id="n142" class="pln"><a href="#n142">142</a></p>
+<p id="n143" class="pln"><a href="#n143">143</a></p>
+<p id="n144" class="pln"><a href="#n144">144</a></p>
 
             </td>
             <td class="text">
@@ -269,89 +272,92 @@
 <p id="t56" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t57" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'division/select'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">select_division</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"select_division"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t58" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t59" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'division/&lt;division_name>/'</span><span class="op">,</span> <span class="nam">include</span><span class="op">(</span><span class="nam">division_patterns</span><span class="op">)</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t59" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'division/&lt;division_id>/'</span><span class="op">,</span> <span class="nam">include</span><span class="op">(</span><span class="nam">division_patterns</span><span class="op">)</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t60" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t61" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'combo/add'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">add_combo</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"add_combo"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t61" class="pln">    <span class="com">#     path('division/&lt;division_id>/class&lt;class_num>', include(class_patterns)),</span><span class="strut">&nbsp;</span></p>
 <p id="t62" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t63" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'combo/select'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">select_combo</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"select_combo"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t63" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'combo/add'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">add_combo</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"add_combo"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t64" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t65" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'combo/&lt;combo_num>/'</span><span class="op">,</span> <span class="nam">include</span><span class="op">(</span><span class="nam">combo_patterns</span><span class="op">)</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t65" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'combo/select'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">select_combo</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"select_combo"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t66" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t67" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'rider/add'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">add_rider</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"add_rider"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t67" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'combo/&lt;combo_num>/'</span><span class="op">,</span> <span class="nam">include</span><span class="op">(</span><span class="nam">combo_patterns</span><span class="op">)</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t68" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t69" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'rider/select'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">select_rider</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"select_rider"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t69" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'rider/add'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">add_rider</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"add_rider"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t70" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t71" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'rider/select2'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">select_rider2</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"select_rider2"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t71" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'rider/select'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">select_rider</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"select_rider"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t72" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t73" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'rider/&lt;rider_pk>/edit'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">edit_rider</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"edit_rider"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t73" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'rider/select2'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">select_rider2</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"select_rider2"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t74" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t75" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'horse/add'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">add_horse</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"add_horse"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t75" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'rider/&lt;rider_pk>/edit'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">edit_rider</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"edit_rider"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t76" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t77" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'horse/select'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">select_horse</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"select_horse"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t77" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'horse/add'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">add_horse</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"add_horse"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t78" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t79" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'horse/select2'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">select_horse2</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"select_horse2"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t79" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'horse/select'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">select_horse</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"select_horse"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t80" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t81" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'horse/&lt;horse_pk>/edit'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">edit_horse</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"edit_horse"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t81" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'horse/select2'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">select_horse2</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"select_horse2"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t82" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t83" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'populate-pdf'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">populate_pdf</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"populate_pdf"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t84" class="pln"><span class="op">]</span><span class="strut">&nbsp;</span></p>
-<p id="t85" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t86" class="stm run hide_run"><span class="nam">urlpatterns</span> <span class="op">=</span> <span class="op">[</span><span class="strut">&nbsp;</span></p>
-<p id="t87" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">''</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">select_show</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"select_show"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t88" class="pln">     <span class="nam">path</span><span class="op">(</span><span class="str">'show-autocomplete'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">ShowAutocomplete</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t89" class="pln">         <span class="nam">name</span><span class="op">=</span><span class="str">"show_autocomplete"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t90" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t91" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'rider-autocomplete'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">RiderAutocomplete</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t92" class="pln">         <span class="nam">name</span><span class="op">=</span><span class="str">"rider_autocomplete"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t93" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t94" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'horse-autocomplete'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">HorseAutocomplete</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t95" class="pln">         <span class="nam">name</span><span class="op">=</span><span class="str">"horse_autocomplete"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t96" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'combo-autocomplete'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">ComboAutocomplete</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"combo_autocomplete"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t97" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t98" class="pln">   <span class="nam">path</span><span class="op">(</span><span class="str">'division-autocomplete'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">DivisionAutocomplete</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t99" class="pln">         <span class="nam">name</span><span class="op">=</span><span class="str">"division_autocomplete"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t100" class="pln">     <span class="nam">path</span><span class="op">(</span><span class="str">'class-autocomplete'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">ClassAutocomplete</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t101" class="pln">         <span class="nam">name</span><span class="op">=</span><span class="str">"classes_autocomplete"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t102" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'add'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">add_show</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">'add_show'</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t103" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t104" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'&lt;show_date>/'</span><span class="op">,</span> <span class="nam">include</span><span class="op">(</span><span class="nam">show_patterns</span><span class="op">)</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t105" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t106" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'signup'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">sign_up</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">'sign_up'</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t107" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t108" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'login'</span><span class="op">,</span> <span class="nam">auth_views</span><span class="op">.</span><span class="nam">LoginView</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
-<p id="t109" class="pln">        <span class="nam">template_name</span><span class="op">=</span><span class="str">'log_in.html'</span><span class="op">)</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">'log_in'</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t83" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'horse/&lt;horse_pk>/edit'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">edit_horse</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"edit_horse"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t84" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t85" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'populate-pdf'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">populate_pdf</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"populate_pdf"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t86" class="pln"><span class="op">]</span><span class="strut">&nbsp;</span></p>
+<p id="t87" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t88" class="stm run hide_run"><span class="nam">urlpatterns</span> <span class="op">=</span> <span class="op">[</span><span class="strut">&nbsp;</span></p>
+<p id="t89" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">''</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">select_show</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">"select_show"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t90" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'show-autocomplete'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">ShowAutocomplete</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t91" class="pln">         <span class="nam">name</span><span class="op">=</span><span class="str">"show_autocomplete"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t92" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t93" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'rider-autocomplete'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">RiderAutocomplete</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t94" class="pln">         <span class="nam">name</span><span class="op">=</span><span class="str">"rider_autocomplete"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t95" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t96" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'horse-autocomplete'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">HorseAutocomplete</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t97" class="pln">         <span class="nam">name</span><span class="op">=</span><span class="str">"horse_autocomplete"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t98" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'combo-autocomplete'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">ComboAutocomplete</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t99" class="pln">         <span class="nam">name</span><span class="op">=</span><span class="str">"combo_autocomplete"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t100" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t101" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'division-autocomplete'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">DivisionAutocomplete</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t102" class="pln">         <span class="nam">name</span><span class="op">=</span><span class="str">"division_autocomplete"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t103" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'class-autocomplete'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">ClassAutocomplete</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t104" class="pln">         <span class="nam">name</span><span class="op">=</span><span class="str">"classes_autocomplete"</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t105" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'add'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">add_show</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">'add_show'</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t106" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t107" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'&lt;show_date>/'</span><span class="op">,</span> <span class="nam">include</span><span class="op">(</span><span class="nam">show_patterns</span><span class="op">)</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t108" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t109" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'signup'</span><span class="op">,</span> <span class="nam">views</span><span class="op">.</span><span class="nam">sign_up</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">'sign_up'</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t110" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t111" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'logout'</span><span class="op">,</span> <span class="nam">auth_views</span><span class="op">.</span><span class="nam">LogoutView</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">'log_out'</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t112" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t111" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'login'</span><span class="op">,</span> <span class="nam">auth_views</span><span class="op">.</span><span class="nam">LoginView</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
+<p id="t112" class="pln">        <span class="nam">template_name</span><span class="op">=</span><span class="str">'log_in.html'</span><span class="op">)</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">'log_in'</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t113" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t114" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t115" class="pln"><span class="op">]</span><span class="strut">&nbsp;</span></p>
-<p id="t116" class="stm run hide_run"><span class="nam">urlpatterns</span> <span class="op">+=</span> <span class="nam">staticfiles_urlpatterns</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t117" class="stm run hide_run"><span class="nam">urlpatterns</span> <span class="op">+=</span> <span class="nam">static</span><span class="op">(</span><span class="nam">settings</span><span class="op">.</span><span class="nam">STATIC_URL</span><span class="op">,</span> <span class="nam">document_root</span><span class="op">=</span><span class="nam">settings</span><span class="op">.</span><span class="nam">STATIC_ROOT</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t118" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t119" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t120" class="stm run hide_run"><span class="str">"""horseshow URL Configuration</span><span class="strut">&nbsp;</span></p>
+<p id="t114" class="pln">    <span class="nam">path</span><span class="op">(</span><span class="str">'logout'</span><span class="op">,</span> <span class="nam">auth_views</span><span class="op">.</span><span class="nam">LogoutView</span><span class="op">.</span><span class="nam">as_view</span><span class="op">(</span><span class="op">)</span><span class="op">,</span> <span class="nam">name</span><span class="op">=</span><span class="str">'log_out'</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t115" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t116" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t117" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t118" class="pln"><span class="op">]</span><span class="strut">&nbsp;</span></p>
+<p id="t119" class="stm run hide_run"><span class="nam">urlpatterns</span> <span class="op">+=</span> <span class="nam">staticfiles_urlpatterns</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t120" class="stm run hide_run"><span class="nam">urlpatterns</span> <span class="op">+=</span> <span class="nam">static</span><span class="op">(</span><span class="nam">settings</span><span class="op">.</span><span class="nam">STATIC_URL</span><span class="op">,</span> <span class="nam">document_root</span><span class="op">=</span><span class="nam">settings</span><span class="op">.</span><span class="nam">STATIC_ROOT</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t121" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t122" class="pln"><span class="str">The `urlpatterns` list routes URLs to views. For more information please see:</span><span class="strut">&nbsp;</span></p>
-<p id="t123" class="pln"><span class="str">    https://docs.djangoproject.com/en/2.1/topics/http/urls/</span><span class="strut">&nbsp;</span></p>
-<p id="t124" class="pln"><span class="str">Examples:</span><span class="strut">&nbsp;</span></p>
-<p id="t125" class="pln"><span class="str">Function views</span><span class="strut">&nbsp;</span></p>
-<p id="t126" class="pln"><span class="str">    1. Add an import:  from my_app import views</span><span class="strut">&nbsp;</span></p>
-<p id="t127" class="pln"><span class="str">    2. Add a URL to urlpatterns:  path('', views.home, name='home')</span><span class="strut">&nbsp;</span></p>
-<p id="t128" class="pln"><span class="str">Class-based views</span><span class="strut">&nbsp;</span></p>
-<p id="t129" class="pln"><span class="str">    1. Add an import:  from other_app.views import Home</span><span class="strut">&nbsp;</span></p>
-<p id="t130" class="pln"><span class="str">    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')</span><span class="strut">&nbsp;</span></p>
-<p id="t131" class="pln"><span class="str">Including another URLconf</span><span class="strut">&nbsp;</span></p>
-<p id="t132" class="pln"><span class="str">    1. Import the include() function: from django.urls import include, path</span><span class="strut">&nbsp;</span></p>
-<p id="t133" class="pln"><span class="str">    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))</span><span class="strut">&nbsp;</span></p>
-<p id="t134" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t135" class="pln"><span class="str">    Most of our url templates show how certain subdivisions exist in the organization of the horse show, so the information</span><span class="strut">&nbsp;</span></p>
-<p id="t136" class="pln"><span class="str">    can be passed between different templatesself</span><span class="strut">&nbsp;</span></p>
-<p id="t137" class="pln"><span class="str">    Obsolete URLs were commented out or removed</span><span class="strut">&nbsp;</span></p>
-<p id="t138" class="pln"><span class="str">    Autocomplete pages are only used for autocomplete functionality- will not be a functional page for the purpose</span><span class="strut">&nbsp;</span></p>
-<p id="t139" class="pln"><span class="str">    of organizing a Horse Show</span><span class="strut">&nbsp;</span></p>
-<p id="t140" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t141" class="pln"><span class="str"> """</span><span class="strut">&nbsp;</span></p>
+<p id="t122" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t123" class="stm run hide_run"><span class="str">"""horseshow URL Configuration</span><span class="strut">&nbsp;</span></p>
+<p id="t124" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t125" class="pln"><span class="str">The `urlpatterns` list routes URLs to views. For more information please see:</span><span class="strut">&nbsp;</span></p>
+<p id="t126" class="pln"><span class="str">    https://docs.djangoproject.com/en/2.1/topics/http/urls/</span><span class="strut">&nbsp;</span></p>
+<p id="t127" class="pln"><span class="str">Examples:</span><span class="strut">&nbsp;</span></p>
+<p id="t128" class="pln"><span class="str">Function views</span><span class="strut">&nbsp;</span></p>
+<p id="t129" class="pln"><span class="str">    1. Add an import:  from my_app import views</span><span class="strut">&nbsp;</span></p>
+<p id="t130" class="pln"><span class="str">    2. Add a URL to urlpatterns:  path('', views.home, name='home')</span><span class="strut">&nbsp;</span></p>
+<p id="t131" class="pln"><span class="str">Class-based views</span><span class="strut">&nbsp;</span></p>
+<p id="t132" class="pln"><span class="str">    1. Add an import:  from other_app.views import Home</span><span class="strut">&nbsp;</span></p>
+<p id="t133" class="pln"><span class="str">    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')</span><span class="strut">&nbsp;</span></p>
+<p id="t134" class="pln"><span class="str">Including another URLconf</span><span class="strut">&nbsp;</span></p>
+<p id="t135" class="pln"><span class="str">    1. Import the include() function: from django.urls import include, path</span><span class="strut">&nbsp;</span></p>
+<p id="t136" class="pln"><span class="str">    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))</span><span class="strut">&nbsp;</span></p>
+<p id="t137" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t138" class="pln"><span class="str">    Most of our url templates show how certain subdivisions exist in the organization of the horse show, so the information</span><span class="strut">&nbsp;</span></p>
+<p id="t139" class="pln"><span class="str">    can be passed between different templatesself</span><span class="strut">&nbsp;</span></p>
+<p id="t140" class="pln"><span class="str">    Obsolete URLs were commented out or removed</span><span class="strut">&nbsp;</span></p>
+<p id="t141" class="pln"><span class="str">    Autocomplete pages are only used for autocomplete functionality- will not be a functional page for the purpose</span><span class="strut">&nbsp;</span></p>
+<p id="t142" class="pln"><span class="str">    of organizing a Horse Show</span><span class="strut">&nbsp;</span></p>
+<p id="t143" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t144" class="pln"><span class="str"> """</span><span class="strut">&nbsp;</span></p>
 
             </td>
         </tr>
@@ -362,7 +368,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.5.2</a>,
-            created at 2019-02-13 10:30
+            created at 2019-02-22 23:42
         </p>
     </div>
 </div>
