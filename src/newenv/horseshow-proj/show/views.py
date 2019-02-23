@@ -338,10 +338,11 @@ def rank_class(request, show_date, division_id, class_num):
             participations = class_obj.participations.all()
 
             for participation in participations:
+                print(participation)
                 combo_num = participation.combo.num
                 if combo_num in combo_map:
                     participation.score = combo_map[combo_num]
-                    participation.save()
+                    participation.save(update_fields=["score"])
 
             return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
 
