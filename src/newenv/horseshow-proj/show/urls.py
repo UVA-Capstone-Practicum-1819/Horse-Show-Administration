@@ -44,7 +44,7 @@ combo_patterns = [
     path('billing',
          views.view_billing, name="view_billing"),
 
-    path('scratch', views.scratch_combo, name="scratch_combo"),
+    # path('scratch', views.scratch_combo, name="scratch_combo"),
 
     path('edit', views.edit_combo, name="edit_combo"),
 ]
