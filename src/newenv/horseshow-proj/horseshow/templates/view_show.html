@@ -3,66 +3,71 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-<h3>Show: {{ show_name }}</h3>
-
 <body>
 
+  <h3>Show: {{ show_name }}</h3>
+
+  {% comment %} show information {% endcomment %}
   <h4><b>Date:</b> {{ date }}
-    <br><b>Location:</b> {{ location }}</h4>
-  
+  <br><b>Location:</b> {{ location }}</h4>
+    
 
-  {% with classes_per_division=10 %}
+  {% comment %} table containing all the divisions and their respective classes {% endcomment %}
   <table class="table table-striped table-bordered">
-        <thead class="bg-info">
+      {% comment %} the table header (division, classes) {% endcomment %}
+      <thead class="bg-info">
 
-          <th>Division</th>
-          <th colspan="{{classes_per_division}}">Classes</th>
-          
-        </thead>
-         <tbody>
-          {% for division in divisions %}
-            <tr>
+        <th>Division</th>
+        <th colspan="10">Classes</th>
+        
+      </thead>
+
+      {% comment %} table body (each row contains division and then its classes) {% endcomment %}
+      <tbody>
+
+        {% for division in divisions %}
+          <tr>
+            {% comment %} the cell containing the clickable division name {% endcomment %}
+            <td>
+
+              <a class="btn" href="{% url 'view_division' show_date=date division_id=division.pk %}">{{division.name}}</a> 
+
+            </td>
+              
+            {% comment %} cells for each of the classes {% endcomment %}
+            {% for class in division.classes.all %}
               <td>
 
-                <a class="btn" href="{% url 'view_division' show_date=date division_id=division.pk %}">{{division.name}}</a> 
+                <a class="btn" href="{% url 'view_class' show_date=date division_id=division.pk class_num=class.num %}">
+
+                  {{class.num}} - {{class.name}}
+
+                </a> 
 
               </td>
-              
-      
-              {% for class in division.classes.all %}
-                <td>
 
-                  <a class="btn" href="{% url 'view_class' show_date=date division_id=division.pk class_num=class.num %}">{{class.num}} - {{class.name}}</a> 
-                </td>
-              {% endfor %}
-              
-              <td>
-                <a class="btn btn-success" href="{% url 'add_class' show_date=date division_id=division.id %}">+ Add Class</a> 
-              </td>
-               
-            </tr>
+            {% endfor %}
             
-           {% endfor %}
-
-
-
-           <tr>
-              <td>
-                <a class="btn btn-primary" href="{% url 'add_division' show_date=date %}">+ Add Another Division</a>
-              </td>
-            </tr>
-
-                  <a class="btn" href="{% url 'view_class' show_date=date division_name=division.name class_num=class.num %}">{{class.num}} - {{class.name}}</a> 
-                </td>
-              {% endfor %}
-              
+            {% comment %} add class cell for each division {% endcomment %}
+            <td>
+              <a class="btn btn-success" href="{% url 'add_class' show_date=date division_id=division.id %}">+ Add Class</a> 
+            </td>
                
-            </tr>
-           {% endfor %}
+          </tr>
+
+                  
+        {% endfor %}
+
+        {% comment %} another row for the add division button {% endcomment %}
+          <tr>
+            <td>
+              <a class="btn btn-primary" href="{% url 'add_division' show_date=date %}">+ Add Another Division</a>
+            </td>
+          </tr>
 
         </tbody>
       </table>
-    {% endwith %}
+    
 
   
 
