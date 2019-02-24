@@ -195,13 +195,25 @@ class ViewsTestCases(TestCase):
         request = HttpRequest()
         response = self.client.get(reverse('select_show'))
 
+    def test_select_combo(self):
+        self.client.login(username='john', password='johnpassword')
+        request = HttpRequest()
+        response = self.client.get(reverse('select_combo', kwargs={'show_date':'2018-12-10'}))
+
     def test_select_show_post(self):
         self.client.login(username='john', password='johnpassword')
         show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
         request = HttpRequest()
         response = self.client.post('/show/', {'date':'2018-12-10'})
 
-    def sign_up_test(self):
+    def test_select_combo_post(self):
+        horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
+            '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
+        rider1 = Rider.objects.create(name="Anna Wu", address="address1", city="cville", state="VA",
+                                      zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
+        combo1 = HorseRiderCombo.objects.create(
+            num=200, rider=rider1, horse=horse1)
+        self.client.login(username='john', password='johnpassword')
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
         request = HttpRequest()
-        client = Client()
-        response = client.get('/show/signup/')
+        response = self.client.post('/show/2018-12-10/combo/select', {'combo':'200'})
