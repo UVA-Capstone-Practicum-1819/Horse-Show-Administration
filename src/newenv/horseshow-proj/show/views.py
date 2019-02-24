@@ -338,10 +338,11 @@ def rank_class(request, show_date, division_id, class_num):
             participations = class_obj.participations.all()
 
             for participation in participations:
+                print(participation)
                 combo_num = participation.combo.num
                 if combo_num in combo_map:
                     participation.score = combo_map[combo_num]
-                    participation.save()
+                    participation.save(update_fields=["score"])
 
             return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
 
@@ -654,7 +655,8 @@ def edit_combo(request, show_date, combo_num):
     if request.method == "POST":
         if request.POST.get('remove_class'):
             num = request.POST['remove_class']
-            selected_class = ClassParticipation.objects.filter(combo=combo).get(participated_class=num)
+            class_obj = Class.objects.filter(show=show_date).get(num=num)
+            selected_class = ClassParticipation.objects.filter(combo=combo).get(participated_class=class_obj)
             selected_class.delete()
 
         if request.POST.get('add_class'):
@@ -944,6 +946,7 @@ def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d,
     #     #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
     #             int += 1
     # return bool_combine
+
 
 def calculate_age(born):
     today = date.today()
