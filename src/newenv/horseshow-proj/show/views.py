@@ -161,7 +161,7 @@ def view_billing(request, show_date, combo_num):
     total = classes.count()
     price = 0
     for classe in classes:
-        class_pre_reg = ClassParticipation.objects.filter(combo=combo).get(participated_class=classe.num)
+        class_pre_reg = ClassParticipation.objects.filter(combo=combo).get(participated_class=classe)
         if class_pre_reg.is_prereg == True:
             price += show.pre_reg_price
         else:
@@ -340,10 +340,11 @@ def rank_class(request, show_date, division_id, class_num):
             participations = class_obj.participations.all()
 
             for participation in participations:
+                print(participation)
                 combo_num = participation.combo.num
                 if combo_num in combo_map:
                     participation.score = combo_map[combo_num]
-                    participation.save()
+                    participation.save(update_fields=["score"])
 
             return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
 
@@ -656,7 +657,8 @@ def edit_combo(request, show_date, combo_num):
     if request.method == "POST":
         if request.POST.get('remove_class'):
             num = request.POST['remove_class']
-            selected_class = ClassParticipation.objects.filter(combo=combo).get(participated_class=num)
+            class_obj = Class.objects.filter(show=show_date).get(num=num)
+            selected_class = ClassParticipation.objects.filter(combo=combo).get(participated_class=class_obj)
             selected_class.delete()
 
         if request.POST.get('add_class'):
@@ -768,7 +770,8 @@ def populate_pdf_division(division_name, page, show, d):
                     s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
                     d[s] = c.num # add to the dictionary the class number
                     e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
-    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                    num_entry = ClassParticipation.objects.filter(participated_class=c).count()
+                    d[e] =  num_entry
                     # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
                         # print(combo.horse.name)
                         # print(combo.rider.name)
@@ -791,6 +794,20 @@ def populate_pdf_division(division_name, page, show, d):
 
 def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, bool_combine):
     for division in Division.objects.filter(name__icontains=division_name):
+        # combined = True;
+        # div2 = Division.objects.filter(name__icontains=division_name2).filter(name__icontains="hunter")
+        # if div2.count()>0:
+        #     if div2.show.date == show.date:
+        #     #check num entry combined > 2
+        #         for c in Class.objects.filter(division__name__icontains=division_name2).filter(division__name__icontains="hunter"):
+        #             if c.show.date == show.date:
+        #                 num_entry = ClassParticipation.objects.filter(participated_class=c).count()
+        #                 if num_entry > 2:
+        #                     combined = False;
+                            
+
+
+
         if division.show.date == show.date:
             # print(division.name)
             dp = "p" + str(page1)
@@ -803,11 +820,8 @@ def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, b
                     s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
                     d[s] = c.num # add to the dictionary the class number
                     e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
-    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
-                    # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
-                        # print(combo.horse.name)
-                        # print(combo.rider.name)
-                        # print(combo.horse.owner)
+                    num_entry = ClassParticipation.objects.filter(participated_class=c).count()
+                    d[e] =  num_entry
                     list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
                     for i in range(1,7): # for i range from 1st place to 6th place
                         # set the keys to the right combo, owner and rider text fields
@@ -836,7 +850,8 @@ def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, b
                         s = dp2 + '_c' + str(int) # set the key to the right class (initially c1) text field
                         d[s] = c.num # add to the dictionary the class number
                         e = dp2 + '_e' + str(int) # set the key to the right entry (initially c1) text field
-        #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                        num_entry = ClassParticipation.objects.filter(participated_class=c).count()
+                        d[e] =  num_entry
                 int += 1
     return bool_combine
 
@@ -854,7 +869,8 @@ def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d,
                     s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
                     d[s] = c.num # add to the dictionary the class number
                     e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
-    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                    num_entry = ClassParticipation.objects.filter(participated_class=c).count()
+                    d[e] =  num_entry
                     # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
                         # print(combo.horse.name)
                         # print(combo.rider.name)
@@ -888,7 +904,8 @@ def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d,
                         s = dp2 + '_c' + str(int) # set the key to the right class (initially c1) text field
                         d[s] = c.num # add to the dictionary the class number
                         e = dp2 + '_e' + str(int) # set the key to the right entry (initially c1) text field
-        #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                        num_entry = ClassParticipation.objects.filter(participated_class=c).count()
+                        d[e] =  num_entry
                 int += 1
     return bool_combine
 
@@ -906,7 +923,8 @@ def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d,
                     s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
                     d[s] = c.num # add to the dictionary the class number
                     e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
-    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                    num_entry = ClassParticipation.objects.filter(participated_class=c).count()
+                    d[e] =  num_entry
                     # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
                         # print(combo.horse.name)
                         # print(combo.rider.name)
@@ -939,7 +957,8 @@ def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d,
                         s = dp2 + '_c' + str(int) # set the key to the right class (initially c1) text field
                         d[s] = c.num # add to the dictionary the class number
                         e = dp2 + '_e' + str(int) # set the key to the right entry (initially c1) text field
-        #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                        num_entry = ClassParticipation.objects.filter(participated_class=c).count()
+                        d[e] =  num_entry
                 int += 1
     return bool_combine
 
