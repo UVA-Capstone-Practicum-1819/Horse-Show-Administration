@@ -450,6 +450,7 @@ class CheckRider(TestCase):
         assertEquals(response.status_code, 200)
 
     def test_select_rider_post_ok(self):
+
         response = self.client.post(
             f"/show/{self.show.date}/rider/select/"))
         assertEquals(response.status_code, 200)
@@ -458,6 +459,7 @@ class CheckRider(TestCase):
         response = self.client.get(
             reverse('select_rider2', kwargs={"show_date": self.show.date}))
         assertEquals(response.status_code, 200)
+
 
     def test_select_rider2_post_ok(self):
         pass
@@ -470,6 +472,7 @@ class CheckRider(TestCase):
 
     def test_add_rider_get_ok(self):
         pass
+
 
 
     def test_add_rider_post_ok(self):
