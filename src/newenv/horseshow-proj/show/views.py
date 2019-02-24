@@ -194,10 +194,11 @@ def scratch_combo(request, show_date, combo_num):
 
 def view_division_scores(request, show_date, division_id):
     """ displays list of classes in division, hrc winners of each of those classes from 1st-6th places, and form to enter champion info """
+
+    # get the division from the show object
     show = Show.objects.get(date=show_date)
-    # get the division object from the name of the divison that was passed in
-    # I don't think this will work right with multiple shows...
     division = show.divisions.get(id=division_id)
+
     form = DivisionChampForm()
     if request.method == "POST":
         form = DivisionChampForm(request.POST)
@@ -218,8 +219,9 @@ def view_division_scores(request, show_date, division_id):
 
     else:
         form = DivisionChampForm()
+        
     context = {'classes': division.classes.all(), 'date': show_date,
-               'id': division_id, 'form': form}
+               'id': division_id, 'name': division.name, 'form': form}
     # passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
     return render(request, 'view_division_scores.html', context)
 
