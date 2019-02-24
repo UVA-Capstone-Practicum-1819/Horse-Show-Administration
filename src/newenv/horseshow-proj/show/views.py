@@ -86,21 +86,23 @@ def add_show(request):
     form = ShowForm()
     if request.method == "GET":
         return render(request, 'add_show.html', {'form': form})
-    f = ShowForm(request.POST)
-    if not f.is_valid():
-        return render(request, 'add_show.html', {'form': f})
-    show_name = f.cleaned_data['name']
-    show_date = f.cleaned_data['date']
-    if Show.objects.filter(date=show_date).count() == 1:
-        response = {'ok': True, 'success_msg': "Cannot have Shows with same date",
-                    'form': form}
-        return render(request, 'add_show.html', response, {'form': f})
-    show_location = f.cleaned_data['location']
-    new_show = Show.objects.create(
-        name=show_name, date=show_date, location=show_location,
-        day_of_price=f.cleaned_data['day_of_price'], pre_reg_price=f.cleaned_data['pre_reg_price'])
-
-    return redirect('view_show', show_date=show_date)
+    if request.method == "POST":
+        f = ShowForm(request.POST)
+        if not f.is_valid():
+            return render(request, 'add_show.html', {'form': f})
+        show_name = f.cleaned_data['name']
+        show_date = f.cleaned_data['date']
+        if Show.objects.filter(date=show_date).count() == 1:
+            response = {'ok': True, 'success_msg': "Cannot have Shows with same date",
+                        'form': form}
+            return render(request, 'add_show.html', response, {'form': f})
+        show_location = f.cleaned_data['location']
+        new_show = Show.objects.create(
+            name=show_name, date=show_date, location=show_location,
+            day_of_price=f.cleaned_data['day_of_price'], pre_reg_price=f.cleaned_data['pre_reg_price'])
+        return redirect('view_show', show_date=show_date)
+    else:
+        return render(request, 'add_show.html', {'form': form})
 
 
 
@@ -294,7 +296,7 @@ def rank_class(request, show_date, division_id, class_num):
         form = RankingForm(request.POST)
         if form.is_valid():
             rank_list = [form.cleaned_data['first'], form.cleaned_data['second'], form.cleaned_data['third'],form.cleaned_data['fourth'],form.cleaned_data['fifth'],form.cleaned_data['sixth']]
-            
+
             for i in rank_list:
                 if i is None:
                     pass
@@ -305,7 +307,7 @@ def rank_class(request, show_date, division_id, class_num):
                     messages.error(request, "Cannot rank combination number " + str(i) + ": it is not registered to the show")
                     bool_error = True
             rank_list_without_none = [x for x in rank_list if x is not None]
-            if len(set(rank_list_without_none)) != len(rank_list_without_none):  
+            if len(set(rank_list_without_none)) != len(rank_list_without_none):
                 messages.error(request, "Same combination entered for more than one rank. Duplicates are not allowed in ranking.")
                 bool_error = True
             if bool_error is True:
@@ -334,7 +336,7 @@ def rank_class(request, show_date, division_id, class_num):
                 form.cleaned_data['fifth']: 1,
                 form.cleaned_data['sixth']: 0.5,
             }
-            
+
             participations = class_obj.participations.all()
 
             for participation in participations:
@@ -532,7 +534,7 @@ def edit_rider(request, show_date, rider_pk):
             rider.birth_date = edit_form.cleaned_data['birth_date']
             rider.member_VHSA = edit_form.cleaned_data['member_VHSA']
             rider.county = edit_form.cleaned_data['county']
-            
+
             rider.save()
     else:
         edit_form = RiderEditForm(
@@ -824,7 +826,7 @@ def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, b
                                     d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
                                     d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.rider.name
                                     d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.horse.owner
-                                
+
                             except ObjectDoesNotExist:
                                 print("")
                     if bool_combine is True:
@@ -958,21 +960,21 @@ def populate_pdf(request, show_date): # populates text fields of PDF
 
     # p3 Junior/Children's Hunter
     # p4 Amateur Hunter
-    try: 
+    try:
         p3_combine = populate_pdf_division_combine_by_age("Amateur", 3, 4, show, d, p3_combine)
     except ObjectDoesNotExist:
         print("")
-                    
+
     #p5 Small/Medium Pony Hunter
     #p6 Large Pony Hunter
-    try: 
+    try:
         p5_combine = populate_pdf_division_combine_by_hsize("Pony Hunter", 5, 6, show, d, p5_combine)
     except ObjectDoesNotExist:
         print("")
 
     # p7 green hunter pony
     # p8 green hunter horse
-    try: 
+    try:
         p7_combine = populate_pdf_division_combine_by_htype("Green Hunter", 7, 8, show, d, p7_combine)
     except ObjectDoesNotExist:
         print("")
@@ -981,12 +983,12 @@ def populate_pdf(request, show_date): # populates text fields of PDF
         populate_pdf_division("Thoroughbred Hunter", 9, show, d)
     except ObjectDoesNotExist:
         print("")
-   
+
     try: # p10 working Hunter
         populate_pdf_division("Working", 10, show, d)
     except ObjectDoesNotExist:
         print("")
-    
+
     try: #p11 Hunter Pleasure Pony
         populate_pdf_division("Hunter Pleasure Pony", 11, show, d)
     except ObjectDoesNotExist:
@@ -1054,7 +1056,7 @@ def populate_pdf(request, show_date): # populates text fields of PDF
                     if fill_class_num_pony is True:
                         d[dp + '_c' + str(3)] = c.num
                         # d[dp + '_e' + str(int)] =  # system does not keep track of entry yep need to update then fix this line
-                   
+
     #p16 Associate Equitation On the Flat Classes (adult/children)
     for division in Division.objects.filter(name__icontains="Flat"):
         if division.show.date == show.date:

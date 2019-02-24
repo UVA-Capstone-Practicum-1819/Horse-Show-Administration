@@ -6,6 +6,7 @@ from show.views import *
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from show import models
+from unittest.mock import Mock
 from django.urls import reverse
 from django.http import HttpRequest
 
@@ -157,3 +158,50 @@ class CheckPonySize(TestCase):
         if combo3.horse.size == "large":
             list.append(combo3.rider.name)
         self.assertTrue(not list)
+
+class ViewsTestCases(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+
+    def test_add_show_get(self):
+           show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+           new_division = Division.objects.create(name="division")
+           request = HttpRequest()
+           client = Client()
+           response = client.get(reverse('add_show'))
+
+    def test_add_show_post(self):
+        self.client.login(username='john', password='johnpassword')
+        request = HttpRequest()
+        response = self.client.post('/show/add', {'name':'test', 'date':'2018-12-10', 'location':'here', 'day_of_price':10, 'pre_reg_price':5})
+        self.assertRedirects(response, '/show/2018-12-10/')
+
+    def test_view_show(self):
+        self.client.login(username='john', password='johnpassword')
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        request = HttpRequest()
+        response = self.client.get(reverse('view_show', kwargs={'show_date':'2018-12-10'}))
+
+    def test_view_show(self):
+        self.client.login(username='john', password='johnpassword')
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        request = HttpRequest()
+        response = self.client.post('/show/2018-12-10/', {'num':200})
+        response.content
+
+    def test_select_show(self):
+        self.client.login(username='john', password='johnpassword')
+        request = HttpRequest()
+        response = self.client.get(reverse('select_show'))
+
+    def test_select_show_post(self):
+        self.client.login(username='john', password='johnpassword')
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        request = HttpRequest()
+        response = self.client.post('/show/', {'date':'2018-12-10'})
+
+    def sign_up_test(self):
+        request = HttpRequest()
+        client = Client()
+        response = client.get('/show/signup/')
