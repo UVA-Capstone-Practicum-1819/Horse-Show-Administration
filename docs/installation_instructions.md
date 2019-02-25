@@ -23,7 +23,8 @@ This program is deployed on a server that can run locally without internet conne
   
   a) Download Python from here: https://www.python.org/downloads/
       
-      i) On the main page, under “Download the latest version for Windows”, click “Download Python 3.7.2”, open the file once       it’s fully downloaded, and follow the instructions
+      i) On the main page, under “Download the latest version for Windows”, click “Download Python 3.7.2”
+      ii) open the file once it’s fully downloaded, and follow the instructions
   
   b)Download Git from here: https://git-scm.com/downloads 
      
