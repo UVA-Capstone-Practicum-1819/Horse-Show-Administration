@@ -20,14 +20,21 @@ This program is deployed on a server that can run locally without internet conne
 
 ### Set up the computer with the required dependencies
 1) Manually install dependencies
+  
   a) Download Python from here: https://www.python.org/downloads/
+      
       i) On the main page, under “Download the latest version for Windows”, click “Download Python 3.7.2”, open the file once       it’s fully downloaded, and follow the instructions
+  
   b)Download Git from here: https://git-scm.com/downloads 
-      i) Click the Windows button and once the package is fully downloaded, open it and follow the instructions
+     
+     i) Click the Windows button and once the package is fully downloaded, open it and follow the instructions
 
 2) Add the dependencies to the environment variables (python, pip, git) 
+  
   a) Control Panel > System & Security > System > Advanced System Settings > Environment Variables 
+  
   b) Click on “Path” under user variables and select “Edit”
+  
   c) Browse for ….
 
  3) Open the Windows control panel and run the following commands: 
@@ -40,8 +47,10 @@ This program is deployed on a server that can run locally without internet conne
 ### Clone the repo onto the computer
 1) Go to the search tab on the start menu, and type in “cmd” to search for the command prompt
 2) On the command line, type “cd C:\Users\Club\Documents” and run “git clone https://github.com/UVA-Capstone-Practicum-1819/Horse-Show-Administration.git” in order to pull code
-    a) MUST BE CLONED UNDER “C:\Users\Club\Documents” FOR WINDOWS APP TO WORK
-    b) If a folder does not exist, cd into the existing folders and type “mkdir “ + folder name
+   
+   a) MUST BE CLONED UNDER “C:\Users\Club\Documents” FOR WINDOWS APP TO WORK
+   
+   b) If a folder does not exist, cd into the existing folders and type “mkdir “ + folder name
 3) Type “dir” into the command line, and if you see a folder called “Horse-Show-Administration”, cloning the repo was successful.
 
  
