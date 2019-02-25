@@ -6,9 +6,9 @@ debugging and finalizing pdf work -- Anna
 
 printing labels and cleaning up code, fixing functionality -- Gina and Shivani
 
-Installation instructions - Lalita
+Installation instructions -- Lalita
 
-Cleaning up, coverage and fixing functionality - Tarun, Rhea
+Cleaning up, coverage and fixing functionality -- Tarun, Rhea
 
 
 
