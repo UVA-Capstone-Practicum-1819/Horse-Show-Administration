@@ -25,6 +25,7 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 
+#This file is heavily modified due to testing for coverage without excused code in the way
 
 class AuthRequiredMiddleware(object):
     """
