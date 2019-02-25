@@ -8,7 +8,7 @@ This is the Installation Instruction for the Horse Show Administration program d
 
 These instructions assume you are using a Windows 10 OS. You can’t successfully test/implement these installation instructions without a Windows computer.
 
-We also assume you’ve set up the folders, but do provide some instruction if you do not have them set up.
+We also assume you’ve set up the path, but do provide some instruction if you do not have them set up.
 
 This program is deployed on a server that can run locally without internet connection.
 
