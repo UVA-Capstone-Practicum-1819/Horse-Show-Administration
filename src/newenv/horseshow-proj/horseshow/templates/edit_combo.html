@@ -12,7 +12,9 @@
 
             <form class="form"  method="post">
                 {% csrf_token %}
+                
                 {{ edit_form | crispy }}
+
                 <button type="submit" name="edit" value="Edit" class="btn btn-success">Edit Information</button>
             </form>
         </div>
@@ -20,15 +22,9 @@
         <div class="col-lg-6">
 
 
-            <form class="form" method="post">
-                {% csrf_token %}
-                {{ class_combo_form | crispy }}
-                {{ class_combo_form.media}}
-                <button class="btn bn-default" name="add_class" value="Add" type="submit">Add Class</button>
+        
 
-            </form>
-
-            <table class="table">
+            <table class="table table-striped table-bordered">
                 <tr>
                     <thead>
                         <th scope="col">Class #</th>
@@ -53,6 +49,14 @@
                     {% endfor %}
                 </tbody>
             </table>
+
+            <form  class="form" method="post">
+            {% csrf_token %}
+            {{ class_combo_form | crispy }}
+            {{ class_combo_form.media }}
+            <button class="btn btn-primary" name="add_class" value="Add" type="submit">Add Class</button>
+
+        </form>
 
             <h4>Total Classes: {{ tot }}</h4>
             <h4>Total Price: ${{ price }}</h4>

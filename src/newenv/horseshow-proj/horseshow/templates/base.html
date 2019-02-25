@@ -29,17 +29,24 @@
                     <li>
                         <a href="{% url 'add_division' show_date=date %}">Add Division</a>
                     </li>
-                    <li>
+                    {% comment %} <li>
                         <a href="{% url 'select_division' show_date=date %}">Edit Division/View Division Score</a>
-                    </li>
+                    </li> {% endcomment %}
                     <li>
-                        <a href="{% url 'select_rider' show_date=date %}">Add Horse-Rider Combo to the Database</a>
+                        <a href="{% url 'select_rider' show_date=date %}">Add Horse-Rider Combo</a>
                     </li>
                     <li>
                         <a href="{% url 'select_rider2' show_date=date %}">Edit Rider Information</a>
                     </li>
                     <li>
                         <a href="{% url 'select_horse2' show_date=date %}">Edit Horse Information</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'add_rider' show_date=date %}">Add Rider</a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'add_horse' show_date=date %}">Add Horse</a>
                     </li>
                 {% endif %}
                 <li>

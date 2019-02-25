@@ -7,40 +7,42 @@
   <div class="row">
     <div class="col-md-8">
       {% comment %} Display the show title {% endcomment %}
-      <h2>Show: <a href="{% url 'view_show' show_date=date %}">{{show_name}}</a></h2>
+      <h3><a href="{% url 'view_show' show_date=date %}">Show: {{show_name}}</a> > Division: {{name}}</h3>
       {% comment %} Display the division title {% endcomment %}
-      <h4>Division: {{name}}</h4>
+      
       {% comment %} Show a list of all the classes {% endcomment %}
       <div class="row">
 
-        <table class="table">
+        <a href="{% url 'view_division_scores' show_date=date division_id=id %}" class="btn btn-primary">View Division Scores</a>
+
+        <table class="table table-striped table-bordered" >
           {% comment %} The column heads {% endcomment %}
-          <thead>
+          <thead class="bg-info">
             <th>#</th>
             <th>Class</th>
             <th>Scratch</th>
-            <th>Edit</th>
+            
           </thead>
           {% comment %} Each class {% endcomment %}
           <tbody>
             {% for class in classes %}
             <tr>
               <td>
-                {{ class.num }}
+                {{class.num}}
               </td>
               <td>
-                {{class.name}}
+              <a href="{% url 'view_class' show_date=date division_id=id class_num=class.num %}">{{ class.name }}</a>
+                
               </td>
+              
               <td>
-                <a href="{% url 'delete_class' show_date=date division_id=id class_num=class.num %}">Scratch</a>
+                <a class="btn btn-danger" href="{% url 'delete_class' show_date=date division_id=id class_num=class.num %}">X</a>
               </td>
-              <td>
-                <a href="{% url 'view_class' show_date=date division_id=id class_num=class.num %}">Edit
-                  Class</a>
-              </td>
-              <td>
+              
+              
+              {% comment %} <td>
                 {{ remove_form | crispy}}
-              </td>
+              </td> {% endcomment %}
             </tr>
             {% endfor %}
           </tbody>
@@ -51,21 +53,27 @@
   </div>
   {% for message in messages %}
 
-  <div class="alert alert-success">
-    <a class="close" href="#" data-dismiss="alert">×</a>
+    <div class="alert alert-success">
+      <a class="close" href="#" data-dismiss="alert">×</a>
 
-    {{ message }}
+      {{ message }}
 
 
   </div>
   {% endfor %}
   {% if form %}
-  <form method="POST">
+  <h3> Add Another Class </h3>
+  <form class="form-inline" method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
+    {{ form | crispy}}
+    <button type="submit" class="btn btn-success">Submit</button>
   </form>
+
   {% endif %}
+
+  {% comment %} Button to view division scores {% endcomment %}
+
+  
 
 </div>
 {% endblock %}
