@@ -56,6 +56,7 @@ class AuthRequiredMiddleware(object):
 
 def view_show(request, show_date):
     """ used as the home page for a selected show """
+    show = Show.objects.get(date=show_date)
     if request.method == "POST":
         form = ComboNumForm(request.POST)
         if form.is_valid():
@@ -69,14 +70,13 @@ def view_show(request, show_date):
         del request.session['horse_pk']
     form = ComboNumForm()
 
-    show = Show.objects.get(date=show_date)
-
     context = {
         "show_name": show.name,
         "date": show_date,
         "location": show.location,
         "divisions": show.divisions.all(),
         'form': form,
+
     }
     return render(request, 'view_show.html', context)
 
@@ -86,22 +86,23 @@ def add_show(request):
     form = ShowForm()
     if request.method == "GET":
         return render(request, 'add_show.html', {'form': form})
-    f = ShowForm(request.POST)
-    if not f.is_valid():
-        return render(request, 'add_show.html', {'form': f})
-    show_name = f.cleaned_data['name']
-    show_date = f.cleaned_data['date']
-    if Show.objects.filter(date=show_date).count() == 1:
-        response = {'ok': True, 'success_msg': "Cannot have Shows with same date",
-                    'form': form}
-        return render(request, 'add_show.html', response, {'form': f})
-    show_location = f.cleaned_data['location']
-    new_show = Show.objects.create(
-        name=show_name, date=show_date, location=show_location,
-        day_of_price=f.cleaned_data['day_of_price'], pre_reg_price=f.cleaned_data['pre_reg_price'])
-
-    return redirect('view_show', show_date=show_date)
-
+    if request.method == "POST":
+        f = ShowForm(request.POST)
+        if not f.is_valid():
+            return render(request, 'add_show.html', {'form': f})
+        show_name = f.cleaned_data['name']
+        show_date = f.cleaned_data['date']
+        if Show.objects.filter(date=show_date).count() == 1:
+            response = {'ok': True, 'success_msg': "Cannot have Shows with same date",
+                        'form': form}
+            return render(request, 'add_show.html', response, {'form': f})
+        show_location = f.cleaned_data['location']
+        new_show = Show.objects.create(
+            name=show_name, date=show_date, location=show_location,
+            day_of_price=f.cleaned_data['day_of_price'], pre_reg_price=f.cleaned_data['pre_reg_price'])
+        return redirect('view_show', show_date=show_date)
+    else:
+        return render(request, 'add_show.html', {'form': form})
 
 
 def select_show(request):
@@ -151,15 +152,17 @@ def select_combo(request, show_date):
 
 
 def view_billing(request, show_date, combo_num):
-    """ Billing list shows what horse rider combos need to be billed for and their total price """
+    """ Billing list shows what horse rider combos need to be billed for and their total price based on
+    whether or not they are pregistered for each class """
     show = Show.objects.get(date=show_date)
     combo = show.combos.filter(show=show_date).get(num=combo_num)
     classes = combo.classes.all()
     total = classes.count()
     price = 0
     for classe in classes:
-        class_pre_reg = ClassParticipation.objects.filter(combo=combo).get(participated_class=classe.num)
-        if class_pre_reg.is_preregistered == True:
+        class_pre_reg = ClassParticipation.objects.filter(
+            combo=combo).get(participated_class=classe)
+        if class_pre_reg.is_prereg == True:
             price += show.pre_reg_price
         else:
             price += show.day_of_price
@@ -167,7 +170,7 @@ def view_billing(request, show_date, combo_num):
     #price = show.pre_reg_price * total
     # for minimum requirements, only calculates price based on pre-registration price
     context = {'name': combo.rider, 'date': show_date,
-               'classes': classes.all(), 'combo_num': combo_num, 'tot': total, 'price':price}
+               'classes': classes.all(), 'combo_num': combo_num, 'tot': total, 'price': price}
     # the context will help create the table for the list of classes a user is currently in
     return render(request, 'view_billing.html', context)
 
@@ -191,12 +194,13 @@ def scratch_combo(request, show_date, combo_num):
     # rendered to the same html page
 
 
-def view_division_scores(request, show_date, division_name):
+def view_division_scores(request, show_date, division_id):
     """ displays list of classes in division, hrc winners of each of those classes from 1st-6th places, and form to enter champion info """
+
+    # get the division from the show object
     show = Show.objects.get(date=show_date)
-    # get the division object from the name of the divison that was passed in
-    # I don't think this will work right with multiple shows...
-    division = show.divisions.get(name=division_name)
+    division = show.divisions.get(id=division_id)
+
     form = DivisionChampForm()
     if request.method == "POST":
         form = DivisionChampForm(request.POST)
@@ -217,81 +221,125 @@ def view_division_scores(request, show_date, division_name):
 
     else:
         form = DivisionChampForm()
-    context = {'classes': division.classes.all(), 'date':show_date,
-               'name': division_name, 'form': form}
+        
+    context = {'classes': division.classes.all(), 'date': show_date,
+               'id': division_id, 'name': division.name, 'form': form}
     # passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
     return render(request, 'view_division_scores.html', context)
 
 
-def delete_class(request, show_date, division_name, class_num):
+def delete_class(request, show_date, division_id, class_num):
     """ deletes a class from a division """
     show = Show.objects.get(date=show_date)
-    division = show.divisions.get(name=division_name)
+    division = show.divisions.get(id=division_id)
     class_obj = division.classes.get(num=class_num)
     # gets the division object from the division name that was passed in
     class_obj.delete()  # removes the class object
     # redirects to division_classes and passes in the division's name
-    return redirect('view_division', show_date=show_date, division_name=division_name)
+    return redirect('view_division', show_date=show_date, division_id=division_id)
 
 
-def view_division_classes(request, show_date, division_name):
+def view_division_classes(request, show_date, division_id):
     """ lists the classes in a division """
     show = Show.objects.get(date=show_date)
-    division = show.divisions.get(name=division_name)
-    context = {'classes': division.classes.all(), 'name': division_name}
+    division = show.divisions.get(id=division_id)
+    context = {'classes': division.classes.all(), 'id': division_id}
     # passes the division's name and classes to the "division_classes.html" and renders that page
     return render(request, 'view_division_classes.html', context)
 
 
-def add_class(request, show_date, division_name):
+def add_class(request, show_date, division_id):
     """ This view allows you to add a new class """
     if request.method == "POST":
         form = ClassForm(request.POST)
         if form.is_valid():
             show = Show.objects.get(date=show_date)
-            division = show.divisions.get(name=division_name)
+            division = show.divisions.get(id=division_id)
             existing_classes = division.classes.filter(
                 num=form.cleaned_data['num'])
             if existing_classes:
-                messages.error(request, "class number in use")
-                return redirect('view_division_classes', show_date=show_date, division_name=division_name)
+                messages.info(
+                    request, 'Combo for selected horse and rider already exists!')
+                return redirect('view_division_classes', show_date=show_date, division_id=division_id)
             class_form = ClassForm(request.POST)
             class_obj = class_form.save(commit=False)
             class_obj.division = division
-            class_obj.show = show_date
+            class_obj.show = show
             class_obj.save()
-            return redirect('view_class', show_date=show_date, division_name=division_name, class_num=class_obj.num)
+            return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_obj.num)
     else:
         form = ClassForm()
     return render(request, 'add_class.html', {'form': form})
 
 
-def select_class(request, show_date, division_name):
+def select_class(request, show_date, division_id):
     """ This view allows you to select a class from a prepopulated list """
     if request.method == "POST":
         form = ClassSelectForm(request.POST)
         if form.is_valid():
             class_num = form.cleaned_data['num']
             request.session['class_obj'] = class_name
-            return redirect('rank_class', show_date=show_date, division_name=division_name, class_num=class_num)
+            return redirect('rank_class', show_date=show_date, division_id=division_id, class_num=class_num)
     else:
         form = ClassSelectForm()
     return render(request, 'select_class.html', {'form': form})
 
 
-def rank_class(request, show_date, division_name, class_num):
+def rank_class(request, show_date, division_id, class_num):
     """
         This method ranks classes from 1st through 6th and stores the winning scores under
         specific horse rider combos that competed in that class and were awarded points
         points are always starting from 10, then 6, and so on
     """
     show = Show.objects.get(date=show_date)
-    division = show.divisions.get(name=division_name)
+    division = show.divisions.get(id=division_id)
     class_obj = division.classes.get(num=class_num)
+    bool_error = False
     if request.method == 'POST':
-
         form = RankingForm(request.POST)
         if form.is_valid():
+
+            rank_list = [form.cleaned_data['first'], form.cleaned_data['second'], form.cleaned_data['third'],
+                         form.cleaned_data['fourth'], form.cleaned_data['fifth'], form.cleaned_data['sixth']]
+
+
+            for i in rank_list:
+                if i is None:
+                    pass
+                elif i < 100 or i > 999:
+                    messages.error(request, "Invalid combination number " + str(
+                        i) + ": combination number should be three digits: smallest 100, biggest 999")
+                    bool_error = True
+                elif show.combos.filter(num=i).count() == 0:
+                    messages.error(request, "Cannot rank combination number " +
+                                   str(i) + ": it is not registered to the show")
+                    bool_error = True
+            rank_list_without_none = [x for x in rank_list if x is not None]
+            if len(set(rank_list_without_none)) != len(rank_list_without_none):
+
+                messages.error(
+                    request, "Same combination entered for more than one rank. Duplicates are not allowed in ranking.")
+
+                bool_error = True
+            if bool_error is True:
+                # request.session['first'] = rank_list[0]
+                # request.session['second'] = rank_list[1]
+                # request.session['third'] = rank_list[2]
+                # request.session['fourth'] = rank_list[3]
+                # request.session['fifth'] = rank_list[4]
+                # request.session['sixth'] = rank_list[5]
+                # request.session['bool_error'] = True
+                return redirect('rank_class', show_date=show_date, division_id=division_id, class_num=class_num)
+
+            class_obj.first = rank_list[0]
+            class_obj.second = rank_list[1]
+            class_obj.third = rank_list[2]
+            class_obj.fourth = rank_list[3]
+            class_obj.fifth = rank_list[4]
+            class_obj.sixth = rank_list[5]
+            class_obj.save(
+                update_fields=["first", "second", "third", "fourth", "fifth", "sixth"])
+
             combo_map = {
                 form.cleaned_data['first']: 10,
                 form.cleaned_data['second']: 6,
@@ -300,22 +348,30 @@ def rank_class(request, show_date, division_name, class_num):
                 form.cleaned_data['fifth']: 1,
                 form.cleaned_data['sixth']: 0.5,
             }
-            
 
             participations = class_obj.participations.all()
 
             for participation in participations:
+                print(participation)
                 combo_num = participation.combo.num
                 if combo_num in combo_map:
                     participation.score = combo_map[combo_num]
-                    participation.save()
+                    participation.save(update_fields=["score"])
 
-            return redirect('view_class', show_date=show_date, division_name=division_name, class_num=class_num)
-
+            return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
 
     else:
-        form = RankingForm(show_date=show_date)
-        context = {'form': form }
+        # print(bool_error)
+        # if 'bool_error' in request.session:
+        #     form = RankingForm(initial={'show_field': show_date, 'first': request.session['first'], 'second': request.session['second'], 'third': request.session['third'], 'fourth': request.session['fourth'], 'fifth': request.session['fifth'], 'sixth': request.session['sixth']})
+        # else:
+        form = RankingForm(initial={'first': class_obj.first, 'second': class_obj.second, 'third': class_obj.third,
+                                    'fourth': class_obj.fourth, 'fifth': class_obj.fifth, 'sixth': class_obj.sixth})
+        context = {
+            "name": division.name,
+            "class": class_obj,
+            'form': form
+        }
         return render(request, 'rank_class.html', context)
 
 
@@ -324,24 +380,26 @@ def add_division(request, show_date):
     show = Show.objects.get(date=show_date)
 
     if request.method == "POST":
-
         form = DivisionForm(request.POST)
         if form.is_valid():
             divisions = show.divisions.filter(name=form.cleaned_data['name'])
             if(len(divisions) > 0):
                 # prepare error message, will display on submit.
-                messages.error(request, "The division name is in use. Please pick another division name.")
+                messages.error(
+                    request, "The division name is in use. Please pick another division name.")
                 return redirect('add_division', show_date=show_date)
             division_form = DivisionForm(request.POST)
             division = division_form.save(commit=False)
             division.show = show
             division.save()
-            if 'another' in request.POST:
-                return redirect('add_division', show_date=show_date)
-            elif 'exit' in request.POST:
-                return redirect('view_show', show_date=show_date)
-            elif 'class_add' in request.POST:
-                return redirect('view_division', show_date=show_date, division_name=division.name)
+            id = division.id
+            print(id)
+        if 'another' in request.POST:
+            return redirect('add_division', show_date=show_date)
+        elif 'exit' in request.POST:
+            return redirect('view_show', show_date=show_date)
+        elif 'class_add' in request.POST:
+            return redirect('view_division', show_date=show_date, division_id=id)
 
     else:
         form = DivisionForm()
@@ -356,68 +414,83 @@ def add_division(request, show_date):
         return render(request, 'add_division.html', context)
 
 
-def view_division(request, show_date, division_name):
+def view_division(request, show_date, division_id):
     """ Info about divisions/classes in a show """
     show = Show.objects.get(date=show_date)
-    division = show.divisions.get(name=division_name)
+    division = show.divisions.get(id=division_id)
     if request.method == 'POST':  # if POST, create a new class for this division
         form = ClassForm(request.POST)
         if form.is_valid():
-            existing_classes_count = division.classes.filter(
-                num=form.cleaned_data['num']).count()
+            # filter ALL show classes so that there are no duplicates across divisions
+            existing_classes_count = Class.objects.filter(
+                show=show, num=form.cleaned_data['num']).count()
+
             # verify number doesnt already exist
             if existing_classes_count > 0:
                 # prepare error message, will display on submit.
                 messages.error(request, "class number in use")
-                return redirect('view_division', show_date=show_date, division_name=division_name)
+                return redirect('view_division', show_date=show_date, division_id=division_id)
 
             class_form = ClassForm(request.POST)
             class_obj = class_form.save(commit=False)
             class_obj.division = division
+            class_obj.show = show
             class_obj.save()
             # render page with new division
-            return redirect('view_division', show_date=show_date, division_name=division_name)
+            return redirect('view_division', show_date=show_date, division_id=division_id)
     else:
         # each division only has a max of 3 classes, no input form if 3 classes present
         division_classes = division.classes.all()
+        form = ClassForm()
         context = {
             "date": show_date,
             "show_name": show.name,
-            "name": division_name,
+            "id": division_id,
+            "name": division.name,
             "classes": division_classes,
+            "form": form,
         }
-        if(len(division_classes) < 3):
-            form = ClassForm()
-            context['form'] = form
         return render(request, 'view_division.html', context)
 
 
-
-def view_class(request, show_date, division_name, class_num):
+def view_class(request, show_date, division_id, class_num):
     """ render class info including combos in class """
     show = Show.objects.get(date=show_date)
-    division = show.divisions.get(name=division_name)
+    division = show.divisions.get(id=division_id)
     class_obj = division.classes.get(num=class_num)
     combos = class_obj.combos.all()
-
+    if request.method == "POST":
+        form = ComboSelectForm(request.POST)
+        # allows the user to select from the pre-existing horse-rider combos
+        if form.is_valid():
+            combo = form.cleaned_data['combo']
+            return redirect('view_billing', show_date=show_date, combo_num=combo.num)
+    else:
+        form = ComboSelectForm()
+    # form = ComboSelectForm()
     context = {
         "combos": combos,
         "class": class_obj,
+        "class_num": class_obj.num,
         "date": show_date,
-        "name": division_name,
+        "id": division_id,
+        "name": division.name,
         "show_name": show.name,
+        "add_form": form,
     }
     return render(request, "view_class.html", context)  # render info
 
 
-def delete_combo(request, show_date, division_name, class_num, combo):
+def delete_combo(request, show_date, division_id, class_num, combo_num):
     """ scratch a combo from the class page so that it reflects in the combo's billing """
-    combo = HorseRiderCombo.objects.get(num=combo)
+    combo = HorseRiderCombo.objects.get(num=combo_num)
     show = Show.objects.get(date=show_date)
-    division = show.divisions.get(name=division_name)
+    division = show.divisions.get(id=division_id)
     class_obj = division.classes.get(num=class_num)
-    combo.classes.remove(class_obj)
-    return redirect('view_class', show_date=show_date, division_name=division_name, class_num=class_num)
+    selected_class = ClassParticipation.objects.filter(
+        combo=combo).get(participated_class=class_obj)
+    selected_class.delete()
+    return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
 
 
 def select_division(request, show_date):
@@ -428,7 +501,7 @@ def select_division(request, show_date):
             form = DivisionSelectForm(request.POST)
             if form.is_valid():
                 show = Show.objects.get(date=show_date)
-                return redirect('view_division_classes', show_date=show_date, division_name=form.cleaned_data['name'])
+                return redirect('view_division_classes', show_date=show_date, division_id=form.cleaned_data['division'])
         if 'score' in request.POST:  # if a division is selected and the "See Divison Scores" button is clicked
             form = DivisionSelectForm(request.POST)
             if form.is_valid():
@@ -437,7 +510,7 @@ def select_division(request, show_date):
                 for division in divisions:
                     if division_obj == division:
                         # redirects to divisionscore and passes in the division_name
-                        return redirect('view_division_scores', show_date=show_date, division_name=division.name)
+                        return redirect('view_division_scores', show_date=show_date, division_id=division.id)
 
     else:
         form = DivisionSelectForm()
@@ -476,13 +549,13 @@ def edit_rider(request, show_date, rider_pk):
             rider.birth_date = edit_form.cleaned_data['birth_date']
             rider.member_VHSA = edit_form.cleaned_data['member_VHSA']
             rider.county = edit_form.cleaned_data['county']
-            
+
             rider.save()
     else:
         edit_form = RiderEditForm(
-        {'name': rider.name, 'address': rider.address, 'city': rider.city, 'state': rider.state, 'zip_code': rider.zip_code,
-         'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'county': rider.county},
-        instance=rider)
+            {'name': rider.name, 'address': rider.address, 'city': rider.city, 'state': rider.state, 'zip_code': rider.zip_code,
+             'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'county': rider.county},
+            instance=rider)
     return render(request, 'edit_rider.html', {'rider': rider, 'edit_rider_form': edit_form, 'date': show_date})
 
 
@@ -571,7 +644,8 @@ def add_combo(request, show_date):
                                                cell=cell, email=email, show=show)
             except IntegrityError:
                 #messages.error(request, "HRC already exists!")
-                messages.info(request, 'Combo for selected horse and rider already exists!')
+                messages.info(
+                    request, 'Combo for selected horse and rider already exists!')
                 return redirect('select_rider', show_date=show.date)
             return redirect('edit_combo', show_date=show.date, combo_num=num)
         else:
@@ -585,20 +659,23 @@ def add_combo(request, show_date):
     rider = get_object_or_404(Rider, pk=rider_pk)
     horse = get_object_or_404(Horse, pk=horse_pk)
     form = HorseRiderComboCreateForm()
-    return render(request, 'add_combo.html', {'form': form, 'rider': rider, 'horse': horse, 'date': show_date})
+
+    return render(request, 'add_combo.html', {'form': form,  'rider': rider, 'horse': horse, 'date': show_date})
 
 
 def edit_combo(request, show_date, combo_num):
     """
     edits the combination that was specified by num
-    also handles the addition/removal of classes and the calculation of price
+    also handles the addition/removal of classes based on num and the calculation of price
      """
     show = Show.objects.get(date=show_date)
     combo = show.combos.get(num=combo_num)
     if request.method == "POST":
         if request.POST.get('remove_class'):
             num = request.POST['remove_class']
-            selected_class = ClassParticipation.objects.filter(combo=combo).get(participated_class=num)
+            class_obj = Class.objects.filter(show=show_date).get(num=num)
+            selected_class = ClassParticipation.objects.filter(
+                combo=combo).get(participated_class=class_obj)
             selected_class.delete()
 
         if request.POST.get('add_class'):
@@ -607,8 +684,10 @@ def edit_combo(request, show_date, combo_num):
             if class_combo_form.is_valid():
                 selected_class = class_combo_form.cleaned_data['num']
                 is_prereg = class_combo_form.cleaned_data['is_preregistered']
-                class_obj = Class.objects.filter(show=show_date).get(num=selected_class)
-                classParticipation = ClassParticipation(participated_class=class_obj, combo=combo, is_preregistered=is_prereg)
+                class_obj = Class.objects.filter(
+                    show=show_date).get(num=selected_class)
+                classParticipation = ClassParticipation(
+                    participated_class=class_obj, combo=combo, is_preregistered=is_prereg)
                 classParticipation.save()
 
         elif request.POST.get('edit'):
@@ -690,11 +769,13 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
 
 class DivisionAutocomplete(autocomplete.Select2QuerySetView):
     """ fills in form automatically based on value entered by user """
+
     def get_queryset(self):
         qs = Division.objects.all().order_by('name')
         if self.q:
             qs = qs.filter(division_name__istartswith=self.q)
         return qs
+
 
 def populate_pdf_division(division_name, page, show, d):
     for division in Division.objects.filter(name__icontains=division_name):
@@ -707,32 +788,53 @@ def populate_pdf_division(division_name, page, show, d):
             for c in Class.objects.filter(division__name__icontains=division_name):
                 if c.show.date == show.date:
                     # print(c.num)
-                    s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
-                    d[s] = c.num # add to the dictionary the class number
-                    e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
-    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                    # set the key to the right class (initially c1) text field
+                    s = dp + '_c' + str(int)
+                    d[s] = c.num  # add to the dictionary the class number
+                    # set the key to the right entry (initially c1) text field
+                    e = dp + '_e' + str(int)
+                    num_entry = ClassParticipation.objects.filter(
+                        participated_class=c).count()
+                    d[e] = num_entry
                     # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
-                        # print(combo.horse.name)
-                        # print(combo.rider.name)
-                        # print(combo.horse.owner)
-                    list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
-                    for i in range(1,7): # for i range from 1st place to 6th place
+                    # print(combo.horse.name)
+                    # print(combo.rider.name)
+                    # print(combo.horse.owner)
+                    # create a list that stores rank 1-6 in that class
+                    list = (c.first, c.second, c.third,
+                            c.fourth, c.fifth, c.sixth)
+                    for i in range(1, 7):  # for i range from 1st place to 6th place
                         # set the keys to the right combo, owner and rider text fields
                         shorse = s + '_combo' + str(i)
                         sowner = s + '_owner' + str(i)
                         srider = s + '_rider' + str(i)
-                        if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
-                            try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
-                                combo = HorseRiderCombo.objects.get(num=list[i-1])
-                                d[shorse] = combo.horse # write to pdf the correct combo to that rank
+                        # if the class is already ranked, and there exist a combo associate with the rank
+                        if list[i-1] != 0:
+                            try:  # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                                combo = HorseRiderCombo.objects.get(
+                                    num=list[i-1])
+                                # write to pdf the correct combo to that rank
+                                d[shorse] = combo.horse
                                 d[srider] = combo.rider.name
                                 d[sowner] = combo.horse.owner
                             except ObjectDoesNotExist:
                                 print("")
                 int += 1
 
+
 def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, bool_combine):
     for division in Division.objects.filter(name__icontains=division_name):
+        # combined = True;
+        # div2 = Division.objects.filter(name__icontains=division_name2).filter(name__icontains="hunter")
+        # if div2.count()>0:
+        #     if div2.show.date == show.date:
+        #     #check num entry combined > 2
+        #         for c in Class.objects.filter(division__name__icontains=division_name2).filter(division__name__icontains="hunter"):
+        #             if c.show.date == show.date:
+        #                 num_entry = ClassParticipation.objects.filter(participated_class=c).count()
+        #                 if num_entry > 2:
+        #                     combined = False;
+
         if division.show.date == show.date:
             # print(division.name)
             dp = "p" + str(page1)
@@ -742,47 +844,59 @@ def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, b
             int = 1
             for c in Class.objects.filter(division__name__icontains=division_name):
                 if c.show.date == show.date:
-                    s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
-                    d[s] = c.num # add to the dictionary the class number
-                    e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
-    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
-                    # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
-                        # print(combo.horse.name)
-                        # print(combo.rider.name)
-                        # print(combo.horse.owner)
-                    list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
-                    for i in range(1,7): # for i range from 1st place to 6th place
+                    # set the key to the right class (initially c1) text field
+                    s = dp + '_c' + str(int)
+                    d[s] = c.num  # add to the dictionary the class number
+                    # set the key to the right entry (initially c1) text field
+                    e = dp + '_e' + str(int)
+                    num_entry = ClassParticipation.objects.filter(
+                        participated_class=c).count()
+                    d[e] = num_entry
+                    # create a list that stores rank 1-6 in that class
+                    list = (c.first, c.second, c.third,
+                            c.fourth, c.fifth, c.sixth)
+                    for i in range(1, 7):  # for i range from 1st place to 6th place
                         # set the keys to the right combo, owner and rider text fields
                         shorse = s + '_combo' + str(i)
                         sowner = s + '_owner' + str(i)
                         srider = s + '_rider' + str(i)
-                        if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
-                            try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
-                                combo = HorseRiderCombo.objects.get(num=list[i-1])
+                        # if the class is already ranked, and there exist a combo associate with the rank
+                        if list[i-1] != 0:
+                            try:  # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                                combo = HorseRiderCombo.objects.get(
+                                    num=list[i-1])
                                 if combo.rider.adult is False:
-                                    d[shorse] = combo.horse # write to pdf the correct combo to that rank
+                                    # write to pdf the correct combo to that rank
+                                    d[shorse] = combo.horse
                                     d[srider] = combo.rider.name
                                     d[sowner] = combo.horse.owner
                                 else:
                                     bool_combine = True
+
                                     d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
-                                    d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.rider.name
-                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.horse.owner
-                                
+                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.rider.name
+                                    d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.horse.owner
+
+
                             except ObjectDoesNotExist:
                                 print("")
                     if bool_combine is True:
                         # print(c.num)
                         d[dp2 + "_show_name"] = show.name
                         d[dp2 + "_show_date"] = show.date
-                        s = dp2 + '_c' + str(int) # set the key to the right class (initially c1) text field
-                        d[s] = c.num # add to the dictionary the class number
-                        e = dp2 + '_e' + str(int) # set the key to the right entry (initially c1) text field
-        #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                        # set the key to the right class (initially c1) text field
+                        s = dp2 + '_c' + str(int)
+                        d[s] = c.num  # add to the dictionary the class number
+                        # set the key to the right entry (initially c1) text field
+                        e = dp2 + '_e' + str(int)
+                        num_entry = ClassParticipation.objects.filter(
+                            participated_class=c).count()
+                        d[e] = num_entry
                 int += 1
     return bool_combine
 
-def populate_pdf_division_combine_by_hsize(division_name, page1, page2, show, d, bool_combine):
+
+def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d, bool_combine):
     for division in Division.objects.filter(name__icontains=division_name):
         if division.show.date == show.date:
             # print(division.name)
@@ -793,46 +907,64 @@ def populate_pdf_division_combine_by_hsize(division_name, page1, page2, show, d,
             int = 1
             for c in Class.objects.filter(division__name__icontains=division_name):
                 if c.show.date == show.date:
-                    s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
-                    d[s] = c.num # add to the dictionary the class number
-                    e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
-    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                    # set the key to the right class (initially c1) text field
+                    s = dp + '_c' + str(int)
+                    d[s] = c.num  # add to the dictionary the class number
+                    # set the key to the right entry (initially c1) text field
+                    e = dp + '_e' + str(int)
+                    num_entry = ClassParticipation.objects.filter(
+                        participated_class=c).count()
+                    d[e] = num_entry
                     # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
-                        # print(combo.horse.name)
-                        # print(combo.rider.name)
-                        # print(combo.horse.owner)
-                    list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
-                    for i in range(1,7): # for i range from 1st place to 6th place
+                    # print(combo.horse.name)
+                    # print(combo.rider.name)
+                    # print(combo.horse.owner)
+                    # create a list that stores rank 1-6 in that class
+                    list = (c.first, c.second, c.third,
+                            c.fourth, c.fifth, c.sixth)
+                    for i in range(1, 7):  # for i range from 1st place to 6th place
                         # set the keys to the right combo, owner and rider text fields
                         shorse = s + '_combo' + str(i)
                         sowner = s + '_owner' + str(i)
                         srider = s + '_rider' + str(i)
-                        if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
-                            try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
-                                combo = HorseRiderCombo.objects.get(num=list[i-1])
+                        # if the class is already ranked, and there exist a combo associate with the rank
+                        if list[i-1] != 0:
+                            try:  # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                                combo = HorseRiderCombo.objects.get(
+                                    num=list[i-1])
                                 print(combo.horse.size)
                                 if combo.horse.type == "pony":
                                     if combo.horse.size == "large":
-                                        d[shorse] = combo.horse # write to pdf the correct combo to that rank
+                                        # write to pdf the correct combo to that rank
+                                        d[shorse] = combo.horse
                                         d[srider] = combo.rider.name
                                         d[sowner] = combo.horse.owner
                                     elif combo.horse.size == "medium" or combo.horse.size == "small":
                                         bool_combine = True
-                                        d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
-                                        d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.rider.name
-                                        d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.horse.owner
+                                        # write to pdf the correct combo to that rank
+                                        d[dp2 + '_c' +
+                                            str(int) + '_combo' + str(i)] = combo.horse
+                                        d[dp2 + '_c' + str(int) + '_rider' +
+                                          str(i)] = combo.rider.name
+                                        d[dp2 + '_c' + str(int) + '_owner' +
+                                          str(i)] = combo.horse.owner
                             except ObjectDoesNotExist:
                                 print("")
                     if bool_combine is True:
                         # print(c.num)
                         d[dp2 + "_show_name"] = show.name
                         d[dp2 + "_show_date"] = show.date
-                        s = dp2 + '_c' + str(int) # set the key to the right class (initially c1) text field
-                        d[s] = c.num # add to the dictionary the class number
-                        e = dp2 + '_e' + str(int) # set the key to the right entry (initially c1) text field
-        #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                        # set the key to the right class (initially c1) text field
+                        s = dp2 + '_c' + str(int)
+                        d[s] = c.num  # add to the dictionary the class number
+                        # set the key to the right entry (initially c1) text field
+                        e = dp2 + '_e' + str(int)
+                        num_entry = ClassParticipation.objects.filter(
+                            participated_class=c).count()
+                        d[e] = num_entry
                 int += 1
     return bool_combine
+
 
 def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d, bool_combine):
     for division in Division.objects.filter(name__icontains=division_name):
@@ -845,163 +977,140 @@ def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d,
             int = 1
             for c in Class.objects.filter(division__name__icontains=division_name):
                 if c.show.date == show.date:
-                    s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
-                    d[s] = c.num # add to the dictionary the class number
-                    e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
-    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                    # set the key to the right class (initially c1) text field
+                    s = dp + '_c' + str(int)
+                    d[s] = c.num  # add to the dictionary the class number
+                    # set the key to the right entry (initially c1) text field
+                    e = dp + '_e' + str(int)
+                    num_entry = ClassParticipation.objects.filter(
+                        participated_class=c).count()
+                    d[e] = num_entry
                     # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
-                        # print(combo.horse.name)
-                        # print(combo.rider.name)
-                        # print(combo.horse.owner)
-                    list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
-                    for i in range(1,7): # for i range from 1st place to 6th place
+                    # print(combo.horse.name)
+                    # print(combo.rider.name)
+                    # print(combo.horse.owner)
+                    # create a list that stores rank 1-6 in that class
+                    list = (c.first, c.second, c.third,
+                            c.fourth, c.fifth, c.sixth)
+                    for i in range(1, 7):  # for i range from 1st place to 6th place
                         # set the keys to the right combo, owner and rider text fields
                         shorse = s + '_combo' + str(i)
                         sowner = s + '_owner' + str(i)
                         srider = s + '_rider' + str(i)
-                        if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
-                            try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
-                                combo = HorseRiderCombo.objects.get(num=list[i-1])
+                        # if the class is already ranked, and there exist a combo associate with the rank
+                        if list[i-1] != 0:
+                            try:  # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                                combo = HorseRiderCombo.objects.get(
+                                    num=list[i-1])
                                 print(combo.horse.type)
                                 if combo.horse.type == "pony":
-                                    d[shorse] = combo.horse # write to pdf the correct combo to that rank
+                                    # write to pdf the correct combo to that rank
+                                    d[shorse] = combo.horse
                                     d[srider] = combo.rider.name
                                     d[sowner] = combo.horse.owner
                                 else:
                                     bool_combine = True
-                                    d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
-                                    d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.rider.name
-                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.horse.owner
+                                    # write to pdf the correct combo to that rank
+                                    d[dp2 + '_c' +
+                                        str(int) + '_combo' + str(i)] = combo.horse
+                                    d[dp2 + '_c' + str(int) + '_rider' +
+                                      str(i)] = combo.rider.name
+                                    d[dp2 + '_c' + str(int) + '_owner' +
+                                      str(i)] = combo.horse.owner
                             except ObjectDoesNotExist:
                                 print("")
                     if bool_combine is True:
                         # print(c.num)
                         d[dp2 + "_show_name"] = show.name
                         d[dp2 + "_show_date"] = show.date
-                        s = dp2 + '_c' + str(int) # set the key to the right class (initially c1) text field
-                        d[s] = c.num # add to the dictionary the class number
-                        e = dp2 + '_e' + str(int) # set the key to the right entry (initially c1) text field
-        #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
+                        # set the key to the right class (initially c1) text field
+                        s = dp2 + '_c' + str(int)
+                        d[s] = c.num  # add to the dictionary the class number
+                        # set the key to the right entry (initially c1) text field
+                        e = dp2 + '_e' + str(int)
+                        num_entry = ClassParticipation.objects.filter(
+                            participated_class=c).count()
+                        d[e] = num_entry
                 int += 1
     return bool_combine
 
-def populate_pdf_division_combine_mis(division_name, page1, page2, show, d, bool_combine):
-    for division in Division.objects.filter(name__icontains=division_name):
-        if division.show.date == show.date:
-            # print(division.name)
-            dp = "p" + str(page1)
-            d[dp + "_show_name"] = show.name
-            d[dp + "_show_date"] = show.date
-            int = 1
-            for c in Class.objects.filter(division__name__icontains=division_name):
-                if c.show.date == show.date:
-                    s = dp + '_c' + str(int) # set the key to the right class (initially c1) text field
-                    d[s] = c.num # add to the dictionary the class number
-                    e = dp + '_e' + str(int) # set the key to the right entry (initially c1) text field
-    #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
-                    # for combo in HorseRiderCombo.objects.filter(classes__num=c.num):
-                        # print(combo.horse.name)
-                        # print(combo.rider.name)
-                        # print(combo.horse.owner)
-                    list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
-                    for i in range(1,7): # for i range from 1st place to 6th place
-                        # set the keys to the right combo, owner and rider text fields
-                        shorse = s + '_combo' + str(i)
-                        sowner = s + '_owner' + str(i)
-                        srider = s + '_rider' + str(i)
-                        if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
-                            try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
-                                combo = HorseRiderCombo.objects.get(num=list[i-1])
-                                print(combo.horse.type)
-                                if combo.horse.type == "pony":
-                                    d[shorse] = combo.horse # write to pdf the correct combo to that rank
-                                    d[srider] = combo.rider.name
-                                    d[sowner] = combo.horse.owner
-                                else:
-                                    bool_combine = True
-                                    d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
-                                    d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.rider.name
-                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.horse.owner
-                            except ObjectDoesNotExist:
-                                print("")
-                    if bool_combine is True:
-                        # print(c.num)
-                        d[dp2 + "_show_name"] = show.name
-                        d[dp2 + "_show_date"] = show.date
-                        s = dp2 + '_c' + str(int) # set the key to the right class (initially c1) text field
-                        d[s] = c.num # add to the dictionary the class number
-                        e = dp2 + '_e' + str(int) # set the key to the right entry (initially c1) text field
-        #             # d[e] =  # system does not keep track of entry yep need to update then fix this line
-                int += 1
-    return bool_combine
 
 def calculate_age(born):
     today = date.today()
     return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
-def populate_pdf(request, show_date): # populates text fields of PDF
+
+def populate_pdf(request, show_date):  # populates text fields of PDF
     """ populate pdf for VHSA horse show reports """
-    show = Show.objects.get(date=show_date) # get the show by its date
+    show = Show.objects.get(date=show_date)  # get the show by its date
     d = {
         'p2_show_name': show.name,
         'p2_show_date': show_date,
-    } #populate the 2nd page of pdf with the show name and show time.
+    }  # populate the 2nd page of pdf with the show name and show time.
     p3_combine = False
     p5_combine = False
     p7_combine = False
 
     # p3 Junior/Children's Hunter
     # p4 Amateur Hunter
-    try: 
+    try:
+
         p3_combine = populate_pdf_division_combine_by_age("Amateur", 3, 4, show, d, p3_combine)
     except ObjectDoesNotExist:
         print("")
-                    
+
     #p5 Small/Medium Pony Hunter
     #p6 Large Pony Hunter
-    try: 
+    try:
         p5_combine = populate_pdf_division_combine_by_hsize("Pony Hunter", 5, 6, show, d, p5_combine)
+
     except ObjectDoesNotExist:
         print("")
 
     # p7 green hunter pony
     # p8 green hunter horse
-    try: 
+    try:
+
         p7_combine = populate_pdf_division_combine_by_htype("Green Hunter", 7, 8, show, d, p7_combine)
+
     except ObjectDoesNotExist:
         print("")
 
-    try: # p9 Thoroughbred Hunter
+    try:  # p9 Thoroughbred Hunter
         populate_pdf_division("Thoroughbred Hunter", 9, show, d)
     except ObjectDoesNotExist:
         print("")
-   
+
+
     try: # p10 working Hunter
+
         populate_pdf_division("Working", 10, show, d)
     except ObjectDoesNotExist:
         print("")
-    
+
+
     try: #p11 Hunter Pleasure Pony
+
         populate_pdf_division("Hunter Pleasure Pony", 11, show, d)
     except ObjectDoesNotExist:
         print("")
 
-    try: #p12 Junior Hunter Pleasure Horse
+    try:  # p12 Junior Hunter Pleasure Horse
         populate_pdf_division("Junior Hunter Pleasure", 12, show, d)
     except ObjectDoesNotExist:
         print("")
 
-    try: #p13 Adult Hunter Pleasure Horse
+    try:  # p13 Adult Hunter Pleasure Horse
         populate_pdf_division("Adult Hunter Pleasure", 13, show, d)
     except ObjectDoesNotExist:
         print("")
 
-    try: #p14 Hunter Short Stirrup
+    try:  # p14 Hunter Short Stirrup
         populate_pdf_division("Short Stirrup", 14, show, d)
     except ObjectDoesNotExist:
         print("")
 
-    #p15 Associate Equitation Classes (adult/children/pony)
+    # p15 Associate Equitation Classes (adult/children/pony)
     for division in Division.objects.filter(name__icontains="Equitation").exclude(name__icontains="Flat"):
         if division.show.date == show.date:
             dp = "p15"
@@ -1011,18 +1120,24 @@ def populate_pdf(request, show_date): # populates text fields of PDF
                 if c.show.date == show.date:
                     fill_class_num_adult = False
                     fill_class_num_child = False
-                    list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
-                    for i in range(1,7): # for i range from 1st place to 6th place
+                    # create a list that stores rank 1-6 in that class
+                    list = (c.first, c.second, c.third,
+                            c.fourth, c.fifth, c.sixth)
+                    for i in range(1, 7):  # for i range from 1st place to 6th place
                         # set the keys to the right combo, owner and rider text fields
-                        if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
-                            try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
-                                combo = HorseRiderCombo.objects.get(num=list[i-1])
+                        # if the class is already ranked, and there exist a combo associate with the rank
+                        if list[i-1] != 0:
+                            try:  # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                                combo = HorseRiderCombo.objects.get(
+                                    num=list[i-1])
                                 if combo.rider.adult is True and combo.horse.type == "horse":
                                     fill_class_num_adult = True
-                                    d[dp + '_c' + str(1) + '_combo' + str(i)] = combo.rider.name
+                                    d[dp + '_c' + str(1) + '_combo' +
+                                      str(i)] = combo.rider.name
                                 if combo.rider.adult is False and combo.horse.type == "horse":
                                     fill_class_num_child = True
-                                    d[dp + '_c' + str(2) + '_combo' + str(i)] = combo.rider.name
+                                    d[dp + '_c' + str(2) + '_combo' +
+                                      str(i)] = combo.rider.name
                             except ObjectDoesNotExist:
                                 print("")
                     if fill_class_num_adult is True:
@@ -1034,22 +1149,29 @@ def populate_pdf(request, show_date): # populates text fields of PDF
             for c in Class.objects.filter(division__name__icontains="Equitation").exclude(division__name__icontains="Flat").filter(division__name__icontains="Pony"):
                 if c.show.date == show.date:
                     fill_class_num_pony = False
-                    list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
-                    for i in range(1,7): # for i range from 1st place to 6th place
-                        if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
-                            try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
-                                combo = HorseRiderCombo.objects.get(num=list[i-1])
+                    # create a list that stores rank 1-6 in that class
+                    list = (c.first, c.second, c.third,
+                            c.fourth, c.fifth, c.sixth)
+                    for i in range(1, 7):  # for i range from 1st place to 6th place
+                        # if the class is already ranked, and there exist a combo associate with the rank
+                        if list[i-1] != 0:
+                            try:  # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                                combo = HorseRiderCombo.objects.get(
+                                    num=list[i-1])
                                 print(combo.horse.type)
                                 if combo.horse.type == "pony":
                                     fill_class_num_pony = True
-                                    d[dp + '_c' + str(3) + '_combo' + str(i)] = combo.rider.name
+                                    d[dp + '_c' + str(3) + '_combo' +
+                                      str(i)] = combo.rider.name
                             except ObjectDoesNotExist:
                                 print("")
                     if fill_class_num_pony is True:
                         d[dp + '_c' + str(3)] = c.num
                         # d[dp + '_e' + str(int)] =  # system does not keep track of entry yep need to update then fix this line
-                   
+
+
     #p16 Associate Equitation On the Flat Classes (adult/children)
+
     for division in Division.objects.filter(name__icontains="Flat"):
         if division.show.date == show.date:
             dp = "p16"
@@ -1060,23 +1182,30 @@ def populate_pdf(request, show_date): # populates text fields of PDF
                     fill_class_num_adult = False
                     fill_class_num_child_15_17 = False
                     fill_class_num_child_14_less = False
-                    list = (c.first, c.second, c.third, c.fourth, c.fifth, c.sixth) # create a list that stores rank 1-6 in that class
-                    for i in range(1,7): # for i range from 1st place to 6th place
+                    # create a list that stores rank 1-6 in that class
+                    list = (c.first, c.second, c.third,
+                            c.fourth, c.fifth, c.sixth)
+                    for i in range(1, 7):  # for i range from 1st place to 6th place
                         # set the keys to the right combo, owner and rider text fields
-                        if list[i-1] != 0: # if the class is already ranked, and there exist a combo associate with the rank
-                            try: # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
-                                combo = HorseRiderCombo.objects.get(num=list[i-1])
+                        # if the class is already ranked, and there exist a combo associate with the rank
+                        if list[i-1] != 0:
+                            try:  # get the combo that is placed at each rank, write to pdf the rider and horse owner associated with combo
+                                combo = HorseRiderCombo.objects.get(
+                                    num=list[i-1])
                                 if combo.rider.adult is True and combo.horse.type == "horse":
                                     fill_class_num_adult = True
-                                    d[dp + '_c' + str(1) + '_combo' + str(i)] = combo.rider.name
+                                    d[dp + '_c' + str(1) + '_combo' +
+                                      str(i)] = combo.rider.name
                                 if combo.rider.adult is False:
                                     age = calculate_age(combo.rider.birth_date)
-                                    if 15 <= age <=17:
+                                    if 15 <= age <= 17:
                                         fill_class_num_child_15_17 = True
-                                        d[dp + '_c' + str(2) + '_combo' + str(i)] = combo.rider.name
+                                        d[dp + '_c' + str(2) + '_combo' +
+                                          str(i)] = combo.rider.name
                                     if age <= 14:
                                         fill_class_num_child_14_less = True
-                                        d[dp + '_c' + str(3) + '_combo' + str(i)] = combo.rider.name
+                                        d[dp + '_c' + str(3) + '_combo' +
+                                          str(i)] = combo.rider.name
                             except ObjectDoesNotExist:
                                 print("")
                     if fill_class_num_adult is True:
@@ -1090,6 +1219,7 @@ def populate_pdf(request, show_date): # populates text fields of PDF
                         # d[dp + '_e' + str(int)] =  # system does not keep track of entry yep need to update then fix this line
 
     write_fillable_pdf("show/static/VHSA_Results_2015.pdf",
-                       "show/static/VHSA_Final_Results.pdf", d) #uses "VHSA_Results_2015.pdf" and populates it's fields with the info in data dict, then it saves this new populated pdf to "VHSA_Final_Results.pdf"
+                       "show/static/VHSA_Final_Results.pdf", d)  # uses "VHSA_Results_2015.pdf" and populates it's fields with the info in data dict, then it saves this new populated pdf to "VHSA_Final_Results.pdf"
 
-    return render(request, 'final_results.html', {"filename": "show/static/VHSA_Final_Results.pdf"}) #returns the populated pdf
+    # returns the populated pdf
+    return render(request, 'final_results.html', {"filename": "show/static/VHSA_Final_Results.pdf"})

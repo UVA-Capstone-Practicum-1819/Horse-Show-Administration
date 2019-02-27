@@ -8,7 +8,6 @@ from localflavor.us.models import USStateField, USZipCodeField
 from django.core.exceptions import ValidationError
 
 
-
 class Show(models.Model):
     """
     Model for a Show, includes basic information such as name/date/location and a pre_reg_price
@@ -32,6 +31,7 @@ class Division(models.Model):
     """
     class Meta:
         unique_together = ('show', 'name')
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, default="")
     champion = models.IntegerField(default=0)
     champion_pts = models.IntegerField(default=0)
@@ -53,18 +53,19 @@ class Class(models.Model):
 
     num = models.IntegerField(default=0)
     name = models.CharField(max_length=100, default="")
-    show = models.CharField(max_length=100, default="")
     division = models.ForeignKey(
         Division, on_delete=models.CASCADE, related_name="classes", null=True)
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, related_name="classes", null=True)
-    first = models.IntegerField(default=0)
-    second = models.IntegerField(default=0)
-    third = models.IntegerField(default=0)
-    fourth = models.IntegerField(default=0)
-    fifth = models.IntegerField(default=0)
-    sixth = models.IntegerField(default=0)
+    first = models.IntegerField(blank=True, null=True)
+    second = models.IntegerField(blank=True, null=True)
+    third = models.IntegerField(blank=True, null=True)
+    fourth = models.IntegerField(blank=True, null=True)
+    fifth = models.IntegerField(blank=True, null=True)
+    sixth = models.IntegerField(blank=True, null=True)
 
+    def __str__(self):
+        return str(self.num) + ". " + self.name
 
 
 class Horse(models.Model):
@@ -145,15 +146,16 @@ class HorseRiderCombo(models.Model):
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, null=True, related_name='combos')
 
-
     def __str__(self):
         return f"Show: {str(self.show.date)}, Number: {self.num}, Rider: {self.rider.name}, Horse: {self.horse.name}"
+
 
 def validate_unique(self, exclude=None):
     qs = HorseRiderCombo.objects.filter(rider=self.rider, horse=self.horse)
     if self.pk is None:
         if qs.filter(r=self.rider).exists() and qs.filter(h=self.horse.exists()):
             raise ValidationError("HRC already exists")
+
 
 class ClassParticipation(models.Model):
     """

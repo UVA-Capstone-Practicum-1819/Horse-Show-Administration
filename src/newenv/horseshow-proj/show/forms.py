@@ -30,55 +30,57 @@ class RegistrationBillForm(forms.Form):
     registrationtype = forms.ChoiceField(choices=types)
 
 
-class RankingForm(forms.Form):
+class RankingForm(forms.ModelForm):
     """
     This allows you to rank classes from 1st through 6th and store those rankings in the specific Class
     """
 
-    class ComboNumValidator:
-        def __init__(self, num, show=None):
-            self.num = num
-            self.show = show
+    # class ComboNumValidator:
+    #     def __init__(self, num, show=None):
+    #         self.num = num
+    #         self.show = show
 
-        def __call__(self, value):
-            if value < 100 or value > 999:
-                raise ValidationError(
-                    _('Number must be between 100 and 999,inclusive'), code="invalid")
+    #     def __call__(self, value):
+    #         if value < 100 or value > 999:
+    #             raise ValidationError(
+    #                 _('Number must be between 100 and 999,inclusive'), code="invalid")
 
-            if show.combos.filter(num=num).count() == 0:
-                raise ValidationError(
-                    _('Combination must be in the show'), code="invalid")
+    #         if show.combos.filter(num=num).count() == 0:
+    #             raise ValidationError(
+    #                 _('Combination must be in the show'), code="invalid")
+    class Meta:
+        model = Class
+        fields = ('first', 'second', 'third', 'fourth', 'fifth', 'sixth',)
+    # show_field = forms.CharField(max_length=100)
 
-    show_field = forms.CharField(max_length=100)
+    # first = forms.IntegerField()
 
-    first = forms.IntegerField()
+    # second = forms.IntegerField()
 
-    second = forms.IntegerField()
+    # third = forms.IntegerField()
 
-    third = forms.IntegerField()
+    # fourth = forms.IntegerField()
 
-    fourth = forms.IntegerField()
+    # fifth = forms.IntegerField()
 
-    fifth = forms.IntegerField()
+    # sixth = forms.IntegerField()
 
-    sixth = forms.IntegerField()
+    # fields = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
 
-    fields = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     first = cleaned_data['first']
+    #     second = cleaned_data['second']
+    #     third = cleaned_data['third']
+    #     fourth = cleaned_data['fourth']
+    #     fifth = cleaned_data['fifth']
+    #     sixth = cleaned_data['sixth']
 
-    def clean(self):
-        cleaned_data = super().clean()
-        first = cleaned_data['first']
-        second = cleaned_data['second']
-        third = cleaned_data['third']
-        fourth = cleaned_data['fourth']
-        fifth = cleaned_data['fifth']
-        sixth = cleaned_data['sixth']
-
-        if first and second and third and fourth and fifth and sixth:
-            field_list = [first, second, third, fourth, fifth, sixth]
-            if len(set(field_list)) != len(field_list):
-                raise ValidationError(
-                    _('Cannot have duplicate combination numbers.'), code="invalid")
+        # if first and second and third and fourth and fifth and sixth:
+        #     field_list = [first, second, third, fourth, fifth, sixth]
+        #     if len(set(field_list)) != len(field_list):
+        #         raise ValidationError(
+        #             _('Cannot have duplicate combination numbers.'), code="invalid")
 
 
 class RiderForm(forms.ModelForm):
@@ -155,7 +157,6 @@ class HorseRiderComboCreateForm(forms.ModelForm):
     class Meta:
         model = HorseRiderCombo
         fields = ('num', 'contact', 'email', 'cell')
-
 
 
 class HorseRiderEditForm(forms.ModelForm):
@@ -241,7 +242,7 @@ class RemoveClassForm(forms.Form):
 
 class ClassComboForm(forms.ModelForm):
     """ # This allows the user to add classes for a specific combo by entering the class number """
-    is_preregistered = forms.BooleanField()
+    is_preregistered = forms.BooleanField(required=False)
 
     class Meta:
         model = Class
@@ -269,7 +270,7 @@ class ClassSelectForm(forms.ModelForm):
 
 
 class DivisionForm(forms.ModelForm):
-    """ # This form allows info to be entered for a division """
+    """ # This form allows python info to be entered for a division """
 
     class Meta:
         model = Division

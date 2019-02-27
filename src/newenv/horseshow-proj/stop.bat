@@ -1,0 +1,1 @@
+Taskkill /F /IM python.exe /T
