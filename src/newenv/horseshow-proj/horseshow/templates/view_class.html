@@ -3,7 +3,7 @@
 {% load static %}
 {% block content %}
 
-<h3><a href="{% url 'view_show' show_date=date %}">Show: {{show.name}}</a> > <a href="{% url 'view_division' show_date=date division_id=id %}"> Division: {{name}}</a> > Class: {{class.num}} - {{class.name}}</h3>
+<h3><a href="{% url 'view_show' show_date=date %}">Show: {{show_name}}</a> > <a href="{% url 'view_division' show_date=date division_id=id %}"> Division: {{name}}</a> > Class: {{class.num}} - {{class.name}}</h3>
 
 <div class="row">
   <form class="form" method="post">

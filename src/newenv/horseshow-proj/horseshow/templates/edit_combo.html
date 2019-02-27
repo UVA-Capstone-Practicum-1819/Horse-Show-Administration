@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
 {% if division %}
-<h3><a href="{% url 'view_show' show_date=date %}">Show: {{show_name}}</a> > <a href="{% url 'view_division' show_date=date division_id=division.id %}"> Division: {{name}}</a> > Class: <a href="{% url 'view_class' show_date=date division_id=division.id class_num=class.num %}">{{class.num}} - {{class.name}}</a> > {{combo.num}}</h3>
+<h3><a href="{% url 'view_show' show_date=date %}">Show: {{show.name}}</a> > <a href="{% url 'view_division' show_date=date division_id=division.id %}"> Division: {{division.name}}</a> > Class: <a href="{% url 'view_class' show_date=date division_id=division.id class_num=class.num %}">{{class.num}} - {{class.name}}</a> > {{combo.num}}</h3>
 {% else %}
 <h3>Horse Rider Combination </h3>
 {% endif %}
