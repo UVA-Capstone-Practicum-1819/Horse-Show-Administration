@@ -326,4 +326,35 @@ class CheckRankRepeatValidation(TestCase):
         self.assertTrue(c1.second is None)
         self.assertEqual(str,"Same combination entered for more than one rank. Duplicates are not allowed in ranking.")
 
-        
+
+class TestPopulatePDF(TestCase):
+    def test_pdf(self):
+        show = Show.objects.create(date=datetime.datetime.strptime('20190526', "%Y%m%d"), name="Show1",location="Cville", day_of_price=15, pre_reg_price=11)
+        data_dict = {
+        'p2_show_name': show.name,
+        'p2_show_date': show.date,
+        }
+        record_key = []
+        template_pdf = pdfrw.PdfReader('show/static/VHSA_Results_2015.pdf')   
+        for i in range(1, 4):
+        # populating data onto the second page of the pdf
+            annotations = template_pdf.pages[i]['/Annots'] 
+            for annotation in annotations:
+                print(annotation)
+                if annotation['/Subtype'] == '/Widget':
+                    if annotation['/T']:
+                        key = annotation['/T'][1:-1]
+                        self.assertTrue(key is not None)
+                        if key in data_dict.keys():
+                            record_key.append(key)
+                            annotation.update(pdfrw.PdfDict(V='{}'.format(data_dict[key])))
+                            key_update = pdfrw.PdfDict(V='{}'.format(data_dict[key]))['/V']
+                            self.assertTrue(key_update in ['Show1', '2019-05-26 00:00:00'])
+                else: 
+                    continue
+                    self.assertTrue(key is None)
+            pdfrw.PdfWriter().write("show/static/VHSA_Final_Results.pdf", template_pdf)
+        print(pdfrw.PdfReader('show/static/VHSA_Final_Results.pdf').pages[1]['/Annots'][0]['/T'][1:-1])
+        # print(record_key)
+        self.assertTrue(data_dict[record_key[0]] == "Show1")
+        self.assertTrue(data_dict[record_key[1]] == show.date)
