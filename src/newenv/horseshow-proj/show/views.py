@@ -162,7 +162,7 @@ def view_billing(request, show_date, combo_num):
     for classe in classes:
         class_pre_reg = ClassParticipation.objects.filter(
             combo=combo).get(participated_class=classe)
-        if class_pre_reg.is_prereg == True:
+        if class_pre_reg.is_preregistered == True:
             price += show.pre_reg_price
         else:
             price += show.day_of_price
@@ -460,13 +460,36 @@ def view_class(request, show_date, division_id, class_num):
     class_obj = division.classes.get(num=class_num)
     combos = class_obj.combos.all()
     if request.method == "POST":
-        form = ComboSelectForm(request.POST)
-        # allows the user to select from the pre-existing horse-rider combos
+        form = AddComboToClassForm(request.POST)
+        # allows the user to enter a combo num they believe exists
         if form.is_valid():
-            combo = form.cleaned_data['combo']
-            return redirect('view_billing', show_date=show_date, combo_num=combo.num)
+            num = form.cleaned_data['num']
+            # checking to see if combo number exists in this show 
+            try:
+                combo = HorseRiderCombo.objects.get(show=show, num=num)
+                # error checking for if combo is already in class
+                combo_classes = combo.classes.all()
+                if(class_obj in combo_classes):
+                    messages.error(request, "Horse-Rider Combo is already in this class.")
+                    return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
+                classParticipation = ClassParticipation(participated_class=class_obj, combo=combo, is_preregistered=form.cleaned_data['preregistered'])
+                classParticipation.save()
+                context = {
+                    "combos": class_obj.combos.all(),
+                    "class": class_obj,
+                    "class_num": class_obj.num,
+                    "date": show_date,
+                    "id": division_id,
+                    "name": division.name,
+                    "show_name": show.name,
+                    "add_form": form,
+                }
+                return render(request, 'view_class.html', context)
+            except:
+                messages.error(request, "Horse Rider Combo does not exist in this show.")
+                return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
     else:
-        form = ComboSelectForm()
+        form = AddComboToClassForm()
     # form = ComboSelectForm()
     context = {
         "combos": combos,
@@ -663,7 +686,7 @@ def add_combo(request, show_date):
     return render(request, 'add_combo.html', {'form': form,  'rider': rider, 'horse': horse, 'date': show_date})
 
 
-def edit_combo(request, show_date, combo_num):
+def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
     """
     edits the combination that was specified by num
     also handles the addition/removal of classes based on num and the calculation of price
@@ -707,8 +730,12 @@ def edit_combo(request, show_date, combo_num):
     registered_classes = combo.classes.all()
     number_registered_classes = len(registered_classes)
     price = number_registered_classes * 10
-
-    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+    if division_id != None:
+        division = Division.objects.get(id=division_id)
+        c = Class.objects.get(show=show, num=class_num)
+        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+    else:
+        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
 
 
 class ShowAutocomplete(autocomplete.Select2QuerySetView):

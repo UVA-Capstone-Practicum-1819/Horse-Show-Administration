@@ -151,6 +151,13 @@ class ComboNumForm(forms.Form):
     num = forms.IntegerField(
         validators=[MinValueValidator(100), MaxValueValidator(999)])
 
+class AddComboToClassForm(forms.Form):
+    """ # This Form is used to add a combo to a class on the view class page """
+
+    num = forms.IntegerField(
+        validators=[MinValueValidator(100), MaxValueValidator(999)])
+    preregistered = forms.BooleanField(required=False)
+
 
 class HorseRiderComboCreateForm(forms.ModelForm):
     """ # This creates the Horse Rider Combo itself. for creating a horse rider combo """
