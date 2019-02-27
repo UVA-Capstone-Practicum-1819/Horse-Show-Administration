@@ -1,5 +1,5 @@
-from .sheet import Sheet
-from .specifications import Specification
+from labels.sheet import Sheet
+from labels.specifications import Specification
 from reportlab.graphics import shapes
 from .models import *
 
@@ -32,7 +32,7 @@ def generate_show_labels(show_date):
 		string_classes = []
 		for c in classes: 
 			string_classes.append(str(c.num))
-		info = str(combo.num) + " - " + combo.horse.name + " \n " + combo.rider.name + " \n " + ''.join(string_classes)
+		info = str(combo.num) + " - " + combo.horse.name + " \n " + combo.rider.name + " \n " + ', '.join(string_classes)
 		# Add label
 		sheet.add_label(info)
 		sheet.save('labels.pdf')
