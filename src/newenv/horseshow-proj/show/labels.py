@@ -35,6 +35,6 @@ def generate_show_labels(show_date):
 		info = str(combo.num) + " - " + combo.horse.name + " \n " + combo.rider.name + " \n " + ', '.join(string_classes)
 		# Add label
 		sheet.add_label(info)
-		sheet.save('labels.pdf')
+		sheet.save(str(show_date)+'.pdf')
 	print("{0:d} label(s) output on {1:d} page(s).".format(sheet.label_count, sheet.page_count))
 

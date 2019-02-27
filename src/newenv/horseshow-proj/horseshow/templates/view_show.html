@@ -68,8 +68,17 @@
         </tbody>
       </table>
     
+  {% for message in messages %}
 
-  <p><a href="{% url 'generate_labels' show_date=date %}">Generate Horse Rider Combo labels</a></p>
+    <div class="alert alert-danger">
+      <a class="close" href="." data-dismiss="alert">×</a>
+
+      {{ message }}
+
+
+    </div>
+  {% endfor %}
+  <p><a href="{% url 'generate_labels' show_date=date %}">Generate Horse Rider Combo Labels</a></p>
 
   {% comment %} 
   {% for division in divisions %}
