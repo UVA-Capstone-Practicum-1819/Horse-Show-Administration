@@ -359,8 +359,7 @@ class Sheet(object):
 
         # Call the drawing function.
         if(isinstance(obj, str)):
-            self.drawing_callable(available, float(self._dw), float(self._dh), "yo")
-            self.drawing_callable(available, float(self._dw), float(self._dh), "yo")        
+            self.drawing_callable(available, float(self._dw), float(self._dh), obj)
         else:
             self.drawing_callable(available, float(self._dw), float(self._dh), obj)
         # Render the contents on the label.

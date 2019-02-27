@@ -24,6 +24,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
+from .labels import generate_show_labels
 
 
 class AuthRequiredMiddleware(object):
@@ -1223,3 +1224,17 @@ def populate_pdf(request, show_date):  # populates text fields of PDF
 
     # returns the populated pdf
     return render(request, 'final_results.html', {"filename": "show/static/VHSA_Final_Results.pdf"})
+
+
+
+def generate_labels(request, show_date):
+    generate_show_labels(show_date)
+    show = Show.objects.get(date=show_date)
+    context = {
+        "show_name": show.name,
+        "date": show_date,
+        "location": show.location,
+        "divisions": show.divisions.all(),
+
+    }
+    return render(request, 'view_show.html', context)
