@@ -452,8 +452,8 @@ class CheckRider(TestCase):
     def test_select_rider_post_ok(self):
 
         response = self.client.post(
-            f"/show/{self.show.date}/rider/select/"))
-        assertEquals(response.status_code, 200)
+            f"/show/{self.show.date}/rider/select/")
+        assertEqual(response.status_code, 200)
 
     def test_select_rider2_get_ok(self):
         response = self.client.get(
