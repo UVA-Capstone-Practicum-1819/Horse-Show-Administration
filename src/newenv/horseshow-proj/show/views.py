@@ -651,6 +651,7 @@ def add_combo(request, show_date):
         redirects to the edit combo page for the same combination after it is done
      """
     show = Show.objects.get(date=show_date)
+    form_errors = ""
     if request.method == 'POST':
         form = HorseRiderComboCreateForm(request.POST)
         if form.is_valid():
@@ -672,7 +673,8 @@ def add_combo(request, show_date):
                 return redirect('select_rider', show_date=show.date)
             return redirect('edit_combo', show_date=show.date, combo_num=num)
         else:
-            return redirect('view_show', show_date=show_date)
+            
+            form_errors = form.non_field_errors
     rider_pk = request.session['rider_pk']
     if rider_pk is None:
         return redirect('select_show')
@@ -683,7 +685,7 @@ def add_combo(request, show_date):
     horse = get_object_or_404(Horse, pk=horse_pk)
     form = HorseRiderComboCreateForm()
 
-    return render(request, 'add_combo.html', {'form': form,  'rider': rider, 'horse': horse, 'date': show_date})
+    return render(request, 'add_combo.html', {'form': form,  'rider': rider, 'horse': horse, 'date': show_date, 'form_errors': form_errors})
 
 
 def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):

@@ -151,6 +151,7 @@ class ComboNumForm(forms.Form):
     num = forms.IntegerField(
         validators=[MinValueValidator(100), MaxValueValidator(999)])
 
+
 class AddComboToClassForm(forms.Form):
     """ # This Form is used to add a combo to a class on the view class page """
 
@@ -161,9 +162,28 @@ class AddComboToClassForm(forms.Form):
 
 class HorseRiderComboCreateForm(forms.ModelForm):
     """ # This creates the Horse Rider Combo itself. for creating a horse rider combo """
+
+    email = forms.EmailField(required=False, label="Email")
+    cell = forms.CharField(max_length=12, required=False, label="Cell Phone #")
+
     class Meta:
         model = HorseRiderCombo
         fields = ('num', 'contact', 'email', 'cell')
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        email = cleaned_data.get('email')
+        cell = cleaned_data.get('cell')
+
+        print("This is the email: " + email)
+        print("This is the cell: " + cell)
+
+        if not email and not cell:
+            print("do something!")
+            raise forms.ValidationError(
+                'Have to include at least 1 contact (email or cell)')
+
+        return cleaned_data
 
 
 class HorseRiderEditForm(forms.ModelForm):
