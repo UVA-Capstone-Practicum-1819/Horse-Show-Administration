@@ -571,13 +571,14 @@ def edit_rider(request, show_date, rider_pk):
             rider.zip_code = edit_form.cleaned_data['zip_code']
             rider.birth_date = edit_form.cleaned_data['birth_date']
             rider.member_VHSA = edit_form.cleaned_data['member_VHSA']
+            rider.member_4H = edit_form.cleaned_data['member_4H']
             rider.county = edit_form.cleaned_data['county']
 
             rider.save()
     else:
         edit_form = RiderEditForm(
             {'name': rider.name, 'address': rider.address, 'city': rider.city, 'state': rider.state, 'zip_code': rider.zip_code,
-             'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'county': rider.county},
+             'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'member_4H': rider.member_4H, 'county': rider.county},
             instance=rider)
     return render(request, 'edit_rider.html', {'rider': rider, 'edit_rider_form': edit_form, 'date': show_date})
 
@@ -673,7 +674,6 @@ def add_combo(request, show_date):
                 return redirect('select_rider', show_date=show.date)
             return redirect('edit_combo', show_date=show.date, combo_num=num)
         else:
-            
             form_errors = form.non_field_errors
     rider_pk = request.session['rider_pk']
     if rider_pk is None:

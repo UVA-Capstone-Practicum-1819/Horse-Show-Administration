@@ -99,7 +99,7 @@ class RiderForm(forms.ModelForm):
     class Meta:
         model = Rider
         fields = ('name', 'address', 'city', 'state', 'zip_code', 'email',
-                  'adult', 'birth_date', 'member_VHSA', 'county',)
+                  'adult', 'birth_date', 'member_VHSA', 'member_4H', 'county')
 
 
 class RiderSelectForm(forms.ModelForm):
@@ -208,7 +208,7 @@ class RiderEditForm(forms.ModelForm):
     class Meta:
         model = Rider
         fields = ('name', 'address', 'city', 'state', 'zip_code',
-                  'birth_date', 'member_VHSA', 'county')
+                  'birth_date', 'member_VHSA', 'member_4H', 'county')
 
 
 class HorseEditForm(forms.ModelForm):
