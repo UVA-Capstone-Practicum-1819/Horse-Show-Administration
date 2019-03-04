@@ -80,6 +80,18 @@ def view_show(request, show_date):
     }
     return render(request, 'view_show.html', context)
 
+def edit_show(request, show_date):
+    """ used for editing the information about a show, such as its preregistration price and name """
+
+    if request.method == "POST":
+        pass
+    
+    show = Show.objects.get(date=show_date)
+
+    show_form = ShowForm(data={'name': show.name, 'date': show.date, 'location': show.location, 'day_of_price': show.day_of_price, 'pre_reg_price': show.pre_reg_price})
+
+    return render(request, 'edit_show.html', {'show_form': show_form})
+
 
 def add_show(request):
     """ view used to create the show, if successful, redirects to its show home page """
