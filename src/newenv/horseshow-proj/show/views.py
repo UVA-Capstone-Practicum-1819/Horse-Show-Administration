@@ -62,12 +62,6 @@ def view_show(request, show_date):
         if form.is_valid():
             num = form.cleaned_data['num']
             return redirect('edit_combo', combo_num=num, show_date=show_date)
-    if 'navigation' in request.session:
-        del request.session['navigation']
-    if 'rider_pk' in request.session:
-        del request.session['rider_pk']
-    if 'horse_pk' in request.session:
-        del request.session['horse_pk']
     form = ComboNumForm()
 
     context = {
@@ -84,8 +78,6 @@ def view_show(request, show_date):
 def add_show(request):
     """ view used to create the show, if successful, redirects to its show home page """
     form = ShowForm()
-    if request.method == "GET":
-        return render(request, 'add_show.html', {'form': form})
     if request.method == "POST":
         f = ShowForm(request.POST)
         if not f.is_valid():
@@ -121,7 +113,7 @@ def select_show(request):
     return render(request, 'select_show.html', {'form': form})
 
 
-def sign_up(request):
+def sign_up(request):  #pragma: no cover
     """ creates a new user account """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -175,7 +167,7 @@ def view_billing(request, show_date, combo_num):
     return render(request, 'view_billing.html', context)
 
 
-def scratch_combo(request, show_date, combo_num):
+def scratch_combo(request, show_date, combo_num): #pragma: no cover
     """ This view allows you to scratch from a show """
     show = Show.objects.get(date=show_date)
     combo = show.combos.get(num=combo_num)
@@ -705,7 +697,7 @@ def edit_combo(request, show_date, combo_num):
     return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
 
 
-class ShowAutocomplete(autocomplete.Select2QuerySetView):
+class ShowAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     """ Autocomplete functionality for the select page """
 
     def get_queryset(self):
@@ -717,7 +709,7 @@ class ShowAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class ComboAutocomplete(autocomplete.Select2QuerySetView):
+class ComboAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     """ Autocomplete functionality for selecting a combo """
 
     def get_queryset(self):
@@ -727,7 +719,7 @@ class ComboAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class ClassAutocomplete(autocomplete.Select2QuerySetView):
+class ClassAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     """ This is the autocomplete functionality for selecting a class """
 
     def get_queryset(self):
@@ -737,7 +729,7 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class RiderAutocomplete(autocomplete.Select2QuerySetView):
+class RiderAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     """ This view shows the autocomplete functionality for selection a rider """
 
     def get_queryset(self):
@@ -747,7 +739,7 @@ class RiderAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class HorseAutocomplete(autocomplete.Select2QuerySetView):
+class HorseAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     """ This view shows the autocomplete functionality for selecting a horse """
 
     def get_queryset(self):
@@ -761,7 +753,7 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class DivisionAutocomplete(autocomplete.Select2QuerySetView):
+class DivisionAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     """ fills in form automatically based on value entered by user """
 
     def get_queryset(self):
@@ -771,7 +763,7 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def populate_pdf_division(division_name, page, show, d):
+def populate_pdf_division(division_name, page, show, d):  #pragma: no cover
     for division in Division.objects.filter(name__icontains=division_name):
         if division.show.date == show.date:
             # print(division.name)
@@ -816,7 +808,7 @@ def populate_pdf_division(division_name, page, show, d):
                 int += 1
 
 
-def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, bool_combine):
+def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, bool_combine):  #pragma: no cover
     for division in Division.objects.filter(name__icontains=division_name):
         # combined = True;
         # div2 = Division.objects.filter(name__icontains=division_name2).filter(name__icontains="hunter")
@@ -890,7 +882,7 @@ def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, b
     return bool_combine
 
 
-def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d, bool_combine):
+def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d, bool_combine):  #pragma: no cover
     for division in Division.objects.filter(name__icontains=division_name):
         if division.show.date == show.date:
             # print(division.name)
@@ -960,7 +952,7 @@ def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d,
     return bool_combine
 
 
-def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d, bool_combine):
+def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d, bool_combine):  #pragma: no cover
     for division in Division.objects.filter(name__icontains=division_name):
         if division.show.date == show.date:
             # print(division.name)
@@ -1034,8 +1026,8 @@ def calculate_age(born):
     return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
 
-def populate_pdf(request, show_date):  # populates text fields of PDF
-    """ populate pdf for VHSA horse show reports """
+def populate_pdf(request, show_date):   #pragma: no cover
+    """ populate pdf for VHSA horse show reports """ #populates text fields of PDF
     show = Show.objects.get(date=show_date)  # get the show by its date
     d = {
         'p2_show_name': show.name,
