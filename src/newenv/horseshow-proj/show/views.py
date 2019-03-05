@@ -227,7 +227,7 @@ def delete_class(request, show_date, division_id, class_num):
     return redirect('view_division', show_date=show_date, division_id=division_id)
 
 
-def view_division_classes(request, show_date, division_id):
+def view_division_classes(request, show_date, division_id): #pragma: no cover
     """ lists the classes in a division """
     show = Show.objects.get(date=show_date)
     division = show.divisions.get(id=division_id)
@@ -259,11 +259,11 @@ def add_class(request, show_date, division_id):
             return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_obj.num)
     else:
         form = ClassForm()
-        context = {'name': division.name, 'form': form}
+        context = {'name': division.name, 'form': form, 'date':show_date}
     return render(request, 'add_class.html', context)
 
 
-def select_class(request, show_date, division_id):
+def select_class(request, show_date, division_id): #pragma: no cover
     """ This view allows you to select a class from a prepopulated list """
     if request.method == "POST":
         form = ClassSelectForm(request.POST)
@@ -361,7 +361,8 @@ def rank_class(request, show_date, division_id, class_num):
         context = {
             "name": division.name,
             "class": class_obj,
-            'form': form
+            'form': form,
+            'date':show_date
         }
         return render(request, 'rank_class.html', context)
 
@@ -450,7 +451,7 @@ def view_class(request, show_date, division_id, class_num):
         # allows the user to enter a combo num they believe exists
         if form.is_valid():
             num = form.cleaned_data['num']
-            # checking to see if combo number exists in this show 
+            # checking to see if combo number exists in this show
             try:
                 combo = HorseRiderCombo.objects.get(show=show, num=num)
                 # error checking for if combo is already in class
@@ -502,7 +503,7 @@ def delete_combo(request, show_date, division_id, class_num, combo_num):
     return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
 
 
-def select_division(request, show_date):
+def select_division(request, show_date): #pragma: no cover
     """ displays division select dropdown and ability to "Save" or "See Division Scores" """
     if request.method == "POST":
 
@@ -632,7 +633,7 @@ def select_horse(request, show_date):
     return render(request, 'select_horse.html', {'form': form, 'date': show_date})
 
 
-def add_combo(request, show_date):
+def add_combo(request, show_date): #pragma: no cover
     """
         creates a page for adding a horse-rider combination, taking in the session variables for the primary keys of the chosen horse and rider
         redirects to the edit combo page for the same combination after it is done
@@ -674,7 +675,7 @@ def add_combo(request, show_date):
     return render(request, 'add_combo.html', {'form': form,  'rider': rider, 'horse': horse, 'date': show_date, 'form_errors': form_errors})
 
 
-def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
+def edit_combo(request, show_date, combo_num, division_id=None, class_num=None): #pragma: no cover
     """
     edits the combination that was specified by num
     also handles the addition/removal of classes based on num and the calculation of price

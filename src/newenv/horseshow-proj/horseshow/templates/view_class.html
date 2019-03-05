@@ -43,9 +43,9 @@
       <button type="submit" class="btn btn-success">Add Combo</button>
     </form>
     {{ form.media }}
-    <a class="btn btn-primary" href="{% url 'select_rider' show_date=date %}">Create New Combo</a>
+    <p><a class="btn btn-primary" href="{% url 'select_rider' show_date=date %}">Create New Combo</a></p>
   </form>
-  <a class="btn btn-primary" href="{% url 'rank_class' show_date=date division_id=id class_num=class.num %}">Rank Class</a>
+  <p><a class="btn btn-primary" href="{% url 'rank_class' show_date=date division_id=id class_num=class.num %}">Rank Class</a></p>
 </div>
 {{ form.media }}
 {% endblock %}
