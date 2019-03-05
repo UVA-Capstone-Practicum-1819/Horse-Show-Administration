@@ -162,14 +162,14 @@ def view_billing(request, show_date, combo_num):
     for classe in classes:
         class_pre_reg = ClassParticipation.objects.filter(
             combo=combo).get(participated_class=classe)
-        if class_pre_reg.is_prereg == True:
+        if class_pre_reg.is_preregistered == True:
             price += show.pre_reg_price
         else:
             price += show.day_of_price
     #total = classes.count()
     #price = show.pre_reg_price * total
     # for minimum requirements, only calculates price based on pre-registration price
-    context = {'name': combo.rider, 'date': show_date,
+    context = {'name': combo.rider, 'show_date': show_date,
                'classes': classes.all(), 'combo_num': combo_num, 'tot': total, 'price': price}
     # the context will help create the table for the list of classes a user is currently in
     return render(request, 'view_billing.html', context)
@@ -179,19 +179,15 @@ def scratch_combo(request, show_date, combo_num):
     """ This view allows you to scratch from a show """
     show = Show.objects.get(date=show_date)
     combo = show.combos.get(num=combo_num)
-    cls = request.GET["cname"]
-    dcls = combo.classes.get(name=cls)
-    combo.classes.remove(dcls)
+    class_num = request.GET["cnum"]
+    class_obj = Class.objects.get(num=class_num)
+    selected_class = ClassParticipation.objects.filter(
+        combo=combo).get(participated_class=class_obj)
+    selected_class.delete()
+    return redirect('view_billing', show_date=show_date, combo_num=combo_num)
     # this line allows for a classes to be scratched (or removed) at no additional cost
     # the list will be changed based on what classes were removed
     # classes will only be removed from the horse-rider combo object, not from the entire database
-    total = combo.classes.count()
-    price = show.pre_reg_price * total
-    context = {'name': combo.rider, 'date': show_date,
-               'classes': combo.classes.all(), 'combo_num': combo_num, 'tot': total, 'price': price}
-    # context information need to populate table
-    return render(request, 'view_billing.html', context)
-    # rendered to the same html page
 
 
 def view_division_scores(request, show_date, division_id):
@@ -221,7 +217,7 @@ def view_division_scores(request, show_date, division_id):
 
     else:
         form = DivisionChampForm()
-        
+
     context = {'classes': division.classes.all(), 'date': show_date,
                'id': division_id, 'name': division.name, 'form': form}
     # passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
@@ -250,6 +246,8 @@ def view_division_classes(request, show_date, division_id):
 
 def add_class(request, show_date, division_id):
     """ This view allows you to add a new class """
+    show = Show.objects.get(date=show_date)
+    division = show.divisions.get(id=division_id)
     if request.method == "POST":
         form = ClassForm(request.POST)
         if form.is_valid():
@@ -269,7 +267,8 @@ def add_class(request, show_date, division_id):
             return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_obj.num)
     else:
         form = ClassForm()
-    return render(request, 'add_class.html', {'form': form})
+        context = {'name': division.name, 'form': form}
+    return render(request, 'add_class.html', context)
 
 
 def select_class(request, show_date, division_id):
@@ -394,11 +393,6 @@ def add_division(request, show_date):
             division.save()
             id = division.id
             print(id)
-        if 'another' in request.POST:
-            return redirect('add_division', show_date=show_date)
-        elif 'exit' in request.POST:
-            return redirect('view_show', show_date=show_date)
-        elif 'class_add' in request.POST:
             return redirect('view_division', show_date=show_date, division_id=id)
 
     else:
