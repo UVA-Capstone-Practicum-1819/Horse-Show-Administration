@@ -26,7 +26,7 @@ class_patterns = [
          views.delete_class, name="delete_class"),
 
     path('combo/<combo_num>/', include(combo_patterns)),
-    
+
     path('combo/<combo_num>/delete', views.delete_combo, name="delete_combo"),
 
 ]

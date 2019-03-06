@@ -109,8 +109,10 @@ class Rider(models.Model):
         blank=True, null=True, verbose_name="Birth Date", )
     member_VHSA = models.BooleanField(
         default=False, blank=True, verbose_name="Member of the VHSA")
-    county = models.CharField(
-        max_length=200, blank=True, verbose_name="If member of 4H, specify county")
+    member_4H = models.BooleanField(
+        default=False, blank=True, verbose_name="Member of the 4H")
+    county = models.CharField(max_length=100, default="", blank=True,
+                              help_text="Only need to specify this if you are a 4H member")
     horses = models.ManyToManyField(Horse, through='HorseRiderCombo')
 
     def __str__(self):
