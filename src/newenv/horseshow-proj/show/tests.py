@@ -9,6 +9,7 @@ from show import models
 from unittest.mock import Mock
 from django.urls import reverse
 from django.http import HttpRequest
+from .labels import generate_show_labels
 
 class BillTests(TestCase):
     def test_billpage_setup(self):
@@ -387,5 +388,18 @@ class CheckRankRepeatValidation(TestCase):
         self.assertTrue(c1.second is None)
         self.assertEqual(str,"Same combination entered for more than one rank. Duplicates are not allowed in ranking.")
 
-        
+class Labels(TestCase):
+    def generate_labels_test(self):
+        show = Show.objects.create(date=datetime.datetime.strptime('20190526', "%Y%m%d"), name="Show1", location="Cville", day_of_price=15, pre_reg_price=11)
+        try:
+            generate_show_labels(show.date)
+            self.assertTrue(True)
+        except(...):
+            self.assertTrue(False)
 
+    def view_generate_labels_test(self):
+        self.client.login(username='john', password='johnpassword')
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        request = HttpRequest()
+        response = self.client.get(reverse('generate_labels', kwargs={'show_date':'2018-12-10'}))
+        self.assertTrue(response.status_code() == 200)

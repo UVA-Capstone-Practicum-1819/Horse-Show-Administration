@@ -32,9 +32,9 @@ def generate_show_labels(show_date):
 		string_classes = []
 		for c in classes: 
 			string_classes.append(str(c.num))
-		info = str(combo.num) + " - " + combo.horse.name + " \n " + combo.rider.name + " \n " + ', '.join(string_classes)
+		info = str(combo.num) + " - " + combo.horse.name + " \n" + combo.rider.name + " \n" + ', '.join(string_classes)
 		# Add label
 		sheet.add_label(info)
-		sheet.save(str(show_date)+'.pdf')
+		sheet.save("show/static/labels/"+str(show_date)+'.pdf')
 	print("{0:d} label(s) output on {1:d} page(s).".format(sheet.label_count, sheet.page_count))
 

@@ -1255,6 +1255,7 @@ def populate_pdf(request, show_date):  # populates text fields of PDF
 
 
 def generate_labels(request, show_date):
+    # view to execute label generating 
     generate_show_labels(show_date)
     show = Show.objects.get(date=show_date)
     if(len(HorseRiderCombo.objects.filter(show=show))==0):
@@ -1269,5 +1270,5 @@ def generate_labels(request, show_date):
         return render(request, 'view_show.html', context)
     else:
         generate_show_labels(show_date)
-        return render(request, 'labels.html', {'location':"../"+str(show_date)+".pdf"})
+        return render(request, 'labels.html', {'date':str(show_date)})
 
