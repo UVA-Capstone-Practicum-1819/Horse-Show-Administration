@@ -8,6 +8,8 @@ install:
   - pip3 install pdfrw
   - pip3 install django-crispy-forms
   - pip3 install django-localflavor
+  - pip3 install pylabels
+  - pip3 install reportlab
 
 script:
   - python3 src/newenv/horseshow-proj/manage.py makemigrations

@@ -24,6 +24,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
+from .labels import generate_show_labels
 
 
 class AuthRequiredMiddleware(object):
@@ -248,7 +249,7 @@ def add_class(request, show_date, division_id):
             existing_classes = division.classes.filter(
                 num=form.cleaned_data['num'])
             if existing_classes:
-                messages.info(
+                messages.error(
                     request, 'Combo for selected horse and rider already exists!')
                 return redirect('view_division_classes', show_date=show_date, division_id=division_id)
             class_form = ClassForm(request.POST)
@@ -1239,3 +1240,24 @@ def populate_pdf(request, show_date):   #pragma: no cover
 
     # returns the populated pdf
     return render(request, 'final_results.html', {"filename": "show/static/VHSA_Final_Results.pdf"})
+
+
+
+def generate_labels(request, show_date):
+    # view to execute label generating 
+    generate_show_labels(show_date)
+    show = Show.objects.get(date=show_date)
+    if(len(HorseRiderCombo.objects.filter(show=show))==0):
+        messages.error(
+                    request, "There are no Horse Rider Combos registered for this show.")
+        context = {
+            "show_name": show.name,
+            "date": show_date,
+            "location": show.location,
+            "divisions": show.divisions.all(),
+        }
+        return render(request, 'view_show.html', context)
+    else:
+        generate_show_labels(show_date)
+        return render(request, 'labels.html', {'date':str(show_date)})
+

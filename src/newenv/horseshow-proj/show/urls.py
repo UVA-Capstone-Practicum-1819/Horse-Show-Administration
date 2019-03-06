@@ -116,6 +116,8 @@ urlpatterns = [
 
     path('logout', auth_views.LogoutView.as_view(), name='log_out'),
 
+    path('<show_date>/generate_labels', views.generate_labels, name="labels")
+
 
 
 ]
