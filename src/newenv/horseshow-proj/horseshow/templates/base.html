@@ -15,17 +15,17 @@
 
                 <li class="sidebar-brand">
                     <a
-                        href="{% url 'select_show' %}">Hoof N' Woof</a>
+                        href="{% url 'select_show' %}">Horse Show Administration</a>
                 </li>
                 {% comment %} if a show is currently selected {% endcomment %}
                 {% if date %}
-                
+
                     <li>
-                    
+
                         <a href="{% url 'view_show' show_date=date %}">Show Home Page</a>
 
                     </li>
-                    
+
                     <li>
                         <a href="{% url 'add_division' show_date=date %}">Add Division</a>
                     </li>

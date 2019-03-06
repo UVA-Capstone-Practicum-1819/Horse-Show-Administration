@@ -24,6 +24,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
+from .labels import generate_show_labels
 
 
 class AuthRequiredMiddleware(object):
@@ -62,12 +63,6 @@ def view_show(request, show_date):
         if form.is_valid():
             num = form.cleaned_data['num']
             return redirect('edit_combo', combo_num=num, show_date=show_date)
-    if 'navigation' in request.session:
-        del request.session['navigation']
-    if 'rider_pk' in request.session:
-        del request.session['rider_pk']
-    if 'horse_pk' in request.session:
-        del request.session['horse_pk']
     form = ComboNumForm()
 
     context = {
@@ -84,8 +79,6 @@ def view_show(request, show_date):
 def add_show(request):
     """ view used to create the show, if successful, redirects to its show home page """
     form = ShowForm()
-    if request.method == "GET":
-        return render(request, 'add_show.html', {'form': form})
     if request.method == "POST":
         f = ShowForm(request.POST)
         if not f.is_valid():
@@ -121,7 +114,7 @@ def select_show(request):
     return render(request, 'select_show.html', {'form': form})
 
 
-def sign_up(request):
+def sign_up(request):  #pragma: no cover
     """ creates a new user account """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -162,14 +155,14 @@ def view_billing(request, show_date, combo_num):
     for classe in classes:
         class_pre_reg = ClassParticipation.objects.filter(
             combo=combo).get(participated_class=classe)
-        if class_pre_reg.is_prereg == True:
+        if class_pre_reg.is_preregistered == True:
             price += show.pre_reg_price
         else:
             price += show.day_of_price
     #total = classes.count()
     #price = show.pre_reg_price * total
     # for minimum requirements, only calculates price based on pre-registration price
-    context = {'name': combo.rider, 'date': show_date,
+    context = {'name': combo.rider, 'show_date': show_date,
                'classes': classes.all(), 'combo_num': combo_num, 'tot': total, 'price': price}
     # the context will help create the table for the list of classes a user is currently in
     return render(request, 'view_billing.html', context)
@@ -179,19 +172,15 @@ def scratch_combo(request, show_date, combo_num):
     """ This view allows you to scratch from a show """
     show = Show.objects.get(date=show_date)
     combo = show.combos.get(num=combo_num)
-    cls = request.GET["cname"]
-    dcls = combo.classes.get(name=cls)
-    combo.classes.remove(dcls)
+    class_num = request.GET["cnum"]
+    class_obj = Class.objects.get(num=class_num)
+    selected_class = ClassParticipation.objects.filter(
+        combo=combo).get(participated_class=class_obj)
+    selected_class.delete()
+    return redirect('view_billing', show_date=show_date, combo_num=combo_num)
     # this line allows for a classes to be scratched (or removed) at no additional cost
     # the list will be changed based on what classes were removed
     # classes will only be removed from the horse-rider combo object, not from the entire database
-    total = combo.classes.count()
-    price = show.pre_reg_price * total
-    context = {'name': combo.rider, 'date': show_date,
-               'classes': combo.classes.all(), 'combo_num': combo_num, 'tot': total, 'price': price}
-    # context information need to populate table
-    return render(request, 'view_billing.html', context)
-    # rendered to the same html page
 
 
 def view_division_scores(request, show_date, division_id):
@@ -221,7 +210,7 @@ def view_division_scores(request, show_date, division_id):
 
     else:
         form = DivisionChampForm()
-        
+
     context = {'classes': division.classes.all(), 'date': show_date,
                'id': division_id, 'name': division.name, 'form': form}
     # passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
@@ -239,7 +228,7 @@ def delete_class(request, show_date, division_id, class_num):
     return redirect('view_division', show_date=show_date, division_id=division_id)
 
 
-def view_division_classes(request, show_date, division_id):
+def view_division_classes(request, show_date, division_id): #pragma: no cover
     """ lists the classes in a division """
     show = Show.objects.get(date=show_date)
     division = show.divisions.get(id=division_id)
@@ -250,6 +239,8 @@ def view_division_classes(request, show_date, division_id):
 
 def add_class(request, show_date, division_id):
     """ This view allows you to add a new class """
+    show = Show.objects.get(date=show_date)
+    division = show.divisions.get(id=division_id)
     if request.method == "POST":
         form = ClassForm(request.POST)
         if form.is_valid():
@@ -258,7 +249,7 @@ def add_class(request, show_date, division_id):
             existing_classes = division.classes.filter(
                 num=form.cleaned_data['num'])
             if existing_classes:
-                messages.info(
+                messages.error(
                     request, 'Combo for selected horse and rider already exists!')
                 return redirect('view_division_classes', show_date=show_date, division_id=division_id)
             class_form = ClassForm(request.POST)
@@ -269,10 +260,11 @@ def add_class(request, show_date, division_id):
             return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_obj.num)
     else:
         form = ClassForm()
-    return render(request, 'add_class.html', {'form': form})
+        context = {'name': division.name, 'form': form, 'date':show_date}
+    return render(request, 'add_class.html', context)
 
 
-def select_class(request, show_date, division_id):
+def select_class(request, show_date, division_id): #pragma: no cover
     """ This view allows you to select a class from a prepopulated list """
     if request.method == "POST":
         form = ClassSelectForm(request.POST)
@@ -370,7 +362,8 @@ def rank_class(request, show_date, division_id, class_num):
         context = {
             "name": division.name,
             "class": class_obj,
-            'form': form
+            'form': form,
+            'date':show_date
         }
         return render(request, 'rank_class.html', context)
 
@@ -394,11 +387,6 @@ def add_division(request, show_date):
             division.save()
             id = division.id
             print(id)
-        if 'another' in request.POST:
-            return redirect('add_division', show_date=show_date)
-        elif 'exit' in request.POST:
-            return redirect('view_show', show_date=show_date)
-        elif 'class_add' in request.POST:
             return redirect('view_division', show_date=show_date, division_id=id)
 
     else:
@@ -460,13 +448,36 @@ def view_class(request, show_date, division_id, class_num):
     class_obj = division.classes.get(num=class_num)
     combos = class_obj.combos.all()
     if request.method == "POST":
-        form = ComboSelectForm(request.POST)
-        # allows the user to select from the pre-existing horse-rider combos
+        form = AddComboToClassForm(request.POST)
+        # allows the user to enter a combo num they believe exists
         if form.is_valid():
-            combo = form.cleaned_data['combo']
-            return redirect('view_billing', show_date=show_date, combo_num=combo.num)
+            num = form.cleaned_data['num']
+            # checking to see if combo number exists in this show
+            try:
+                combo = HorseRiderCombo.objects.get(show=show, num=num)
+                # error checking for if combo is already in class
+                combo_classes = combo.classes.all()
+                if(class_obj in combo_classes):
+                    messages.error(request, "Horse-Rider Combo is already in this class.")
+                    return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
+                classParticipation = ClassParticipation(participated_class=class_obj, combo=combo, is_preregistered=form.cleaned_data['preregistered'])
+                classParticipation.save()
+                context = {
+                    "combos": class_obj.combos.all(),
+                    "class": class_obj,
+                    "class_num": class_obj.num,
+                    "date": show_date,
+                    "id": division_id,
+                    "name": division.name,
+                    "show_name": show.name,
+                    "add_form": form,
+                }
+                return render(request, 'view_class.html', context)
+            except:
+                messages.error(request, "Horse Rider Combo does not exist in this show.")
+                return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
     else:
-        form = ComboSelectForm()
+        form = AddComboToClassForm()
     # form = ComboSelectForm()
     context = {
         "combos": combos,
@@ -493,7 +504,7 @@ def delete_combo(request, show_date, division_id, class_num, combo_num):
     return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
 
 
-def select_division(request, show_date):
+def select_division(request, show_date): #pragma: no cover
     """ displays division select dropdown and ability to "Save" or "See Division Scores" """
     if request.method == "POST":
 
@@ -548,13 +559,14 @@ def edit_rider(request, show_date, rider_pk):
             rider.zip_code = edit_form.cleaned_data['zip_code']
             rider.birth_date = edit_form.cleaned_data['birth_date']
             rider.member_VHSA = edit_form.cleaned_data['member_VHSA']
+            rider.member_4H = edit_form.cleaned_data['member_4H']
             rider.county = edit_form.cleaned_data['county']
 
             rider.save()
     else:
         edit_form = RiderEditForm(
             {'name': rider.name, 'address': rider.address, 'city': rider.city, 'state': rider.state, 'zip_code': rider.zip_code,
-             'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'county': rider.county},
+             'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'member_4H': rider.member_4H, 'county': rider.county},
             instance=rider)
     return render(request, 'edit_rider.html', {'rider': rider, 'edit_rider_form': edit_form, 'date': show_date})
 
@@ -628,6 +640,7 @@ def add_combo(request, show_date):
         redirects to the edit combo page for the same combination after it is done
      """
     show = Show.objects.get(date=show_date)
+    form_errors = ""
     if request.method == 'POST':
         form = HorseRiderComboCreateForm(request.POST)
         if form.is_valid():
@@ -649,7 +662,7 @@ def add_combo(request, show_date):
                 return redirect('select_rider', show_date=show.date)
             return redirect('edit_combo', show_date=show.date, combo_num=num)
         else:
-            return redirect('view_show', show_date=show_date)
+            form_errors = form.non_field_errors
     rider_pk = request.session['rider_pk']
     if rider_pk is None:
         return redirect('select_show')
@@ -660,10 +673,10 @@ def add_combo(request, show_date):
     horse = get_object_or_404(Horse, pk=horse_pk)
     form = HorseRiderComboCreateForm()
 
-    return render(request, 'add_combo.html', {'form': form,  'rider': rider, 'horse': horse, 'date': show_date})
+    return render(request, 'add_combo.html', {'form': form,  'rider': rider, 'horse': horse, 'date': show_date, 'form_errors': form_errors})
 
 
-def edit_combo(request, show_date, combo_num):
+def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
     """
     edits the combination that was specified by num
     also handles the addition/removal of classes based on num and the calculation of price
@@ -707,11 +720,15 @@ def edit_combo(request, show_date, combo_num):
     registered_classes = combo.classes.all()
     number_registered_classes = len(registered_classes)
     price = number_registered_classes * 10
+    if division_id != None:
+        division = Division.objects.get(id=division_id)
+        c = Class.objects.get(show=show, num=class_num)
+        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+    else:
+        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
 
-    return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
 
-
-class ShowAutocomplete(autocomplete.Select2QuerySetView):
+class ShowAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     """ Autocomplete functionality for the select page """
 
     def get_queryset(self):
@@ -723,7 +740,7 @@ class ShowAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class ComboAutocomplete(autocomplete.Select2QuerySetView):
+class ComboAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     """ Autocomplete functionality for selecting a combo """
 
     def get_queryset(self):
@@ -733,7 +750,7 @@ class ComboAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class ClassAutocomplete(autocomplete.Select2QuerySetView):
+class ClassAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     """ This is the autocomplete functionality for selecting a class """
 
     def get_queryset(self):
@@ -743,7 +760,7 @@ class ClassAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class RiderAutocomplete(autocomplete.Select2QuerySetView):
+class RiderAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     """ This view shows the autocomplete functionality for selection a rider """
 
     def get_queryset(self):
@@ -753,7 +770,7 @@ class RiderAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class HorseAutocomplete(autocomplete.Select2QuerySetView):
+class HorseAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     """ This view shows the autocomplete functionality for selecting a horse """
 
     def get_queryset(self):
@@ -767,7 +784,7 @@ class HorseAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class DivisionAutocomplete(autocomplete.Select2QuerySetView):
+class DivisionAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     """ fills in form automatically based on value entered by user """
 
     def get_queryset(self):
@@ -777,7 +794,7 @@ class DivisionAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-def populate_pdf_division(division_name, page, show, d):
+def populate_pdf_division(division_name, page, show, d):  #pragma: no cover
     for division in Division.objects.filter(name__icontains=division_name):
         if division.show.date == show.date:
             # print(division.name)
@@ -822,7 +839,7 @@ def populate_pdf_division(division_name, page, show, d):
                 int += 1
 
 
-def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, bool_combine):
+def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, bool_combine):  #pragma: no cover
     for division in Division.objects.filter(name__icontains=division_name):
         # combined = True;
         # div2 = Division.objects.filter(name__icontains=division_name2).filter(name__icontains="hunter")
@@ -896,7 +913,7 @@ def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, b
     return bool_combine
 
 
-def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d, bool_combine):
+def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d, bool_combine):  #pragma: no cover
     for division in Division.objects.filter(name__icontains=division_name):
         if division.show.date == show.date:
             # print(division.name)
@@ -966,7 +983,7 @@ def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d,
     return bool_combine
 
 
-def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d, bool_combine):
+def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d, bool_combine):  #pragma: no cover
     for division in Division.objects.filter(name__icontains=division_name):
         if division.show.date == show.date:
             # print(division.name)
@@ -1040,8 +1057,8 @@ def calculate_age(born):
     return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
 
-def populate_pdf(request, show_date):  # populates text fields of PDF
-    """ populate pdf for VHSA horse show reports """
+def populate_pdf(request, show_date):   #pragma: no cover
+    """ populate pdf for VHSA horse show reports """ #populates text fields of PDF
     show = Show.objects.get(date=show_date)  # get the show by its date
     d = {
         'p2_show_name': show.name,
@@ -1223,3 +1240,23 @@ def populate_pdf(request, show_date):  # populates text fields of PDF
 
     # returns the populated pdf
     return render(request, 'final_results.html', {"filename": "show/static/VHSA_Final_Results.pdf"})
+
+
+
+def generate_labels(request, show_date): #pragma: no cover
+    # view to execute label generating
+    generate_show_labels(show_date)
+    show = Show.objects.get(date=show_date)
+    if(len(HorseRiderCombo.objects.filter(show=show))==0):
+        messages.error(
+                    request, "There are no Horse Rider Combos registered for this show.")
+        context = {
+            "show_name": show.name,
+            "date": show_date,
+            "location": show.location,
+            "divisions": show.divisions.all(),
+        }
+        return render(request, 'view_show.html', context)
+    else:
+        generate_show_labels(show_date)
+        return render(request, 'labels.html', {'date':str(show_date)})

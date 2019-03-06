@@ -6,6 +6,15 @@ from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
+combo_patterns = [
+    path('billing',
+         views.view_billing, name="view_billing"),
+
+    path('scratch', views.scratch_combo, name="scratch_combo"),
+
+    path('edit', views.edit_combo, name="edit_combo"),
+]
+
 class_patterns = [
     path('',
          views.view_class, name="view_class"),
@@ -16,7 +25,10 @@ class_patterns = [
     path('delete',
          views.delete_class, name="delete_class"),
 
-    path('combo/<combo_num>/delete', views.delete_combo, name="delete_combo")
+    path('combo/<combo_num>/', include(combo_patterns)),
+
+    path('combo/<combo_num>/delete', views.delete_combo, name="delete_combo"),
+
 ]
 
 division_patterns = [
@@ -38,15 +50,6 @@ division_patterns = [
          views.view_division_classes, name="view_division_classes"),
 
 
-]
-
-combo_patterns = [
-    path('billing',
-         views.view_billing, name="view_billing"),
-
-    path('scratch', views.scratch_combo, name="scratch_combo"),
-
-    path('edit', views.edit_combo, name="edit_combo"),
 ]
 
 show_patterns = [
@@ -112,6 +115,8 @@ urlpatterns = [
         template_name='log_in.html'), name='log_in'),
 
     path('logout', auth_views.LogoutView.as_view(), name='log_out'),
+
+    path('<show_date>/generate_labels', views.generate_labels, name="labels")
 
 
 

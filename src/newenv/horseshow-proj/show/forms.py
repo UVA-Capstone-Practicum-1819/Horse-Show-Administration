@@ -99,7 +99,7 @@ class RiderForm(forms.ModelForm):
     class Meta:
         model = Rider
         fields = ('name', 'address', 'city', 'state', 'zip_code', 'email',
-                  'adult', 'birth_date', 'member_VHSA', 'county',)
+                  'adult', 'birth_date', 'member_VHSA', 'member_4H', 'county')
 
 
 class RiderSelectForm(forms.ModelForm):
@@ -152,11 +152,38 @@ class ComboNumForm(forms.Form):
         validators=[MinValueValidator(100), MaxValueValidator(999)])
 
 
+class AddComboToClassForm(forms.Form):
+    """ # This Form is used to add a combo to a class on the view class page """
+
+    num = forms.IntegerField(
+        validators=[MinValueValidator(100), MaxValueValidator(999)])
+    preregistered = forms.BooleanField(required=False)
+
+
 class HorseRiderComboCreateForm(forms.ModelForm):
     """ # This creates the Horse Rider Combo itself. for creating a horse rider combo """
+
+    email = forms.EmailField(required=False, label="Email")
+    cell = forms.CharField(max_length=12, required=False, label="Cell Phone #")
+
     class Meta:
         model = HorseRiderCombo
         fields = ('num', 'contact', 'email', 'cell')
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        email = cleaned_data.get('email')
+        cell = cleaned_data.get('cell')
+
+        print("This is the email: " + email)
+        print("This is the cell: " + cell)
+
+        if not email and not cell:
+            print("do something!")
+            raise forms.ValidationError(
+                'Have to include at least 1 contact (email or cell)')
+
+        return cleaned_data
 
 
 class HorseRiderEditForm(forms.ModelForm):
@@ -181,7 +208,7 @@ class RiderEditForm(forms.ModelForm):
     class Meta:
         model = Rider
         fields = ('name', 'address', 'city', 'state', 'zip_code',
-                  'birth_date', 'member_VHSA', 'county')
+                  'birth_date', 'member_VHSA', 'member_4H', 'county')
 
 
 class HorseEditForm(forms.ModelForm):
@@ -261,7 +288,7 @@ class ClassSelectForm(forms.ModelForm):
         model = Class
         fields = ('num',)
 
-    def clean_date(self):
+    def clean_date(self): #pragma: no cover
         class_obj = self.cleaned_data['name']
         classes = Class.objects.all()
         if class_obj in classes:

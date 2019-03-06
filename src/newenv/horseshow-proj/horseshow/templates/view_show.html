@@ -10,7 +10,7 @@
   {% comment %} show information {% endcomment %}
   <h4><b>Date:</b> {{ date }}
   <br><b>Location:</b> {{ location }}</h4>
-    
+
 
   {% comment %} table containing all the divisions and their respective classes {% endcomment %}
   <table class="table table-striped table-bordered">
@@ -19,7 +19,7 @@
 
         <th>Division</th>
         <th colspan="10">Classes</th>
-        
+
       </thead>
 
       {% comment %} table body (each row contains division and then its classes) {% endcomment %}
@@ -30,10 +30,10 @@
             {% comment %} the cell containing the clickable division name {% endcomment %}
             <td>
 
-              <a class="btn" href="{% url 'view_division' show_date=date division_id=division.pk %}">{{division.name}}</a> 
+              <a class="btn" href="{% url 'view_division' show_date=date division_id=division.pk %}">{{division.name}}</a>
 
             </td>
-              
+
             {% comment %} cells for each of the classes {% endcomment %}
             {% for class in division.classes.all %}
               <td>
@@ -42,20 +42,20 @@
 
                   {{class.num}} - {{class.name}}
 
-                </a> 
+                </a>
 
               </td>
 
             {% endfor %}
-            
+
             {% comment %} add class cell for each division {% endcomment %}
             <td>
-              <a class="btn btn-success" href="{% url 'add_class' show_date=date division_id=division.id %}">+ Add Class</a> 
+              <a class="btn btn-success" href="{% url 'add_class' show_date=date division_id=division.id %}">+ Add Class</a>
             </td>
-               
+
           </tr>
 
-                  
+
         {% endfor %}
 
         {% comment %} another row for the add division button {% endcomment %}
@@ -68,33 +68,27 @@
         </tbody>
       </table>
     
+  {% for message in messages %}
 
-  
+    <div class="alert alert-danger">
+      <a class="close" href="." data-dismiss="alert">×</a>
 
-  {% comment %} 
-  {% for division in divisions %}
-  <li><a href="{% url 'view_division' show_date=date division_id=division.id %}">{{division.name}}</a></li>
+      {{ message }}
+
+
+    </div>
   {% endfor %}
-  <p>
 
-
-
-    
-    <p><a class="btn btn-primary" href="{% url 'select_division' show_date=date %}">Edit Division/ View Division Score</a></p>
-    <p><a class="btn btn-primary" href="{% url 'select_rider' show_date=date %}">Add Horse-Rider Combo to the Database</a></p>
-
-    <p>
       <form method="POST" class="form">
         {% csrf_token %}
         <button class="btn btn-primary" type="submit">Edit Horse Rider Combo</button>
         {{ form.as_table }}
 
       </form>
-    </p>
     <p><a class="btn btn-primary" href="{% url 'select_combo' show_date=date %}">Bill a Rider</a></p>
     <p><a class="btn btn-primary" href="{% url 'populate_pdf' show_date=date%}">Generate VHSA PDF</a></p>
+    <p><a href="{% url 'labels' show_date=date %}">Generate Horse Rider Combo Labels</a></p>
 
-  </p> {% endcomment %}
 
 </body>
 {% endblock %}

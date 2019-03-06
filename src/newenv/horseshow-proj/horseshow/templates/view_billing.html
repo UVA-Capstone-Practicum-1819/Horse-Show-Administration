@@ -25,11 +25,7 @@
                 <!-- {{ form | crispy}} -->
               </td>
               <td>
-                <a
-                class="btn btn-primary btn-sm"
-                name="scratch">
-
-                Scratch</a>
+                <a class="btn btn-primary btn-sm" href="{% url 'scratch_combo' show_date=show_date combo_num=combo_num%}?next={{request.path}}&cnum={{c.num}}" name="scratch">Scratch</a>
               </td>
             </tr>
 
@@ -40,7 +36,7 @@
         <h4>Total Classes: {{ tot }}</h4>
         <h4>Total Price: ${{ price }}</h4>
         <a class="btn btn-primary btn-sm"
-        href="{% url 'view_show' show_date=date%}">Return to Show Page</a>
+        href="{% url 'view_show' show_date=show_date%}">Return to Show Page</a>
     </form>
 </div>
 <!-- {{ form.media }} -->

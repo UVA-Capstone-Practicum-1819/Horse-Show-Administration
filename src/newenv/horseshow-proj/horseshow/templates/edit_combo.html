@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
+{% if division %}
+<h3><a href="{% url 'view_show' show_date=date %}">Show: {{show.name}}</a> > <a href="{% url 'view_division' show_date=date division_id=division.id %}"> Division: {{division.name}}</a> > Class: <a href="{% url 'view_class' show_date=date division_id=division.id class_num=class.num %}">{{class.num}} - {{class.name}}</a> > {{combo.num}}</h3>
+{% else %}
 <h3>Horse Rider Combination </h3>
+{% endif %}
 
 <div class="container=fluid">
     <div class="row">
@@ -12,7 +16,7 @@
 
             <form class="form"  method="post">
                 {% csrf_token %}
-                
+
                 {{ edit_form | crispy }}
 
                 <button type="submit" name="edit" value="Edit" class="btn btn-success">Edit Information</button>
@@ -22,7 +26,7 @@
         <div class="col-lg-6">
 
 
-        
+
 
             <table class="table table-striped table-bordered">
                 <tr>
@@ -57,11 +61,7 @@
             <button class="btn btn-primary" name="add_class" value="Add" type="submit">Add Class</button>
 
         </form>
-
-            <h4>Total Classes: {{ tot }}</h4>
-            <h4>Total Price: ${{ price }}</h4>
-
-
+            <p><a class="btn btn-primary" href="{% url 'view_billing' show_date=date combo_num=combo.num %}">Bill a Rider</a></p>
         </div>
     </div>
 </div>
