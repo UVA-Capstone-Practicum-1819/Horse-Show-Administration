@@ -89,3 +89,6 @@ db.sqlite3
 
 # Migrations
 migrations
+
+# Ignore pdf files from label creations
+labels/
