@@ -490,6 +490,22 @@ class ComboTestCases(TestCase):
         response = self.client.post('/show/2018-12-10/combo/select', {'combo':combo1.pk})
         self.assertRedirects(response, '/show/2018-12-10/combo/200/billing')
 
+    def test_scratch_combo_billing(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
+            '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
+        rider1 = Rider.objects.create(name="Anna Wu", address="address1", city="cville", state="VA",
+                                      zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
+        combo1 = HorseRiderCombo.objects.create(
+            num=200, rider=rider1, horse=horse1, show=show)
+        c1 = Class.objects.create(name="Test", num="1")
+        c2 = Class.objects.create(name="Test2", num="2")
+        class_participation = ClassParticipation.objects.create(participated_class=c1, combo=combo1, is_preregistered=False)
+        class_participation = ClassParticipation.objects.create(participated_class=c2, combo=combo1, is_preregistered=True)
+        self.client.login(username='john', password='johnpassword')
+        request = HttpRequest()
+        response = self.client.get('/show/2018-12-10/combo/200/scratch', {'cnum':c1.num})
+
 class DivisionsTestCases(TestCase):
     def test_add_division(self):
         show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
@@ -549,7 +565,13 @@ class RankTestCases(TestCase):
         request = HttpRequest()
         response = self.client.post('/show/2018-12-10/division/1/class/1/rank', {'first':200, 'second':300})
 
-
+    def test_rank_class_get(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        d1 = Division.objects.create(name="jump", show=show)
+        c1 = Class.objects.create(name="Test", num="1", division=d1, show=show)
+        self.client.login(username='john', password='johnpassword')
+        request = HttpRequest()
+        response = self.client.get('/show/2018-12-10/division/1/class/1/rank')
 
     def test_rank_class_duplicates(self):
         show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)

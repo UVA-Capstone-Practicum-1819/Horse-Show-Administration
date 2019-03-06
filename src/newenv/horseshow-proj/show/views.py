@@ -168,7 +168,7 @@ def view_billing(request, show_date, combo_num):
     return render(request, 'view_billing.html', context)
 
 
-def scratch_combo(request, show_date, combo_num): #pragma: no cover
+def scratch_combo(request, show_date, combo_num):
     """ This view allows you to scratch from a show """
     show = Show.objects.get(date=show_date)
     combo = show.combos.get(num=combo_num)
@@ -634,7 +634,7 @@ def select_horse(request, show_date):
     return render(request, 'select_horse.html', {'form': form, 'date': show_date})
 
 
-def add_combo(request, show_date): #pragma: no cover
+def add_combo(request, show_date):
     """
         creates a page for adding a horse-rider combination, taking in the session variables for the primary keys of the chosen horse and rider
         redirects to the edit combo page for the same combination after it is done
@@ -676,7 +676,7 @@ def add_combo(request, show_date): #pragma: no cover
     return render(request, 'add_combo.html', {'form': form,  'rider': rider, 'horse': horse, 'date': show_date, 'form_errors': form_errors})
 
 
-def edit_combo(request, show_date, combo_num, division_id=None, class_num=None): #pragma: no cover
+def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
     """
     edits the combination that was specified by num
     also handles the addition/removal of classes based on num and the calculation of price
@@ -1243,8 +1243,8 @@ def populate_pdf(request, show_date):   #pragma: no cover
 
 
 
-def generate_labels(request, show_date):
-    # view to execute label generating 
+def generate_labels(request, show_date): #pragma: no cover
+    # view to execute label generating
     generate_show_labels(show_date)
     show = Show.objects.get(date=show_date)
     if(len(HorseRiderCombo.objects.filter(show=show))==0):
@@ -1260,4 +1260,3 @@ def generate_labels(request, show_date):
     else:
         generate_show_labels(show_date)
         return render(request, 'labels.html', {'date':str(show_date)})
-

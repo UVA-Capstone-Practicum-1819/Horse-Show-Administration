@@ -288,7 +288,7 @@ class ClassSelectForm(forms.ModelForm):
         model = Class
         fields = ('num',)
 
-    def clean_date(self):
+    def clean_date(self): #pragma: no cover
         class_obj = self.cleaned_data['name']
         classes = Class.objects.all()
         if class_obj in classes:
