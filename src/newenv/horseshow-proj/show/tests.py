@@ -10,6 +10,8 @@ from unittest.mock import Mock
 from django.urls import reverse
 from django.http import HttpRequest
 from .labels import generate_show_labels
+from django.db import IntegrityError
+from contextlib import contextmanager
 
 
 class BillTests(TestCase):
@@ -899,3 +901,36 @@ class TestViewClassTestCase(TestCase):
         response = self.client.get('/show/2018-12-10/division/1/class/1/combo/200/delete')
 
 class AddDuplicateClass(TestCase):
+    def test_failed_add_class(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        d1 = Division.objects.create(name="jump", show=show)
+        c1 = Class.objects.create(name="Class1", num="1", division=d1, show=show)
+        with self.assertRaises(IntegrityError):
+            Class.objects.create(name="Class1", num="1", division=d1, show=show)
+
+    @contextmanager
+    def assertNotRaises(self, exc_type):
+        try:
+            yield None
+        except exc_type:
+            raise self.failureException('{} raised'.format(exc_type))
+
+    def test_add_unique_class(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        d1 = Division.objects.create(name="jump", show=show)
+        c1 = Class.objects.create(name="Class1", num="1", division=d1, show=show)
+        with self.assertNotRaises(IntegrityError):
+            Class.objects.create(name="Class2", num="2", division=d1, show=show)
+
+class ChangedRiderModels(TestCase):
+    def test_valid_address(self):
+        form = RiderForm(data={'name':'Rider1', 'address':'', 'city':'', 'state':"VA",
+                                      'zip_code':'22903', 'email':'aw@email.com', 'adult':'False',
+                                      'birth_date':'2008-12-10'})
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_address(self):
+        form = RiderForm(data={'name':'', 'address':'', 'city':'', 'state':"VA",
+                                      'zip_code':'22903', 'email':'aw@email.com', 'adult':'False',
+                                      'birth_date':'2008-12-10'})
+        self.assertFalse(form.is_valid())

@@ -261,7 +261,7 @@ def add_class(request, show_date, division_id):
     else:
         form = ClassForm()
         context = {'name': division.name, 'form': form, 'date':show_date}
-    return redirect('view_division', show_date=show_date, division_id=division_id)
+    return redirect('view_division', show_date=show_date, division_id=division_id) #goes to division page to add class
 
 
 def select_class(request, show_date, division_id): #pragma: no cover
@@ -699,12 +699,11 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
                 is_prereg = class_combo_form.cleaned_data['is_preregistered']
                 class_obj = Class.objects.filter(show=show_date).get(num=selected_class)
                 #classParticipation = ClassParticipation()
-                try:
+                try: #checks to see if class creation is valid
                     classParticipation = ClassParticipation(
                         participated_class=class_obj, combo=combo, is_preregistered=is_prereg)
                     classParticipation.save()
-                except IntegrityError:
-                    #print("Class is already registered")
+                except IntegrityError: #if not, go back to division page and print error
                     messages.info(
                        request, "Class is already registered")
                     return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
