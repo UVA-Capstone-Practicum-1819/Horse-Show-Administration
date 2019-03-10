@@ -96,12 +96,12 @@ class Horse(models.Model):
 
 
 class Rider(models.Model):
-    """ Model for a rider. Birth date only needs to be recorded if they are 18 or younger """
+    """ Model for a rider. Birth date only needs to be recorded if they are 18 or younger. Street address and city are not required """
     email = models.EmailField(primary_key=True, max_length=200, validators=[
                               EmailValidator()], verbose_name="Email")
     name = models.CharField(max_length=200, verbose_name="Name")
-    address = models.CharField(max_length=200, verbose_name="Street Address")
-    city = models.CharField(default="", max_length=200)
+    address = models.CharField(max_length=200, verbose_name="Street Address", blank=True)
+    city = models.CharField(default="", max_length=200, blank=True)
     state = USStateField(default="VA")
     zip_code = USZipCodeField()
     adult = models.BooleanField(
