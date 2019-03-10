@@ -50,6 +50,7 @@ class Class(models.Model):
     """
     class Meta:
         unique_together = ('show', 'num')
+        ordering = ('num',)
 
     num = models.IntegerField(default=0)
     name = models.CharField(max_length=100, default="")
