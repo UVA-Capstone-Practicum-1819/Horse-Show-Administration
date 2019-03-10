@@ -227,6 +227,14 @@ def delete_class(request, show_date, division_id, class_num):
     # redirects to division_classes and passes in the division's name
     return redirect('view_division', show_date=show_date, division_id=division_id)
 
+def delete_division(request, show_date, division_id):
+    """deletes a division from a show"""
+    show = Show.objects.get(date=show_date)
+    """get division"""
+    division = show.divisions.get(id=division_id)
+    division.delete() 
+    """delete it"""
+    return redirect('view_show', show_date=show_date)
 
 def view_division_classes(request, show_date, division_id): #pragma: no cover
     """ lists the classes in a division """

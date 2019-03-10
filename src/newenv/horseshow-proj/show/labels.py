@@ -36,5 +36,4 @@ def generate_show_labels(show_date):
 		# Add label
 		sheet.add_label(info)
 		sheet.save("show/static/labels/"+str(show_date)+'.pdf')
-	print("{0:d} label(s) output on {1:d} page(s).".format(sheet.label_count, sheet.page_count))
 
