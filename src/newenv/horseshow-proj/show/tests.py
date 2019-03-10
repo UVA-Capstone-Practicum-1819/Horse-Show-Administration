@@ -897,3 +897,5 @@ class TestViewClassTestCase(TestCase):
         self.client.login(username='john', password='johnpassword')
         request = HttpRequest()
         response = self.client.get('/show/2018-12-10/division/1/class/1/combo/200/delete')
+
+class AddDuplicateClass(TestCase):

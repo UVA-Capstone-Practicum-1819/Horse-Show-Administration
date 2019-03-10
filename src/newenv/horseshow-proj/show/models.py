@@ -99,8 +99,8 @@ class Rider(models.Model):
     email = models.EmailField(primary_key=True, max_length=200, validators=[
                               EmailValidator()], verbose_name="Email")
     name = models.CharField(max_length=200, verbose_name="Name")
-    address = models.CharField(max_length=200, verbose_name="Street Address")
-    city = models.CharField(default="", max_length=200)
+    address = models.CharField(max_length=200, verbose_name="Street Address", blank=True)
+    city = models.CharField(default="", max_length=200, blank=True)
     state = USStateField(default="VA")
     zip_code = USZipCodeField()
     adult = models.BooleanField(

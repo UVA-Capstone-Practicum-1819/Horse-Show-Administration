@@ -261,7 +261,7 @@ def add_class(request, show_date, division_id):
     else:
         form = ClassForm()
         context = {'name': division.name, 'form': form, 'date':show_date}
-    return render(request, 'add_class.html', context)
+    return redirect('view_division', show_date=show_date, division_id=division_id)
 
 
 def select_class(request, show_date, division_id): #pragma: no cover
@@ -697,11 +697,17 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
             if class_combo_form.is_valid():
                 selected_class = class_combo_form.cleaned_data['num']
                 is_prereg = class_combo_form.cleaned_data['is_preregistered']
-                class_obj = Class.objects.filter(
-                    show=show_date).get(num=selected_class)
-                classParticipation = ClassParticipation(
-                    participated_class=class_obj, combo=combo, is_preregistered=is_prereg)
-                classParticipation.save()
+                class_obj = Class.objects.filter(show=show_date).get(num=selected_class)
+                #classParticipation = ClassParticipation()
+                try:
+                    classParticipation = ClassParticipation(
+                        participated_class=class_obj, combo=combo, is_preregistered=is_prereg)
+                    classParticipation.save()
+                except IntegrityError:
+                    #print("Class is already registered")
+                    messages.info(
+                       request, "Class is already registered")
+                    return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
 
         elif request.POST.get('edit'):
             edit_form = HorseRiderEditForm(request.POST)
