@@ -4,7 +4,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-<!-- Include the above in your HEAD tag ---------->
+<!-- Include the above in your HEAD tag -->
 
    <div id="wrapper">
 
@@ -13,13 +13,14 @@
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
 
-                <li class="sidebar-brand">
-                    <a
-                        href="{% url 'select_show' %}">Horse Show Administration</a>
+                <li style="color:#fff;font-size: 18px;line-height: 60px;">
+                    Horse Show Administration
                 </li>
                 {% comment %} if a show is currently selected {% endcomment %}
                 {% if date %}
-
+                    <li>
+                        <a href="{% url 'select_show' %}">Select Show</a>
+                    </li>
                     <li>
 
                         <a href="{% url 'view_show' show_date=date %}">Show Home Page</a>
@@ -63,7 +64,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12">
-                      <!-- This wraps the content of each page ---------->
+                      <!-- This wraps the content of each page -->
                       {% block content %}
                       {% endblock %}
                     </div>
