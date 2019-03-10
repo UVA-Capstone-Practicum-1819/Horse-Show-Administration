@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+
+<div class="content container">
+  <div class="row">
+    <div class="col-md-8">
+      {% comment %} Display the show title {% endcomment %}
+      <h3><a href="{% url 'view_show' show_date=date %}">Show: {{show_name}}</a> > Division: {{name}} </h3>
+
+      {% comment %} Display the division title {% endcomment %}
+      {% if form %}
+      <form class="form-inline" method="POST">
+        {% csrf_token %}
+        {{ form | crispy}}
+        <button type="submit" class="btn btn-success">Submit</button>
+      </form>
+
+      {% endif %}
+      {% comment %} Show a list of all the classes {% endcomment %}
+      <div class="row">
+
+        <table class="table table-striped table-bordered" >
+          {% comment %} The column heads {% endcomment %}
+          <thead class="bg-info">
+            <th>#</th>
+            <th>Class</th>
+
+          </thead>
+          {% comment %} Each class {% endcomment %}
+          <tbody>
+            {% for class in classes %}
+            <tr>
+              <td>
+                {{class.num}}
+              </td>
+              <td>
+              <p>{{ class.name }}</p>
+
+              </td>
+
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+  {% comment %} Delete division {% endcomment %}
+  <a href="{% url 'delete_division' show_date=date division_id=id %}" class="btn btn-danger">Delete Division</a>
+
+</div>
+{% endblock %}

@@ -435,7 +435,6 @@ def view_division(request, show_date, division_id):
             # render page with new division
             return redirect('view_division', show_date=show_date, division_id=division_id)
     else:
-        # each division only has a max of 3 classes, no input form if 3 classes present
         division_classes = division.classes.all()
         form = ClassForm()
         context = {
@@ -447,6 +446,30 @@ def view_division(request, show_date, division_id):
             "form": form,
         }
         return render(request, 'view_division.html', context)
+
+def edit_division(request, show_date, division_id):
+    """ view made for editing division name """
+    show = Show.objects.get(date=show_date)
+    division = show.divisions.get(id=division_id)
+    if request.method == 'POST':  # if POST, save division's new name
+        form = EditDivisionForm(request.POST)
+        if form.is_valid():
+            division.name = form.cleaned_data['change_name_to']
+            division.save()
+            # render page with new division
+            return redirect('view_division', show_date=show_date, division_id=division_id)
+    else:
+        division_classes = division.classes.all()
+        form = EditDivisionForm()
+        context = {
+            "date": show_date,
+            "show_name": show.name,
+            "id": division_id,
+            "name": division.name,
+            "classes": division_classes,
+            "form": form,
+        }
+        return render(request, 'edit_division.html', context)        
 
 
 def view_class(request, show_date, division_id, class_num):
