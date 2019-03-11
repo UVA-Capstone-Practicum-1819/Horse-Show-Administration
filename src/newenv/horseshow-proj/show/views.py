@@ -761,22 +761,22 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
                     if division_id != None:
                         division = Division.objects.get(id=division_id)
                         c = Class.objects.get(show=show, num=class_num)
-                        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form,
-                         'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+                        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form, 
+                            'class_combo_form': class_combo_form, 'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
                     else:
-                        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form,
-                         'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+                        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 
+                            'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
                 except ObjectDoesNotExist:
                     messages.info(
                        request, "Class " +str(class_combo_form.cleaned_data['num'])+ " does not exist in this show.")
                     if division_id != None:
                         division = Division.objects.get(id=division_id)
                         c = Class.objects.get(show=show, num=class_num)
-                        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form,
-                         'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+                        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form, 
+                            'class_combo_form': class_combo_form, 'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
                     else:
-                        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form,
-                         'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+                        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 
+                            'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
 
         elif request.POST.get('edit'):
             edit_form = HorseRiderEditForm(request.POST)
@@ -795,9 +795,11 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
     if division_id != None:
         division = Division.objects.get(id=division_id)
         c = Class.objects.get(show=show, num=class_num)
-        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form, 
+            'class_combo_form': class_combo_form, 'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
     else:
-        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 
+            'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
 
 
 class ShowAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
