@@ -3,7 +3,8 @@
 {% load static %}
 {% block content %}
 
-<h3><a href="{% url 'view_show' show_date=date %}">Show: {{show_name}}</a> > <a href="{% url 'view_division' show_date=date division_id=id %}"> Division: {{name}}</a> > Class: {{class.num}} - {{class.name}}</h3>
+<h3><a href="{% url 'view_show' show_date=date %}">Show: {{show_name}}</a> > <a href="{% url 'view_division' show_date=date division_id=id %}">
+    Division: {{name}}</a> > Class: {{class.num}} - {{class.name}}</h3>
 
 <div class="row">
   <form class="form" method="post">
@@ -17,7 +18,8 @@
         {% for combo in combos %}
         <tr>
           <td>
-            <a href="{% url 'edit_combo' show_date=date division_id=id class_num=class_num combo_num=combo.num %}">{{combo.num}}</a>: {{combo.rider.name}} and {{combo.horse.name}}
+            <a href="{% url 'edit_combo' show_date=date division_id=id class_num=class_num combo_num=combo.num %}">{{combo.num}}</a>:
+            {{combo.rider.first_name }} {{combo.rider.last_name }} and {{combo.horse.name}}
           </td>
           <td>
             <a class="btn btn-danger" href="{% url 'delete_combo' show_date=date division_id=id class_num=class_num combo_num=combo.num %}">X</a>
@@ -45,7 +47,8 @@
     {{ form.media }}
     <p><a class="btn btn-primary" href="{% url 'select_rider' show_date=date %}">Create New Combo</a></p>
   </form>
-  <p><a class="btn btn-primary" href="{% url 'rank_class' show_date=date division_id=id class_num=class.num %}">Rank Class</a></p>
+  <p><a class="btn btn-primary" href="{% url 'rank_class' show_date=date division_id=id class_num=class.num %}">Rank
+      Class</a></p>
 </div>
 {{ form.media }}
 {% endblock %}
