@@ -55,6 +55,8 @@ division_patterns = [
 show_patterns = [
     path('', views.view_show, name='view_show'),
 
+    path('edit', views.edit_show, name='edit_show'),
+
     path('division/add', views.add_division, name="add_division"),
 
     path('division/select', views.select_division, name="select_division"),

@@ -9,9 +9,9 @@ from django.core.exceptions import ValidationError
 from localflavor.us.forms import USStateField, USZipCodeField, USStateSelect
 
 
-class ShowForm(forms.Form):
+class ShowForm(forms.ModelForm):
     """
-    Form for creating a Show and saving its information. This information doesn't get edited per Bertha and Rebecca's request as the name, date, and location will be set early on
+    Form for creating and editing a show
     """
     name = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'autocomplete': 'off', }))
@@ -20,6 +20,10 @@ class ShowForm(forms.Form):
         max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
     day_of_price = forms.IntegerField(label="Day-of Price")
     pre_reg_price = forms.IntegerField(label="Preregistration Price")
+
+    class Meta:
+        model = Show
+        fields = ('name', 'date', 'location', 'day_of_price', 'pre_reg_price')
 
 
 class RegistrationBillForm(forms.Form):
