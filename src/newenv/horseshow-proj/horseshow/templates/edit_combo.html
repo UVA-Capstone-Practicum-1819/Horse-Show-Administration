@@ -44,11 +44,9 @@
                     {% for class in classes %}
                     <tr scope="row">
                         <td>{{class.participated_class.num}}</td>
-                        <td>{{class.name}}</td>
                         <td>{{class.participated_class.name}}</td>
-                        <td>N/A</td>
                         <td>{% if class.is_preregistered %}
-                        <td> Yes
+                            Yes
                             {% else %}
                             No
                             {% endif %}
