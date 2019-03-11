@@ -22,6 +22,8 @@ class ShowForm(forms.Form):
     day_of_price = forms.IntegerField(label="Day-of Price")
     pre_reg_price = forms.IntegerField(label="Preregistration Price")
 
+class EditDivisionForm(forms.Form):
+    change_name_to = forms.CharField(max_length=100)
 
 class RegistrationBillForm(forms.Form):
     """
