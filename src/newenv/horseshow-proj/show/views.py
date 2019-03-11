@@ -63,10 +63,14 @@ def view_show(request, show_date):
         if form.is_valid():
             num = form.cleaned_data['num']
             try:
-                HorseRiderCombo.objects.get(num=num)
-                return redirect('edit_combo', combo_num=num, show_date=show_date)
+                for combo in HorseRiderCombo.objects.filter(show = show):
+                    if combo.num==num:
+                        return redirect('edit_combo', combo_num=num, show_date=show_date)
+                    else:
+                        messages.error(request, "The combination number entered does not exist in this show.")
+                        return redirect('view_show', show_date=show_date)
             except ObjectDoesNotExist:
-                    messages.error(request, "The combination number entered does not exist in this show.")
+                messages.error(request, "The combination number entered does not exist in this show.")
             
     form = ComboNumForm()
 
