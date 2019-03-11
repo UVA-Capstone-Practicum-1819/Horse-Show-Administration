@@ -38,6 +38,9 @@ division_patterns = [
     path('delete',
         views.delete_division, name="delete_division"),
 
+    path('edit',
+        views.edit_division, name="edit_division"),
+
     path('class/add',
          views.add_class, name="add_class"),
 
