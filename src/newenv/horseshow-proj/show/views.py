@@ -727,14 +727,7 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
 
     registered_classes = combo.classes.all()
     number_registered_classes = len(registered_classes)
-    # price = number_registered_classes * 10
     participations = combo.participations.all()
-    # # print(participations)
-    # for participation in participations:
-    #     if participation.is_preregistered:
-    #         price += show.pre_reg_price
-    #     else:
-    #         price += show.day_of_price
     if request.method == "POST":
         if request.POST.get('remove_class'):
             num = request.POST['remove_class']
@@ -749,7 +742,6 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
             if class_combo_form.is_valid():
                 selected_class = class_combo_form.cleaned_data['num']
                 is_prereg = class_combo_form.cleaned_data['is_preregistered']
-                #classParticipation = ClassParticipation()
                 try: #checks to see if class creation is valid
                     class_obj = Class.objects.filter(show=show_date).get(num=selected_class)
                     classParticipation = ClassParticipation(
@@ -795,10 +787,6 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
                 combo.contact = edit_form.cleaned_data['contact']
                 combo.save()
 
-    # edit_form = HorseRiderEditForm(
-    #     {'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
-
-    # class_combo_form = ClassComboForm()
     if division_id != None:
         division = Division.objects.get(id=division_id)
         c = Class.objects.get(show=show, num=class_num)
