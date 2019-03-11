@@ -714,6 +714,14 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
      """
     show = Show.objects.get(date=show_date)
     combo = show.combos.get(num=combo_num)
+    edit_form = HorseRiderEditForm(
+        {'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
+
+    class_combo_form = ClassComboForm()
+
+    registered_classes = combo.classes.all()
+    number_registered_classes = len(registered_classes)
+    price = number_registered_classes * 10
     if request.method == "POST":
         if request.POST.get('remove_class'):
             num = request.POST['remove_class']
@@ -728,16 +736,34 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
             if class_combo_form.is_valid():
                 selected_class = class_combo_form.cleaned_data['num']
                 is_prereg = class_combo_form.cleaned_data['is_preregistered']
-                class_obj = Class.objects.filter(show=show_date).get(num=selected_class)
                 #classParticipation = ClassParticipation()
                 try: #checks to see if class creation is valid
+                    class_obj = Class.objects.filter(show=show_date).get(num=selected_class)
                     classParticipation = ClassParticipation(
                         participated_class=class_obj, combo=combo, is_preregistered=is_prereg)
                     classParticipation.save()
-                except IntegrityError: #if not, go back to division page and print error
+                except IntegrityError: #if not, show error on edit combo page
                     messages.info(
-                       request, "Class is already registered")
-                    return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
+                       request, "Combo is already registered for class "+str(class_combo_form.cleaned_data['num']))
+                    if division_id != None:
+                        division = Division.objects.get(id=division_id)
+                        c = Class.objects.get(show=show, num=class_num)
+                        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form,
+                         'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+                    else:
+                        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form,
+                         'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+                except ObjectDoesNotExist:
+                    messages.info(
+                       request, "Class " +str(class_combo_form.cleaned_data['num'])+ " does not exist")
+                    if division_id != None:
+                        division = Division.objects.get(id=division_id)
+                        c = Class.objects.get(show=show, num=class_num)
+                        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form,
+                         'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+                    else:
+                        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form,
+                         'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
 
         elif request.POST.get('edit'):
             edit_form = HorseRiderEditForm(request.POST)
@@ -748,14 +774,14 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
                 combo.contact = edit_form.cleaned_data['contact']
                 combo.save()
 
-    edit_form = HorseRiderEditForm(
-        {'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
+    # edit_form = HorseRiderEditForm(
+    #     {'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
 
-    class_combo_form = ClassComboForm()
+    # class_combo_form = ClassComboForm()
 
-    registered_classes = combo.classes.all()
-    number_registered_classes = len(registered_classes)
-    price = number_registered_classes * 10
+    # registered_classes = combo.classes.all()
+    # number_registered_classes = len(registered_classes)
+    # price = number_registered_classes * 10
     if division_id != None:
         division = Division.objects.get(id=division_id)
         c = Class.objects.get(show=show, num=class_num)

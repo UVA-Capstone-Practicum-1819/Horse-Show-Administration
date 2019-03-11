@@ -54,8 +54,17 @@
                     {% endfor %}
                 </tbody>
             </table>
+        {% for message in messages %}
 
-            <form  class="form" method="post">
+            <div class="alert alert-danger">
+              <a class="close" href="" data-dismiss="alert">×</a>
+
+              {{ message }}
+
+
+          </div>
+        {% endfor %}
+        <form  class="form" method="post">
             {% csrf_token %}
             {{ class_combo_form | crispy }}
             {{ class_combo_form.media }}
