@@ -119,7 +119,7 @@ def select_show(request):
     return render(request, 'select_show.html', {'form': form})
 
 
-def sign_up(request):  #pragma: no cover
+def sign_up(request):  #pragma: no cover # what does this comment mean?
     """ creates a new user account """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -566,7 +566,8 @@ def edit_rider(request, show_date, rider_pk):
     if request.method == "POST":
         edit_form = RiderEditForm(request.POST)
         if edit_form.is_valid():
-            rider.name = edit_form.cleaned_data['name']
+            rider.first_name = edit_form.cleaned_data['first_name']
+            rider.last_name = edit_form.cleaned_data['last_name']
             rider.address = edit_form.cleaned_data['address']
             rider.city = edit_form.cleaned_data['city']
             rider.state = edit_form.cleaned_data['state']
@@ -575,11 +576,10 @@ def edit_rider(request, show_date, rider_pk):
             rider.member_VHSA = edit_form.cleaned_data['member_VHSA']
             rider.member_4H = edit_form.cleaned_data['member_4H']
             rider.county = edit_form.cleaned_data['county']
-
             rider.save()
     else:
         edit_form = RiderEditForm(
-            {'name': rider.name, 'address': rider.address, 'city': rider.city, 'state': rider.state, 'zip_code': rider.zip_code,
+            {'first_name': rider.first_name, 'last_name': rider.last_name, 'address': rider.address, 'city': rider.city, 'state': rider.state, 'zip_code': rider.zip_code,
              'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'member_4H': rider.member_4H, 'county': rider.county},
             instance=rider)
     return render(request, 'edit_rider.html', {'rider': rider, 'edit_rider_form': edit_form, 'date': show_date})
@@ -793,7 +793,7 @@ class RiderAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     """ This view shows the autocomplete functionality for selection a rider """
 
     def get_queryset(self):
-        qs = Rider.objects.all().order_by('name')
+        qs = Rider.objects.all().order_by('last_name')
         if self.q:
             qs = qs.filter(name__istartswith=self.q)
         return qs

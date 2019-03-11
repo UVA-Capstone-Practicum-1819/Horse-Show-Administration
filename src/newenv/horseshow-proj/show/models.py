@@ -97,10 +97,16 @@ class Horse(models.Model):
 
 class Rider(models.Model):
     """ Model for a rider. Birth date only needs to be recorded if they are 18 or younger. Street address and city are not required """
-    email = models.EmailField(primary_key=True, max_length=200, validators=[
-                              EmailValidator()], verbose_name="Email")
-    name = models.CharField(max_length=200, verbose_name="Name")
-    address = models.CharField(max_length=200, verbose_name="Street Address", blank=True)
+    class Meta:
+        unique_together = ('first_name', 'last_name', 'email')
+
+    first_name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
+    email = models.EmailField(max_length=200, validators=[
+        EmailValidator()], verbose_name="Email")
+
+    address = models.CharField(
+        max_length=200, verbose_name="Street Address", blank=True)
     city = models.CharField(default="", max_length=200, blank=True)
     state = USStateField(default="VA")
     zip_code = USZipCodeField()
@@ -117,7 +123,7 @@ class Rider(models.Model):
     horses = models.ManyToManyField(Horse, through='HorseRiderCombo')
 
     def __str__(self):
-        return f"Name: {self.name}, Email: {self.email}"
+        return f"{self.last_name}, {self.first_name}, Email: {self.email}"
 
 
 class HorseRiderCombo(models.Model):
