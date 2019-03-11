@@ -156,8 +156,7 @@ class HorseRiderCombo(models.Model):
         Show, on_delete=models.CASCADE, null=True, related_name='combos')
 
     def __str__(self):
-
-    return f"Show: {str(self.show.date)}, Number: {self.num}, Rider: {self.rider.last_name}, Horse: {self.horse.name}"
+        return f"Show: {str(self.show.date)}, Number: {self.num}, Rider: {self.rider.last_name}, Horse: {self.horse.name}"
 
 
 
