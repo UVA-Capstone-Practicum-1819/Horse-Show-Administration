@@ -731,14 +731,7 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
 
     registered_classes = combo.classes.all()
     number_registered_classes = len(registered_classes)
-    price = number_registered_classes * 10
     participations = combo.participations.all()
-    # print(participations)
-    for participation in participations:
-        if participation.is_preregistered:
-            price += show.pre_reg_price
-        else:
-            price += show.day_of_price
     if request.method == "POST":
         if request.POST.get('remove_class'):
             num = request.POST['remove_class']
@@ -753,35 +746,42 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
             if class_combo_form.is_valid():
                 selected_class = class_combo_form.cleaned_data['num']
                 is_prereg = class_combo_form.cleaned_data['is_preregistered']
-                #classParticipation = ClassParticipation()
                 try: #checks to see if class creation is valid
                     class_obj = Class.objects.filter(show=show_date).get(num=selected_class)
                     classParticipation = ClassParticipation(
                         participated_class=class_obj, combo=combo, is_preregistered=is_prereg)
                     classParticipation.save()
-                except IntegrityError: #if not, show error on edit combo page
+                    participations = combo.participations.all()
+                    if division_id != None: #determines whether or not we are navigating from the class or from select
+                        division = Division.objects.get(id=division_id)
+                        c = Class.objects.get(show=show, num=class_num)
+                        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form, 
+                            'class_combo_form': class_combo_form, 'classes': participations, 'date': show_date})
+                    else:
+                        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 
+                            'classes': participations, 'date': show_date})
+                except IntegrityError: #if combo already in class, show error on edit combo page
                     messages.info(
                        request, "Combo is already registered for class "+str(class_combo_form.cleaned_data['num']))
                     if division_id != None:
                         division = Division.objects.get(id=division_id)
                         c = Class.objects.get(show=show, num=class_num)
                         return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form, 
-                            'class_combo_form': class_combo_form, 'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+                            'class_combo_form': class_combo_form, 'classes': participations, 'date': show_date})
                     else:
                         return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 
-                            'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
-                except ObjectDoesNotExist:
+                            'classes': participations, 'date': show_date})
+                except ObjectDoesNotExist: #if class does not exist to add, show error on edit combo page
                     messages.info(
                        request, "Class " +str(class_combo_form.cleaned_data['num'])+ " does not exist in this show.")
                     if division_id != None:
                         division = Division.objects.get(id=division_id)
                         c = Class.objects.get(show=show, num=class_num)
                         return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form, 
-                            'class_combo_form': class_combo_form, 'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+                            'class_combo_form': class_combo_form, 'classes': participations, 'date': show_date})
                     else:
                         return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 
-                            'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
-
+                            'classes': participations, 'date': show_date})
         elif request.POST.get('edit'):
             edit_form = HorseRiderEditForm(request.POST)
 
@@ -791,19 +791,14 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
                 combo.contact = edit_form.cleaned_data['contact']
                 combo.save()
 
-    # edit_form = HorseRiderEditForm(
-    #     {'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
-
-    # class_combo_form = ClassComboForm()
-
     if division_id != None:
         division = Division.objects.get(id=division_id)
         c = Class.objects.get(show=show, num=class_num)
         return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form, 
-            'class_combo_form': class_combo_form, 'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+            'class_combo_form': class_combo_form, 'classes': participations, 'date': show_date})
     else:
         return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 
-            'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+            'classes': participations, 'date': show_date})
 
 
 class ShowAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
