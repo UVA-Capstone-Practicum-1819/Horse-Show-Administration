@@ -1,16 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Show</title>
-</head>
-<body>
-{% extends 'add_show.html' %}
-
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
 {% block content %}
+<body>
+
 <h1>Show</h1>
-<form class="form" method="POST" class="post-form">{% csrf_token %}
-    {{ form.as_p }}
+<form class="form" method="POST" >{% csrf_token %}
+    {{ show_form | crispy }}
     <button type="submit" class="btn btn-success">Save</button>
 </form>
+</body>
+
 {% endblock %}

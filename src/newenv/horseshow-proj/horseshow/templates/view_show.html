@@ -11,6 +11,8 @@
   <h4><b>Date:</b> {{ date }}
   <br><b>Location:</b> {{ location }}</h4>
     
+  {% comment %} Button for editing a show {% endcomment %}
+  <a href="{% url 'edit_show' show_date=date %}" class='btn btn-primary'>Edit Show</a>
 
   {% comment %} table containing all the divisions and their respective classes {% endcomment %}
   <table class="table table-striped table-bordered">
