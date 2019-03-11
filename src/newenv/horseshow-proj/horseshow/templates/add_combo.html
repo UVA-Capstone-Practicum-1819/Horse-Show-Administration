@@ -2,13 +2,13 @@
 <h3>Add Horse-Rider Combination</h3>
 
 <div>
-  <div><b>Rider:</b> {{ rider.name }}</div>
+  <div><b>Rider:</b> {{ rider.first_name }} {{ rider.last_name }}</div>
   <div><b>Horse:</b> {{ horse.name }}</div>
   <form class="form" method="post">
-    {% csrf_token %} {{ form | crispy }} 
+    {% csrf_token %} {{ form | crispy }}
     <div> {{ form_errors }} </div>
     <button class="btn btn-success" type="submit">Create Horse-Rider Combination </button>
-    
+
   </form>
 </div>
 
