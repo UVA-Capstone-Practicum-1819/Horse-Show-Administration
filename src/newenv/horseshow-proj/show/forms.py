@@ -1,5 +1,5 @@
 from django import forms
-
+from django.utils import timezone
 from show.models import *
 from .models import *
 import datetime
@@ -15,7 +15,7 @@ class ShowForm(forms.Form):
     """
     name = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'autocomplete': 'off', }))
-    date = forms.DateField(widget=forms.SelectDateWidget())
+    date = forms.DateField(widget=forms.SelectDateWidget(), initial=timezone.now())
     location = forms.CharField(
         max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
     day_of_price = forms.IntegerField(label="Day-of Price")

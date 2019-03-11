@@ -2,7 +2,9 @@
 {% load crispy_forms_tags %}
 {% block content %}
 {% if division %}
-<h3><a href="{% url 'view_show' show_date=date %}">Show: {{show.name}}</a> > <a href="{% url 'view_division' show_date=date division_id=division.id %}"> Division: {{division.name}}</a> > Class: <a href="{% url 'view_class' show_date=date division_id=division.id class_num=class.num %}">{{class.num}} - {{class.name}}</a> > {{combo.num}}</h3>
+<h3><a href="{% url 'view_show' show_date=date %}">Show: {{show.name}}</a> > <a href="{% url 'view_division' show_date=date division_id=division.id %}">
+        Division: {{division.name}}</a> > Class: <a href="{% url 'view_class' show_date=date division_id=division.id class_num=class.num %}">{{class.num}}
+        - {{class.name}}</a> > {{combo.num}}</h3>
 {% else %}
 <h3>Horse Rider Combination </h3>
 {% endif %}
@@ -15,7 +17,7 @@
             <p> <b>Rider Name:</b> {{ combo.rider.name }} </p>
             <p> <b>Horse Name:</b> {{ combo.horse.name }} </p>
 
-            <form class="form"  method="post">
+            <form class="form" method="post">
                 {% csrf_token %}
 
                 {{ edit_form | crispy }}
@@ -40,38 +42,40 @@
                 </tr>
                 <tbody>
                     {% for class in classes %}
-                        <tr scope="row">
-                            <td>{{class.num}}</td>
-                            <td>{{class.name}}</td>
-                            <td>N/A</td>
-                            <td>
+                    <tr scope="row">
+                        <td>{{class.participated_class.num}}</td>
+                        <td>{{class.participated_class.name}}</td>
+                        <td>{% if class.is_preregistered %}
+                            Yes
+                            {% else %}
+                            No
+                            {% endif %}
+                        </td>
+                        <td>
                             <form method="post" class="form">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-danger" name="remove_class" value="{{class.num}}">X</button>
+                                <button type="submit" class="btn btn-sm btn-danger" name="remove_class" value="{{class.participated_class.num}}">X</button>
                             </form>
-                            </td>
-                        </tr>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% for message in messages %}
+            {% for message in messages %}
+            <div class="alert alert-warning">
+                <a class="close" href="#" data-dismiss="alert">×</a>
+                {{ message }}
+            </div>
+            {% endfor %}
+            <form class="form" method="post">
+                {% csrf_token %}
+                {{ class_combo_form | crispy }}
+                {{ class_combo_form.media }}
+                <button class="btn btn-primary" name="add_class" value="Add" type="submit">Add Class</button>
 
-            <div class="alert alert-danger">
-              <a class="close" href="" data-dismiss="alert">×</a>
-
-              {{ message }}
-
-
-          </div>
-        {% endfor %}
-        <form  class="form" method="post">
-            {% csrf_token %}
-            {{ class_combo_form | crispy }}
-            {{ class_combo_form.media }}
-            <button class="btn btn-primary" name="add_class" value="Add" type="submit">Add Class</button>
-
-        </form>
-            <p><a class="btn btn-primary" href="{% url 'view_billing' show_date=date combo_num=combo.num %}">Bill a Rider</a></p>
+            </form>
+            <p><a class="btn btn-primary" href="{% url 'view_billing' show_date=date combo_num=combo.num %}">Bill a
+                    Rider</a></p>
         </div>
     </div>
 </div>
