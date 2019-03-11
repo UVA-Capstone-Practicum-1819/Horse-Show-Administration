@@ -865,7 +865,7 @@ def populate_pdf_division(division_name, page, show, d):  #pragma: no cover
                                     num=list[i-1])
                                 # write to pdf the correct combo to that rank
                                 d[shorse] = combo.horse
-                                d[srider] = combo.rider.name
+                                d[srider] = combo.rider.first_name + " " + combo.rider.last_name
                                 d[sowner] = combo.horse.owner
                             except ObjectDoesNotExist:
                                 print("")
@@ -918,13 +918,13 @@ def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, b
                                 if combo.rider.adult is False:
                                     # write to pdf the correct combo to that rank
                                     d[shorse] = combo.horse
-                                    d[srider] = combo.rider.name
+                                    d[srider] = combo.rider.first_name + " " + combo.rider.last_name
                                     d[sowner] = combo.horse.owner
                                 else:
                                     bool_combine = True
 
                                     d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
-                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.rider.name
+                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.rider.first_name + " " + combo.rider.last_name
                                     d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.horse.owner
 
 
@@ -987,7 +987,7 @@ def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d,
                                     if combo.horse.size == "large":
                                         # write to pdf the correct combo to that rank
                                         d[shorse] = combo.horse
-                                        d[srider] = combo.rider.name
+                                        d[srider] = combo.rider.first_name + " " + combo.rider.last_name
                                         d[sowner] = combo.horse.owner
                                     elif combo.horse.size == "medium" or combo.horse.size == "small":
                                         bool_combine = True
@@ -995,7 +995,7 @@ def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d,
                                         d[dp2 + '_c' +
                                             str(int) + '_combo' + str(i)] = combo.horse
                                         d[dp2 + '_c' + str(int) + '_rider' +
-                                          str(i)] = combo.rider.name
+                                          str(i)] = combo.rider.first_name + " " + combo.rider.last_name
                                         d[dp2 + '_c' + str(int) + '_owner' +
                                           str(i)] = combo.horse.owner
                             except ObjectDoesNotExist:
@@ -1056,7 +1056,7 @@ def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d,
                                 if combo.horse.type == "pony":
                                     # write to pdf the correct combo to that rank
                                     d[shorse] = combo.horse
-                                    d[srider] = combo.rider.name
+                                    d[srider] = combo.rider.first_name + " " + combo.rider.last_name
                                     d[sowner] = combo.horse.owner
                                 else:
                                     bool_combine = True
@@ -1064,7 +1064,7 @@ def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d,
                                     d[dp2 + '_c' +
                                         str(int) + '_combo' + str(i)] = combo.horse
                                     d[dp2 + '_c' + str(int) + '_rider' +
-                                      str(i)] = combo.rider.name
+                                      str(i)] = combo.rider.first_name + " " + combo.rider.last_name
                                     d[dp2 + '_c' + str(int) + '_owner' +
                                       str(i)] = combo.horse.owner
                             except ObjectDoesNotExist:
@@ -1183,11 +1183,11 @@ def populate_pdf(request, show_date):   #pragma: no cover
                                 if combo.rider.adult is True and combo.horse.type == "horse":
                                     fill_class_num_adult = True
                                     d[dp + '_c' + str(1) + '_combo' +
-                                      str(i)] = combo.rider.name
+                                      str(i)] = combo.rider.first_name + " " + combo.rider.last_name
                                 if combo.rider.adult is False and combo.horse.type == "horse":
                                     fill_class_num_child = True
                                     d[dp + '_c' + str(2) + '_combo' +
-                                      str(i)] = combo.rider.name
+                                      str(i)] = combo.rider.first_name + " " + combo.rider.last_name
                             except ObjectDoesNotExist:
                                 print("")
                     if fill_class_num_adult is True:
@@ -1212,7 +1212,7 @@ def populate_pdf(request, show_date):   #pragma: no cover
                                 if combo.horse.type == "pony":
                                     fill_class_num_pony = True
                                     d[dp + '_c' + str(3) + '_combo' +
-                                      str(i)] = combo.rider.name
+                                      str(i)] = combo.rider.first_name + " " + combo.rider.last_name
                             except ObjectDoesNotExist:
                                 print("")
                     if fill_class_num_pony is True:
@@ -1245,17 +1245,17 @@ def populate_pdf(request, show_date):   #pragma: no cover
                                 if combo.rider.adult is True and combo.horse.type == "horse":
                                     fill_class_num_adult = True
                                     d[dp + '_c' + str(1) + '_combo' +
-                                      str(i)] = combo.rider.name
+                                      str(i)] = combo.rider.first_name + " " + combo.rider.last_name
                                 if combo.rider.adult is False:
                                     age = calculate_age(combo.rider.birth_date)
                                     if 15 <= age <= 17:
                                         fill_class_num_child_15_17 = True
                                         d[dp + '_c' + str(2) + '_combo' +
-                                          str(i)] = combo.rider.name
+                                          str(i)] = combo.rider.first_name + " " + combo.rider.last_name
                                     if age <= 14:
                                         fill_class_num_child_14_less = True
                                         d[dp + '_c' + str(3) + '_combo' +
-                                          str(i)] = combo.rider.name
+                                          str(i)] = combo.rider.first_name + " " + combo.rider.last_name
                             except ObjectDoesNotExist:
                                 print("")
                     if fill_class_num_adult is True:
