@@ -129,6 +129,8 @@ class HorseForm(forms.ModelForm):
     coggins_date = forms.DateField(
         widget=forms.SelectDateWidget(years=year_range))
 
+    accession_num = forms.CharField(widget=forms.TextInput(attrs={'autocomplete': 'off', }))
+
     class Meta:
         model = Horse
         fields = ('name', 'coggins_date', 'accession_num',
