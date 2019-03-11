@@ -149,6 +149,7 @@ def view_billing(request, show_date, combo_num):
     whether or not they are pregistered for each class """
     show = Show.objects.get(date=show_date)
     combo = show.combos.filter(show=show_date).get(num=combo_num)
+    participations = combo.participations.all()
     classes = combo.classes.all()
     total = classes.count()
     price = 0
@@ -163,7 +164,7 @@ def view_billing(request, show_date, combo_num):
     #price = show.pre_reg_price * total
     # for minimum requirements, only calculates price based on pre-registration price
     context = {'name': combo.rider, 'show_date': show_date,
-               'classes': classes.all(), 'combo_num': combo_num, 'tot': total, 'price': price}
+               'classes': participations, 'combo_num': combo_num, 'tot': total, 'price': price}
     # the context will help create the table for the list of classes a user is currently in
     return render(request, 'view_billing.html', context)
 
@@ -697,11 +698,14 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
             if class_combo_form.is_valid():
                 selected_class = class_combo_form.cleaned_data['num']
                 is_prereg = class_combo_form.cleaned_data['is_preregistered']
-                class_obj = Class.objects.filter(
-                    show=show_date).get(num=selected_class)
-                classParticipation = ClassParticipation(
+                try:
+                    class_obj = Class.objects.filter(show=show_date).get(num=selected_class)
+                    classParticipation = ClassParticipation(
                     participated_class=class_obj, combo=combo, is_preregistered=is_prereg)
-                classParticipation.save()
+                    classParticipation.save()
+                except ObjectDoesNotExist:
+                    messages.error(request, "The class number entered does not exist in this show.")
+                
 
         elif request.POST.get('edit'):
             edit_form = HorseRiderEditForm(request.POST)
@@ -719,11 +723,22 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
 
     registered_classes = combo.classes.all()
     number_registered_classes = len(registered_classes)
-    price = number_registered_classes * 10
+    price = 0
+    
+    participations = combo.participations.all()
+    print(participations)
+    for participation in participations:
+        if participation.is_preregistered:
+            price += show.pre_reg_price
+        else:
+            price += show.day_of_price
+    # print(price)
+
     if division_id != None:
         division = Division.objects.get(id=division_id)
         c = Class.objects.get(show=show, num=class_num)
-        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': participations, 'price': price, 'tot': number_registered_classes, 'date': show_date})
+        
     else:
         return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 'classes': registered_classes, 'price': price, 'tot': number_registered_classes, 'date': show_date})
 
