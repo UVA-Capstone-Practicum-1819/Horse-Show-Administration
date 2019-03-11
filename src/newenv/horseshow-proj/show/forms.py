@@ -15,7 +15,8 @@ class ShowForm(forms.Form):
     """
     name = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'autocomplete': 'off', }))
-    date = forms.DateField(widget=forms.SelectDateWidget(), initial=timezone.now())
+    date = forms.DateField(
+        widget=forms.SelectDateWidget(), initial=timezone.now())
     location = forms.CharField(
         max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
     day_of_price = forms.IntegerField(label="Day-of Price")
@@ -94,13 +95,14 @@ class RiderForm(forms.ModelForm):
 
     birth_date = forms.DateField(
         help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range))
+
     state = USStateField(widget=USStateSelect(), initial="VA")
 
     zip_code = USZipCodeField()
 
     class Meta:
         model = Rider
-        fields = ('name', 'address', 'city', 'state', 'zip_code', 'email',
+        fields = ('first_name', 'last_name', 'address', 'city', 'state', 'zip_code', 'email',
                   'adult', 'birth_date', 'member_VHSA', 'member_4H', 'county')
 
 
@@ -198,6 +200,7 @@ class HorseRiderEditForm(forms.ModelForm):
 
 class RiderEditForm(forms.ModelForm):
     """ for updating a rider """
+
     year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
 
     birth_date = forms.DateField(
@@ -209,7 +212,7 @@ class RiderEditForm(forms.ModelForm):
 
     class Meta:
         model = Rider
-        fields = ('name', 'address', 'city', 'state', 'zip_code',
+        fields = ('first_name', 'last_name', 'address', 'city', 'state', 'zip_code',
                   'birth_date', 'member_VHSA', 'member_4H', 'county')
 
 
@@ -290,7 +293,7 @@ class ClassSelectForm(forms.ModelForm):
         model = Class
         fields = ('num',)
 
-    def clean_date(self): #pragma: no cover
+    def clean_date(self):  # pragma: no cover
         class_obj = self.cleaned_data['name']
         classes = Class.objects.all()
         if class_obj in classes:
