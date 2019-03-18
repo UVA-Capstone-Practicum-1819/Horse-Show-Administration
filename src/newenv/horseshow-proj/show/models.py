@@ -32,6 +32,7 @@ class Division(models.Model):
     class Meta:
         unique_together = ('show', 'name')
     id = models.AutoField(primary_key=True)
+    first_class_num = models.IntegerField(default = 1000)
     name = models.CharField(max_length=100, default="")
     champion = models.IntegerField(default=0)
     champion_pts = models.IntegerField(default=0)

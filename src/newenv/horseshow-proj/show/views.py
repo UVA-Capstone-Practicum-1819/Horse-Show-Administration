@@ -73,12 +73,11 @@ def view_show(request, show_date):
                 messages.error(request, "The combination number entered does not exist in this show.")
             
     form = ComboNumForm()
-
     context = {
         "show_name": show.name,
         "date": show_date,
         "location": show.location,
-        "divisions": show.divisions.all(),
+        "divisions": show.divisions.all().order_by('first_class_num'),
         'form': form,
 
     }
@@ -234,6 +233,12 @@ def delete_class(request, show_date, division_id, class_num):
     class_obj = division.classes.get(num=class_num)
     # gets the division object from the division name that was passed in
     class_obj.delete()  # removes the class object
+    if(len(division.classes.all())>0):
+        division.first_class_num = division.classes.all()[0]
+        division.save()
+    else:
+        division.first_class_num = 1000
+        division.save()
     # redirects to division_classes and passes in the division's name
     return redirect('view_division', show_date=show_date, division_id=division_id)
 
@@ -442,6 +447,9 @@ def view_division(request, show_date, division_id):
             class_obj.division = division
             class_obj.show = show
             class_obj.save()
+            if(class_obj.num < division.first_class_num):
+                division.first_class_num = int(class_obj.num)
+                division.save()
             # render page with new division
             return redirect('view_division', show_date=show_date, division_id=division_id)
     else:
