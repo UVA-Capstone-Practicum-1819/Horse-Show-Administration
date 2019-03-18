@@ -4,7 +4,7 @@ STS technical thesis, User Manual -- everyone
 
 excel and debugging -- Anna
 
-printing labels and cleaning up code, fixing functionality -- Gina and Shivani
+cleaning up code, fixing functionality -- Gina and Shivani
 
 Change date formatting, debugging, coverage -- Lalita
  
