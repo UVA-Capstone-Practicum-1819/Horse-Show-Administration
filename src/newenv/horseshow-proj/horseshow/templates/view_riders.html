@@ -50,9 +50,7 @@
       <th>
         County
       </th>
-      <th>
-        Horses
-      </th>
+      
     </thead>
 
     <tbody id="riderTable">
@@ -70,14 +68,76 @@
           <td> {{rider.member_VHSA}} </td>
           <td> {{rider.member_4H}} </td>
           <td> {{rider.county}} </td>
-          <td> {{rider.horses}} </td>
+          
         </tr>
       {% endfor %}
       
     </tbody>
   </table>
 
-  <p> <a class="btn btn-success" id="addRiderButton" href="{% url 'add_rider' show_date='2019-28-8' %}">+ Add New Rider</a> </p>
+  
+  {% comment %} for adding a new rider, triggers modal popup {% endcomment %}
+<p><a class="btn btn-success" data-toggle="modal" data-target="#addRiderModal">
+  + Add New Rider</a></p>
+
+</div>
+
+
+
+<!-- Add Rider Modal Dialog -->
+<div class="modal fade" id="addRiderModal" tabindex="-1" role="dialog" aria-labelledby="riderModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="riderModalTitle">Add Rider</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body ">
+        <form id="addRiderForm" class="form" method="post">
+           {% csrf_token %}
+           {{ add_rider_form | crispy}}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="addRiderButton">Add Rider</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+
+{% comment %} provides filtering for the rider table {% endcomment %}
+
+ <script>
+$(document).ready(function(){
+  $("#searchLastName").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#riderTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+
+{% comment %} adds a new rider {% endcomment %}
+$(document).ready(function(){
+  $("#addRiderButton").click(function(){
+    $.post("{% url 'add_rider2' %}",
+    $("#addRiderForm").serialize(), function() {
+      location.reload();
+      $("#addRiderForm").reset();
+    });
+  });
+});
+</script> 
+
+
+{% endblock %}
+
+{% comment %} Code for accordian  {% endcomment %}
+
 {% comment %} <div class="accordion" id="rider-accordian">
   <div class="card">
 
@@ -132,36 +192,3 @@
 
 
  </div> {% endcomment %}
-
-
-</div>
-</body>
-
-{% comment %} provides filtering for the rider table {% endcomment %}
-
- <script>
-$(document).ready(function(){
-  $("#searchLastName").on("keyup", function() {
-    var value = $(this).val().toLowerCase();
-    $("#riderTable tr").filter(function() {
-      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-    });
-  });
-});
-</script> 
-
-{% comment %} adds a new rider {% endcomment %}
-<script>
-$(document).ready(function(){
-  $("#addRiderbutton").click(function(){
-    $.get("{% url 'add_rider' %}", function(result){
-      $.each(result, function(i, field){
-        $("div").append(field + " ");
-      });
-    });
-  });
-});
-</script> 
-
-
-{% endblock %}

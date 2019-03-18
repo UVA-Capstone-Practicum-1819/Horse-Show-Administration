@@ -114,6 +114,7 @@ urlpatterns = [
          name="division_autocomplete"),
     path('class-autocomplete', views.ClassAutocomplete.as_view(),
          name="classes_autocomplete"),
+    path('add-rider2', views.add_rider2, name="add_rider2"),
     path('add', views.add_show, name='add_show'),
 
     path('view-riders', views.view_riders, name="view_riders"),

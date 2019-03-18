@@ -1335,5 +1335,16 @@ def generate_labels(request, show_date): #pragma: no cover
         return render(request, 'labels.html', {'date':str(show_date)})
 
 def view_riders(request):
-    context = {'riders': Rider.objects.all()}
+    add_rider_form = RiderForm()
+
+    context = {'riders': Rider.objects.all(), 'add_rider_form': add_rider_form}
     return render(request, 'view_riders.html', context)
+
+def add_rider2(request):
+    if request.method == "POST":
+        add_rider_form = RiderForm(request.POST)
+        if add_rider_form.is_valid():
+            add_rider_form.save()
+            return HttpResponse("Rider succesfully added.")
+        else:
+            print(add_rider_form)
