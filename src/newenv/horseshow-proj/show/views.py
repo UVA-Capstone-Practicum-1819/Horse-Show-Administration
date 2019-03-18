@@ -1333,3 +1333,7 @@ def generate_labels(request, show_date): #pragma: no cover
     else:
         generate_show_labels(show_date)
         return render(request, 'labels.html', {'date':str(show_date)})
+
+def view_riders(request):
+    context = {'riders': Rider.objects.all()}
+    return render(request, 'view_riders.html', context)

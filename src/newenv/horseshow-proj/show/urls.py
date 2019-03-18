@@ -36,10 +36,10 @@ division_patterns = [
          views.view_division, name="view_division"),
 
     path('delete',
-        views.delete_division, name="delete_division"),
+         views.delete_division, name="delete_division"),
 
     path('edit',
-        views.edit_division, name="edit_division"),
+         views.edit_division, name="edit_division"),
 
     path('class/add',
          views.add_class, name="add_class"),
@@ -95,7 +95,10 @@ show_patterns = [
 ]
 
 urlpatterns = [
+
     path('', views.select_show, name="select_show"),
+
+
     path('show-autocomplete', views.ShowAutocomplete.as_view(),
          name="show_autocomplete"),
 
@@ -113,7 +116,9 @@ urlpatterns = [
          name="classes_autocomplete"),
     path('add', views.add_show, name='add_show'),
 
+    path('view-riders', views.view_riders, name="view_riders"),
     path('<show_date>/', include(show_patterns)),
+
 
     path('signup', views.sign_up, name='sign_up'),
 
@@ -122,7 +127,7 @@ urlpatterns = [
 
     path('logout', auth_views.LogoutView.as_view(), name='log_out'),
 
-    path('<show_date>/generate_labels', views.generate_labels, name="labels")
+    path('<show_date>/generate_labels', views.generate_labels, name="labels"),
 
 
 

@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+
+
+
+
+{% load crispy_forms_tags %}
+{% block content %}
+<h2> Riders </h2>
+
+<body>
+<div class="container">
+
+  <p> <input class="form-control" id="searchLastName" type="text" placeholder="Search"> <p>
+  <table class="table table-striped table-bordered">
+    <thead class="bg-info">
+      <th>
+        Last Name
+      </th>
+      <th>
+        First Name
+      </th>
+      <th>
+        Email
+      </th>
+      <th>
+        Address
+      </th>
+      <th>
+        City
+      </th>
+      <th>
+        State
+      </th>
+      <th>
+        Zip Code
+      </th>
+      <th>
+        Adult
+      </th>
+      <th>
+        Birth Date
+      </th>
+      <th>
+        Member VHSA
+      </th>
+      <th>
+        Member 4H
+      </th>
+      <th>
+        County
+      </th>
+      <th>
+        Horses
+      </th>
+    </thead>
+
+    <tbody id="riderTable">
+      {% for rider in riders %}
+        <tr>
+          <td> {{rider.last_name}} </td>
+          <td> {{rider.first_name}} </td>
+          <td> {{rider.email}} </td>
+          <td> {{rider.address}} </td>
+          <td> {{rider.city}} </td>
+          <td> {{rider.state}} </td>
+          <td> {{rider.zip_code}} </td>
+          <td> {{rider.adult}} </td>
+          <td> {{rider.birth_date}} </td>
+          <td> {{rider.member_VHSA}} </td>
+          <td> {{rider.member_4H}} </td>
+          <td> {{rider.county}} </td>
+          <td> {{rider.horses}} </td>
+        </tr>
+      {% endfor %}
+      
+    </tbody>
+  </table>
+
+  <p> <a class="btn btn-success" id="addRiderButton" href="{% url 'add_rider' show_date='2019-28-8' %}">+ Add New Rider</a> </p>
+{% comment %} <div class="accordion" id="rider-accordian">
+  <div class="card">
+
+  
+  {% for rider in riders %}
+    <div class="card-header bg-primary" id="heading-for-{{rider.pk}}">
+      <h2 class="mb-0">
+        <button class="btn btn-primary btn-block" type="button" data-toggle="collapse" data-target="#collapse-{{rider.pk}}" aria-expanded="true" aria-controls="collapse-{{rider.pk}}">
+          {{rider.last_name}}, {{rider.first_name}} 
+
+          
+        </button>
+      </h2>
+    </div>
+
+    <div id="collapse-{{rider.pk}}" class="collapse show" aria-labelledby="heading-for-{{rider.pk}}" data-parent="#rider-accordian">
+      <div class="card-body">
+        <table class="table table-bordered">
+          <tbody>
+            <tr>
+              <td>Email</td>
+              <td>{{rider.email}}</td>
+            </tr>
+            <tr>
+              <td>Birth Date</td>
+              <td>{{rider.birth_date}}</td>
+            </tr>
+            <tr>
+              <td>City</td>
+              <td>{{rider.city}}</td>
+            </tr>
+            <tr>
+              <td>State</td>
+              <td>{{rider.state}}</td>
+            </tr>
+            <tr>
+              <td>Zip Code</td>
+              <td>{{rider.zip_code}}</td>
+            </tr>
+            <tr>
+              <td>County</td>
+              <td>{{rider.county}}</td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    </div>
+  </div>
+
+  {% endfor %}
+
+
+ </div> {% endcomment %}
+
+
+</div>
+</body>
+
+{% comment %} provides filtering for the rider table {% endcomment %}
+
+ <script>
+$(document).ready(function(){
+  $("#searchLastName").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#riderTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+</script> 
+
+{% comment %} adds a new rider {% endcomment %}
+<script>
+$(document).ready(function(){
+  $("#addRiderbutton").click(function(){
+    $.get("{% url 'add_rider' %}", function(result){
+      $.each(result, function(i, field){
+        $("div").append(field + " ");
+      });
+    });
+  });
+});
+</script> 
+
+
+{% endblock %}
