@@ -12,8 +12,18 @@
 <div class="container">
 
   <p> <input class="form-control" id="searchLastName" type="text" placeholder="Search"> <p>
-  <table class="table table-striped table-bordered">
+
+    {% comment %} for adding a new rider, triggers modal popup {% endcomment %}
+<p><a class="btn btn-success" data-toggle="modal" data-target="#addRiderModal">
+  + Add New Rider</a></p>
+
+
+  {% comment %} table to hold all the rider records {% endcomment %}
+  <table class="table table-hover table-striped table-bordered">
     <thead class="bg-info">
+      <th>
+        Edit/Remove
+      </th>
       <th>
         Last Name
       </th>
@@ -55,7 +65,11 @@
 
     <tbody id="riderTable">
       {% for rider in riders %}
-        <tr>
+        <tr id="rider-row-{{rider.pk}}">
+          <td> 
+            <a href="{% url 'edit_rider' rider_pk=rider.pk %}" class="btn btn-warning"><i class="fa">&#xf044;</i></a> 
+            <a id="rider-delete-{{rider.pk}}" href="{% url 'delete_rider' rider_pk=rider.pk %}" class="btn btn-danger">X</a>
+          </td>
           <td> {{rider.last_name}} </td>
           <td> {{rider.first_name}} </td>
           <td> {{rider.email}} </td>
@@ -70,18 +84,15 @@
           <td> {{rider.county}} </td>
           
         </tr>
+        
       {% endfor %}
       
     </tbody>
   </table>
 
   
-  {% comment %} for adding a new rider, triggers modal popup {% endcomment %}
-<p><a class="btn btn-success" data-toggle="modal" data-target="#addRiderModal">
-  + Add New Rider</a></p>
 
 </div>
-
 
 
 <!-- Add Rider Modal Dialog -->
@@ -131,6 +142,32 @@ $(document).ready(function(){
     });
   });
 });
+
+{% comment %} click to edit rider {% endcomment %}
+$(document).ready(function(){
+  $("#rider-row-{{rider.pk}}").click(function(){
+    $.post("{% url 'add_rider2' %}",
+    $("#addRiderForm").serialize(), function() {
+      location.reload();
+      $("#addRiderForm").reset();
+    });
+  });
+});
+
+{% comment %} click to delete rider {% endcomment %}
+{% for rider in riders %}
+  $(document).ready(function(){
+    $("#rider-delete-{{rider.pk}}").click(function(){
+      $.get("{% url 'delete_rider' rider_pk=rider.pk %}",
+      function() {
+        $("#riderTable").load(location.href + " #riderTable");
+    
+      });
+    });
+  });
+{% endfor %}
+
+
 </script> 
 
 

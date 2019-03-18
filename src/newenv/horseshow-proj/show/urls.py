@@ -58,6 +58,12 @@ division_patterns = [
 
 ]
 
+rider_patterns = [
+    path('edit', views.edit_rider, name="edit_rider"),
+
+    path('delete', views.delete_rider, name="delete_rider")
+]
+
 show_patterns = [
     path('', views.view_show, name='view_show'),
 
@@ -67,8 +73,6 @@ show_patterns = [
 
     path('division/<division_id>/', include(division_patterns)),
 
-    #     path('division/<division_id>/class<class_num>', include(class_patterns)),
-
     path('combo/add', views.add_combo, name="add_combo"),
 
     path('combo/select', views.select_combo, name="select_combo"),
@@ -77,11 +81,10 @@ show_patterns = [
 
     path('rider/add', views.add_rider, name="add_rider"),
 
-    path('rider/select', views.select_rider, name="select_rider"),
 
-    path('rider/select2', views.select_rider2, name="select_rider2"),
 
-    path('rider/<rider_pk>/edit', views.edit_rider, name="edit_rider"),
+
+
 
     path('horse/add', views.add_horse, name="add_horse"),
 
@@ -97,6 +100,8 @@ show_patterns = [
 urlpatterns = [
 
     path('', views.select_show, name="select_show"),
+
+    path('rider/<rider_pk>/', include(rider_patterns)),
 
 
     path('show-autocomplete', views.ShowAutocomplete.as_view(),
@@ -159,3 +164,15 @@ Including another URLconf
     of organizing a Horse Show
 
  """
+
+""" 
+old paths
+
+    path('rider/select', views.select_rider, name="select_rider"),
+
+    path('rider/select2', views.select_rider2, name="select_rider2"), 
+
+    path('rider/<rider_pk>/edit', views.edit_rider, name="edit_rider"), 
+    """
+
+#     path('division/<division_id>/class<class_num>', include(class_patterns)),

@@ -587,8 +587,12 @@ def select_rider2(request, show_date):
     return render(request, 'select_rider2.html', {'form': form, 'date': show_date})
 
 
-def edit_rider(request, show_date, rider_pk):
-    """ allows user to change the given fields in rider and save changes """
+def edit_rider(request, rider_pk):
+    pass
+
+""" def edit_rider(request, show_date, rider_pk):
+    # allows user to change the given fields in rider and save changes
+
     rider = Rider.objects.get(pk=rider_pk)
     if request.method == "POST":
         edit_form = RiderEditForm(request.POST)
@@ -610,7 +614,7 @@ def edit_rider(request, show_date, rider_pk):
              'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'member_4H': rider.member_4H, 'county': rider.county},
             instance=rider)
     return render(request, 'edit_rider.html', {'rider': rider, 'edit_rider_form': edit_form, 'date': show_date})
-
+ """
 
 def add_rider(request, show_date):
     """ creates a new rider in a form and stores its primary key into a session, then redirects to select_horse """
@@ -1348,3 +1352,10 @@ def add_rider2(request):
             return HttpResponse("Rider succesfully added.")
         else:
             print(add_rider_form)
+
+
+
+def delete_rider(request, rider_pk):
+    rider = Rider.objects.get(pk=rider_pk)
+    rider.delete()
+    return HttpResponse("Rider is deleted.")
