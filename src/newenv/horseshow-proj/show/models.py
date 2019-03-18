@@ -157,7 +157,7 @@ class HorseRiderCombo(models.Model):
 
     def __str__(self):
 
-        return f"Show: {str(self.show.date)}, Number: {self.num}, Rider: {self.rider.last_name}, Horse: {self.horse.name}"
+        return f"Number: {self.num}, Rider: {self.rider.last_name}, Horse: {self.horse.name}, Show: {str(self.show.date)}"
 
 
 
