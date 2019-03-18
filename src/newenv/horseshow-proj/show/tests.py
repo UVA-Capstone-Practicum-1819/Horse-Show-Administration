@@ -71,12 +71,44 @@ from contextlib import contextmanager
 #         self.assertTrue(isinstance(class_participation, ClassParticipation))
 
 
-# class CheckAge(TestCase):
-#     def test_calculate_age(self):
-#         rider = Rider.objects.create(name="Anna Wu", address="address1", city="cville", state="VA",
-#                                      zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
-#         age = calculate_age(rider.birth_date)
-#         self.assertTrue(age == 15)
+class CheckAge(TestCase):
+    def test_calculate_age(self):
+        rider = Rider.objects.create(first_name="Anna", last_name="Wu", address="address1", city="cville", state="VA",
+                                     zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
+        age = calculate_age(rider.birth_date)
+        self.assertTrue(age == 15)
+
+    def test_calculate_age2(self):
+        rider1 = Rider.objects.create(first_name="Ashley", last_name="Ontiri", city="princeton", state="NJ", zip_code="2290310",
+                                      email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('2010113', "%Y%m%d").date())
+        horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
+            '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
+        combo1 = HorseRiderCombo.objects.create(
+            num=100, rider=rider1, horse=horse1)
+        age = calculate_age(combo1.rider.birth_date)
+        if age <= 14:
+            self.assertTrue(combo1.rider.first_name == "Ashley")
+    def test_calculate_age(self):
+        show = Show.objects.create(
+            name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        new_division = Division.objects.create(name="division")
+        rider = Rider.objects.create(first_name="Anna", last_name="Wu", address="address1", city="cville", state="VA", zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
+        age = calculate_age(rider.birth_date)
+        url = reverse("populate_pdf", kwargs={'show_date': '2018-12-10'})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 302)
+
+class TestPdf(TestCase):
+    def test_pdf(self):
+        show = Show.objects.create(
+            name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        new_division = Division.objects.create(name="division")
+        request = HttpRequest()
+        p = populate_pdf(request, '2018-12-10')
+        url = reverse("populate_pdf", kwargs={'show_date': '2018-12-10'})
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 302)
 
 #     def test_calculate_age2(self):
 #         rider1 = Rider.objects.create(name="Ashley Ontiri", address="address2", city="princeton", state="NJ", zip_code="2290310",
@@ -267,8 +299,7 @@ class ViewsTestCases(TestCase):
 
         horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
             '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
-        rider1 = Rider.objects.create(first_name="Anna", last_name ="Wu", address="address1", city="cville", state="VA",
-                                      zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
+        rider1 = Rider.objects.create(first_name="Anna", last_name ="Wu", address="address1", city="cville", state="VA",zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
         combo1 = HorseRiderCombo.objects.create(
             num=200, rider=rider1, horse=horse1, show = show2)
         # print(combo1.show.date)
@@ -978,3 +1009,30 @@ class ViewsTestCases(TestCase):
 #                                       'zip_code':'22903', 'email':'aw@email.com', 'adult':'False',
 #                                       'birth_date':'2008-12-10'})
 #         self.assertFalse(form.is_valid())
+
+class CheckChampion(TestCase):
+    def test_champion_horse(self):
+        show = Show.objects.create(
+            name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        division = Division.objects.create(name="division")
+        horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
+            '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
+        rider1 = Rider.objects.create(first_name="Anna", last_name ="Wu", address="address1", city="cville", state="VA",zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
+        combo1 = HorseRiderCombo.objects.create(
+            num=200, rider=rider1, horse=horse1, show = show)
+        division.champion = horse1.name
+        self.assertTrue(division.champion == "Ruby")
+
+
+class CheckReserve(TestCase):
+    def test_reserve_horse(self):
+        show = Show.objects.create(
+            name="show1", date="2019-12-10", location="cville", day_of_price=15, pre_reg_price=10)
+        division = Division.objects.create(name="division")
+        horse = Horse.objects.create(name="Pikachu", coggins_date=datetime.datetime.strptime(
+            '20110522', "%Y%m%d").date(), accession_num="que847", owner="Anna Wu", type="pony", size="small")
+        rider = Rider.objects.create(first_name="Anna", last_name ="Wu", address="address1", city="cville", state="VA",zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
+        combo = HorseRiderCombo.objects.create(
+            num=200, rider=rider, horse=horse, show = show)
+        division.champion_reserve = horse.name
+        self.assertTrue(division.champion_reserve == "Pikachu")
