@@ -17,7 +17,7 @@
         {% for combo in combos %}
         <tr>
           <td>
-            <a href="{% url 'edit_combo' show_date=date division_id=id class_num=class_num combo_num=combo.num %}">{{combo.num}}</a>: {{combo.rider.name}} and {{combo.horse.name}}
+            <a href="{% url 'edit_combo' show_date=date division_id=id class_num=class_num combo_num=combo.num %}">{{combo.num}}</a>: {{combo.rider.first_name}} {{combo.rider.last_name}} and {{combo.horse.name}}
           </td>
           <td>
             <a class="btn btn-danger" href="{% url 'delete_combo' show_date=date division_id=id class_num=class_num combo_num=combo.num %}">X</a>
