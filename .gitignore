@@ -60,7 +60,6 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # Unit test / coverage reports
-htmlcov/
 .tox/
 .coverage
 .cache
@@ -90,3 +89,6 @@ db.sqlite3
 
 # Migrations
 migrations
+
+# Ignore pdf files from label creations
+labels/

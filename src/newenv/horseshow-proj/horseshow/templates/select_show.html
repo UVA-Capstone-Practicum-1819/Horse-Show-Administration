@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<h3>Show Select</h3>
+<div>
+    <form class="form" action="{% url 'select_show' %}" method="post">
+        {% csrf_token %}
+        <p>{{ form | crispy }} </p>
+        <p><button type="submit" class="btn btn-success">Select Show</button></p>
+    </form>
+    <a href="{% url 'add_show' %}">Can't find it? Create a New Show</a>
+</div>
+
+{{ form.media }}
+
+{% endblock %}

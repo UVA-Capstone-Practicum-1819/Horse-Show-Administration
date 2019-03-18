@@ -25,7 +25,7 @@ SECRET_KEY = 'db&j906x_yeit)(0vx5$mu$f3!g^4ab%2e^oc00*(*u-p6b1va'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.1.1.168', '128.143.71.210', '127.0.0.1']
+ALLOWED_HOSTS = ['10.1.1.168', '128.143.71.210', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crispy_forms'
+    'crispy_forms',
+    "localflavor"
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
