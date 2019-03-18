@@ -157,9 +157,7 @@ class HorseRiderCombo(models.Model):
         Show, on_delete=models.CASCADE, null=True, related_name='combos')
 
     def __str__(self):
-
         return f"Number: {self.num}, Rider: {self.rider.last_name}, Horse: {self.horse.name}, Show: {str(self.show.date)}"
-
 
 
 def validate_unique(self, exclude=None):

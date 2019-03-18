@@ -79,7 +79,7 @@ class CheckAge(TestCase):
         self.assertTrue(age == 15)
 
     def test_calculate_age2(self):
-        rider1 = Rider.objects.create(first_name="Ashley",last_name="Ontiri", address="address2", city="princeton", state="NJ", zip_code="2290310",
+        rider1 = Rider.objects.create(first_name="Ashley", last_name="Ontiri", city="princeton", state="NJ", zip_code="2290310",
                                       email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('2010113', "%Y%m%d").date())
         horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
             '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
@@ -88,6 +88,19 @@ class CheckAge(TestCase):
         age = calculate_age(combo1.rider.birth_date)
         if age <= 14:
             self.assertTrue(combo1.rider.first_name == "Ashley")
+
+
+class TestPdf(TestCase):
+    def test_pdf(self):
+        show = Show.objects.create(
+            name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        new_division = Division.objects.create(name="division")
+        request = HttpRequest()
+        p = populate_pdf(request, '2018-12-10')
+        url = reverse("populate_pdf", kwargs={'show_date': '2018-12-10'})
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 302)
 
 
 class CheckHorseType(TestCase):
@@ -182,6 +195,7 @@ class CheckPonySize(TestCase):
         self.assertTrue(not list)
 
 
+
 class ViewsTestCases(TestCase):
     def setUp(self):
         self.client = Client()
@@ -251,7 +265,49 @@ class ViewsTestCases(TestCase):
         response = self.client.post(
             '/show/2018-12-10/combo/select', {'combo': '200'})
 
+    def test_edit_invalid_combo(self):
+        self.client.login(username='john', password='johnpassword')
+        show = Show.objects.create(
+            name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        request = HttpRequest()
+        self.assertRaises(HorseRiderCombo.DoesNotExist, edit_combo, request,'2018-12-10',300)
+        
+   def test_edit_combo_in_diff_show(self):
+        self.client.login(username='john', password='johnpassword')
+        show1 = Show.objects.create(
+            name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        show2 = Show.objects.create(
+            name="test", date="2019-04-01", location="there", day_of_price=20, pre_reg_price=10)
 
+        horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
+            '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
+        rider1 = Rider.objects.create(first_name="Anna", last_name ="Wu", address="address1", city="cville", state="VA",zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
+        combo1 = HorseRiderCombo.objects.create(
+            num=200, rider=rider1, horse=horse1, show = show2)
+        # print(combo1.show.date)
+        request = HttpRequest()
+        self.assertRaises(HorseRiderCombo.DoesNotExist, edit_combo, request,'2018-12-10',200)
+
+    def test_add_existing_class_num(self):
+        self.client.login(username='john', password='johnpassword')
+        show = Show.objects.create(
+            name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        div = Division.objects.create(id=1, name="Div1", show=show)
+        c1 = Class.objects.create(num=1, name="Class1", division=div, show=show)
+
+        horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
+            '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
+        rider1 = Rider.objects.create(first_name="Anna", last_name ="Wu", address="address1", city="cville", state="VA",zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
+        combo1 = HorseRiderCombo.objects.create(
+            num=200, rider=rider1, horse=horse1, show = show)
+        part1 = ClassParticipation.objects.create(participated_class=c1, combo=combo1)
+        form = ClassComboForm()
+        if ClassParticipation.objects.filter(participated_class=c1) is None:
+            form_data = {'is_preregistered': False,
+                        'num': 1}
+            form = ClassComboForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        
 class CheckAdult(TestCase):
     def test_rider_is_adult(self):
         list = []
@@ -294,19 +350,18 @@ class CheckEntryNum(TestCase):
             '20110524', "%Y%m%d").date(), accession_num="ace567", owner="Sarah Chu", type="pony", size="medium")
         rider1 = Rider.objects.create(first_name="Anna",last_name="Wu", address="address1", city="cville", state="VA",
                                       zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
-
         combo1 = HorseRiderCombo.objects.create(
-            num=100, rider=rider1, horse=horse1)
-        combo2 = HorseRiderCombo.objects.create(
-            num=100, rider=rider1, horse=horse2)
-        combo3 = HorseRiderCombo.objects.create(
-            num=100, rider=rider1, horse=horse3)
+            num=200, rider=rider1, horse=horse1, show = show2)
+        # print(combo1.show.date)
+        request = HttpRequest()
+        self.assertRaises(HorseRiderCombo.DoesNotExist, edit_combo, request,'2018-12-10',200)
 
-        show = Show.objects.create(date=datetime.datetime.strptime('20190526', "%Y%m%d"), name="Show1",
-                                   location="Cville", day_of_price=15, pre_reg_price=11)
+    def test_add_existing_class_num(self):
+        self.client.login(username='john', password='johnpassword')
+        show = Show.objects.create(
+            name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
         div = Division.objects.create(id=1, name="Div1", show=show)
-        c1 = Class.objects.create(
-            num=1, name="Class1", division=div, show=show)
+        c1 = Class.objects.create(num=1, name="Class1", division=div, show=show)
         part1 = ClassParticipation.objects.create(
             participated_class=c1, combo=combo1)
         part2 = ClassParticipation.objects.create(
@@ -335,31 +390,8 @@ class CheckRankClassForm(TestCase):
             num=101, rider=rider1, horse=horse2)
         combo3 = HorseRiderCombo.objects.create(
             num=102, rider=rider1, horse=horse3)
-
-        form_data = {'first': combo1.num,
-                     'second': combo2.num, 'third': combo3.num}
-        form = RankingForm(data=form_data)
-        self.assertTrue(form.is_valid())
-
-
-class CheckRankDatabaseValidation(TestCase):
-    def test_rank_database_validation(self):
         horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
             '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
-        horse2 = Horse.objects.create(name="Watchme", coggins_date=datetime.datetime.strptime(
-            '20090811', "%Y%m%d").date(), accession_num="ace321", owner="Angie Lee", type="pony", size="small")
-        horse3 = Horse.objects.create(name="Strange", coggins_date=datetime.datetime.strptime(
-            '20110524', "%Y%m%d").date(), accession_num="ace567", owner="Sarah Chu", type="pony", size="medium")
-        rider1 = Rider.objects.create(first_name="Anna",last_name= "Wu", address="address1", city="cville", state="VA",
-                                      zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
-
-        combo1 = HorseRiderCombo.objects.create(
-            num=100, rider=rider1, horse=horse1)
-        combo2 = HorseRiderCombo.objects.create(
-            num=101, rider=rider1, horse=horse2)
-        combo3 = HorseRiderCombo.objects.create(
-            num=102, rider=rider1, horse=horse3)
-
         show = Show.objects.create(date=datetime.datetime.strptime('20190526', "%Y%m%d"), name="Show1",
                                    location="Cville", day_of_price=15, pre_reg_price=11)
         div = Division.objects.create(id=1, name="Div1", show=show)
@@ -484,7 +516,6 @@ class CheckRider(TestCase):
             reverse('edit_rider', kwargs={"show_date": self.show.date, "rider_pk": self.rider1.pk}))
 
     def test_edit_rider_post_ok(self):
-        
         response = self.client.post(
             reverse('edit_rider', kwargs={"show_date": self.show.date, "rider_pk": self.rider1.pk}), data={'name': "some new name", 'address': "some new address", 'city': "some city", 'state': "VA", 'zip_code': 22903,
              'birth_date': self.rider2.birth_date, 'member_VHSA': False, 'county': "some county"})
@@ -528,7 +559,6 @@ class CheckHorse(TestCase):
         response = self.client.get(
             reverse('select_horse2', kwargs={"show_date": self.show.date}))
         
-
     def test_select_horse2_post_ok(self):
         response = self.client.post(reverse('select_horse2', kwargs={"show_date": self.show.date}), data={'horse' : self.horse1.pk})
 
@@ -872,18 +902,9 @@ class TestViewClassTestCase(TestCase):
         rider1 = Rider.objects.create(first_name="Anna",last_name= "Wu", address="address1", city="cville", state="VA",
                                       zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
         combo1 = HorseRiderCombo.objects.create(
-            num=200, rider=rider1, horse=horse1, show=show)
-        self.client.login(username='john', password='johnpassword')
-        request = HttpRequest()
-        response = self.client.post('/show/2018-12-10/division/1/class/1/', {'num':'200'})
-
-    def test_view_class_get(self):
-        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
-        d1 = Division.objects.create(name="jump", show=show)
-        c1 = Class.objects.create(name="Test", num="1", division=d1, show=show)
-        self.client.login(username='john', password='johnpassword')
-        request = HttpRequest()
-        response = self.client.get('/show/2018-12-10/division/1/class/1/')
+            num=200, rider=rider1, horse=horse1, show = show)
+        division.champion = horse1.name
+        self.assertTrue(division.champion == "Ruby")
 
     def test_view_class_delete_combo(self):
         show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
@@ -934,3 +955,31 @@ class ChangedRiderModels(TestCase):
                                       'zip_code':'22903', 'email':'aw@email.com', 'adult':'False',
                                       'birth_date':'2008-12-10'})
         self.assertFalse(form.is_valid())
+        
+class CheckChampion(TestCase):
+    def test_champion_horse(self):
+        show = Show.objects.create(
+            name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        division = Division.objects.create(name="division")
+        horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
+            '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
+        rider1 = Rider.objects.create(first_name="Anna", last_name ="Wu", address="address1", city="cville", state="VA",zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
+        combo1 = HorseRiderCombo.objects.create(
+            num=200, rider=rider1, horse=horse1, show = show)
+        division.champion = horse1.name
+        self.assertTrue(division.champion == "Ruby")
+
+
+class CheckReserve(TestCase):
+    def test_reserve_horse(self):
+        show = Show.objects.create(
+            name="show1", date="2019-12-10", location="cville", day_of_price=15, pre_reg_price=10)
+        division = Division.objects.create(name="division")
+        horse = Horse.objects.create(name="Pikachu", coggins_date=datetime.datetime.strptime(
+            '20110522', "%Y%m%d").date(), accession_num="que847", owner="Anna Wu", type="pony", size="small")
+        rider = Rider.objects.create(first_name="Anna", last_name ="Wu", address="address1", city="cville", state="VA",zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
+        combo = HorseRiderCombo.objects.create(
+            num=200, rider=rider, horse=horse, show = show)
+        division.champion_reserve = horse.name
+        self.assertTrue(division.champion_reserve == "Pikachu")
+
