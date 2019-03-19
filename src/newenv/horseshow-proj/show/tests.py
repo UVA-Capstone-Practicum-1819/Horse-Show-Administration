@@ -918,7 +918,7 @@ class TestViewClassTestCase(TestCase):
         c1 = Class.objects.create(name="Test", num="1", division=d1, show=show)
         horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
             '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
-        rider1 = Rider.objects.create(name="Anna Wu", address="address1", city="cville", state="VA",
+        rider1 = Rider.objects.create(first_name="Anna",last_name= "Wu", address="address1", city="cville", state="VA",
                                       zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
         combo1 = HorseRiderCombo.objects.create(
             num=200, rider=rider1, horse=horse1, show=show)
