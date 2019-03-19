@@ -272,7 +272,7 @@ class ViewsTestCases(TestCase):
         request = HttpRequest()
         self.assertRaises(HorseRiderCombo.DoesNotExist, edit_combo, request,'2018-12-10',300)
         
-   def test_edit_combo_in_diff_show(self):
+    def test_edit_combo_in_diff_show(self):
         self.client.login(username='john', password='johnpassword')
         show1 = Show.objects.create(
             name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
