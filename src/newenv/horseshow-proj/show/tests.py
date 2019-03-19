@@ -348,20 +348,21 @@ class CheckEntryNum(TestCase):
             '20090811', "%Y%m%d").date(), accession_num="ace321", owner="Angie Lee", type="pony", size="small")
         horse3 = Horse.objects.create(name="Strange", coggins_date=datetime.datetime.strptime(
             '20110524', "%Y%m%d").date(), accession_num="ace567", owner="Sarah Chu", type="pony", size="medium")
-        rider1 = Rider.objects.create(first_name="Anna",last_name="Wu", address="address1", city="cville", state="VA",
+        rider1 = Rider.objects.create(name="Anna Wu", address="address1", city="cville", state="VA",
                                       zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
-        combo1 = HorseRiderCombo.objects.create(
-            num=200, rider=rider1, horse=horse1, show = show2)
-        # print(combo1.show.date)
-        request = HttpRequest()
-        self.assertRaises(HorseRiderCombo.DoesNotExist, edit_combo, request,'2018-12-10',200)
 
-    def test_add_existing_class_num(self):
-        self.client.login(username='john', password='johnpassword')
-        show = Show.objects.create(
-            name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        combo1 = HorseRiderCombo.objects.create(
+            num=100, rider=rider1, horse=horse1)
+        combo2 = HorseRiderCombo.objects.create(
+            num=100, rider=rider1, horse=horse2)
+        combo3 = HorseRiderCombo.objects.create(
+            num=100, rider=rider1, horse=horse3)
+
+        show = Show.objects.create(date=datetime.datetime.strptime('20190526', "%Y%m%d"), name="Show1",
+                                   location="Cville", day_of_price=15, pre_reg_price=11)
         div = Division.objects.create(id=1, name="Div1", show=show)
-        c1 = Class.objects.create(num=1, name="Class1", division=div, show=show)
+        c1 = Class.objects.create(
+            num=1, name="Class1", division=div, show=show)
         part1 = ClassParticipation.objects.create(
             participated_class=c1, combo=combo1)
         part2 = ClassParticipation.objects.create(
@@ -371,6 +372,26 @@ class CheckEntryNum(TestCase):
         num_entry = ClassParticipation.objects.filter(
             participated_class=c1).count()
         self.assertTrue(num_entry == 3)
+
+    def test_add_existing_class_num(self):
+        self.client.login(username='john', password='johnpassword')
+        show = Show.objects.create(
+            name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        div = Division.objects.create(id=1, name="Div1", show=show)
+        c1 = Class.objects.create(num=1, name="Class1", division=div, show=show)
+
+        horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
+            '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
+        rider1 = Rider.objects.create(first_name="Anna", last_name ="Wu", address="address1", city="cville", state="VA",zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
+        combo1 = HorseRiderCombo.objects.create(
+            num=200, rider=rider1, horse=horse1, show = show)
+        part1 = ClassParticipation.objects.create(participated_class=c1, combo=combo1)
+        form = ClassComboForm()
+        if ClassParticipation.objects.filter(participated_class=c1) is None:
+            form_data = {'is_preregistered': False,
+                        'num': 1}
+            form = ClassComboForm(data=form_data)
+        self.assertFalse(form.is_valid())
 
 
 class CheckRankClassForm(TestCase):
