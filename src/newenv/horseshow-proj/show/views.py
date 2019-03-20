@@ -25,6 +25,11 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from .labels import generate_show_labels
+from xlutils.copy import copy
+import xlrd
+import xlwt
+from operator import itemgetter
+from openpyxl import load_workbook
 
 
 class AuthRequiredMiddleware(object):
@@ -1338,6 +1343,52 @@ def populate_pdf(request, show_date):
     return render(request, 'final_results.html', {"filename": "show/static/VHSA_Final_Results.pdf"})
 
 
+def populate_excel(request, show_date): #pragma: no cover
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=district-qualified-youth-registration.xls'
+
+    rb = xlrd.open_workbook('show/static/district-qualified-youth-registration.xls')
+    wb = copy(rb)
+    sheet = wb.get_sheet(0)
+
+    list_4h = []
+    show = Show.objects.get(date=show_date)
+    combos = HorseRiderCombo.objects.filter(show=show)
+    for combo in combos:
+        print (combo)
+        if combo.rider.member_4H:
+            horse_name = combo.horse.name
+            entry = [combo.rider.first_name, combo.rider.last_name, horse_name.split("(", 1)[0], combo.rider.county]
+            list_4h.append(entry)
+    sorted_list_4h = sorted(list_4h, key=itemgetter(3, 1))
+    style0 = xlwt.easyxf('font: bold on')
+    style1 = xlwt.easyxf('font: bold on', num_format_str='D-MMM-YY')
+    sheet.write(3, 2, show.name, style0)
+    sheet.write(5, 2, show.location, style0)
+    sheet.write(5, 4, show.date, style1)
+
+    for i in range(0, len(sorted_list_4h)):
+        for j in range(0,4):
+            sheet.write(11+i, j, sorted_list_4h[i][j])
+
+    wb.save(response)
+
+    # wb = load_workbook("show/static/district-qualified-youth-registration.xls")
+    # #Get the current Active Sheet
+    # ws = wb.get_active_sheet()
+    # #You can also select a particular sheet
+    # #based on sheet name
+    # #ws = wb.get_sheet_by_name("Sheet1")
+    # for i in range(0, len(sorted_list_4h)):
+    #     for j in range(0,4):
+    #         sheet.cell(row=11+i, column=j).value = sorted_list_4h[i][j]
+
+    # #save the csb file
+    # wb.save(response)
+
+    return response
+
+
 
 def generate_labels(request, show_date): #pragma: no cover
     # view to execute label generating
@@ -1356,3 +1407,5 @@ def generate_labels(request, show_date): #pragma: no cover
     else:
         generate_show_labels(show_date)
         return render(request, 'labels.html', {'date':str(show_date)})
+
+
