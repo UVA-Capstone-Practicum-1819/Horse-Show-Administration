@@ -18,7 +18,7 @@
   <table class="table table-hover table-striped table-bordered">
     <thead class="bg-info">
       <th>
-        Edit/Remove
+        
       </th>
       <th>
         Last Name
@@ -63,8 +63,9 @@
       {% for rider in riders %}
         <tr id="rider-row-{{rider.pk}}">
           <td> 
-            <a href="{% url 'edit_rider' rider_pk=rider.pk %}" class="btn btn-warning"><i class="fa">&#xf044;</i></a> 
-            <a id="rider-delete-{{rider.pk}}" href="{% url 'delete_rider' rider_pk=rider.pk %}" class="btn btn-danger">X</a>
+          
+          <a href="{% url 'edit_rider' rider_pk=rider.pk %}" class="btn btn-sm btn-warning">Edit</a> 
+            <a id="rider-delete-{{rider.pk}}" href="{% url 'delete_rider' rider_pk=rider.pk %}" class="btn btn-sm btn-danger">Remove</a>
           </td>
           <td> {{rider.last_name}} </td>
           <td> {{rider.first_name}} </td>
@@ -102,7 +103,7 @@
         </button>
       </div>
 
-      <form id="addRiderForm" class="form" method="post">
+      <form id="addRiderForm" class="form" >
         {% csrf_token %}
         <div class="modal-body">
           
@@ -110,8 +111,8 @@
           <div class="container" id="errorBody"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="addRiderButton">Add Rider</button>
+          <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success" id="addRiderButton">Add Rider</button>
         </div>
       </form>
 
@@ -147,6 +148,23 @@ $(document).ready(function(){
   });
 });
 
+
+// Use validation for the addRiderForm
+$( "#addRiderForm" ).submit(function( event ) {
+ 
+    // If .required's value's length is zero
+    if ( $( ".required" ).val().length === 0 ) {
+ 
+        // Usually show some kind of error message here
+ 
+        // Prevent the form from submitting
+        event.preventDefault();
+    } else {
+ 
+        // Run $.ajax() here
+    }
+});
+
 {% comment %} click to edit rider {% endcomment %}
 {% comment %} $(document).ready(function(){
   $("#rider-row-{{rider.pk}}").click(function(){
@@ -180,60 +198,3 @@ $(document).ready(function(){
 
 
 {% endblock %}
-
-{% comment %} Code for accordian  {% endcomment %}
-
-{% comment %} <div class="accordion" id="rider-accordian">
-  <div class="card">
-
-  
-  {% for rider in riders %}
-    <div class="card-header bg-primary" id="heading-for-{{rider.pk}}">
-      <h2 class="mb-0">
-        <button class="btn btn-primary btn-block" type="button" data-toggle="collapse" data-target="#collapse-{{rider.pk}}" aria-expanded="true" aria-controls="collapse-{{rider.pk}}">
-          {{rider.last_name}}, {{rider.first_name}} 
-
-          
-        </button>
-      </h2>
-    </div>
-
-    <div id="collapse-{{rider.pk}}" class="collapse show" aria-labelledby="heading-for-{{rider.pk}}" data-parent="#rider-accordian">
-      <div class="card-body">
-        <table class="table table-bordered">
-          <tbody>
-            <tr>
-              <td>Email</td>
-              <td>{{rider.email}}</td>
-            </tr>
-            <tr>
-              <td>Birth Date</td>
-              <td>{{rider.birth_date}}</td>
-            </tr>
-            <tr>
-              <td>City</td>
-              <td>{{rider.city}}</td>
-            </tr>
-            <tr>
-              <td>State</td>
-              <td>{{rider.state}}</td>
-            </tr>
-            <tr>
-              <td>Zip Code</td>
-              <td>{{rider.zip_code}}</td>
-            </tr>
-            <tr>
-              <td>County</td>
-              <td>{{rider.county}}</td>
-            </tr>
-          </tbody>
-        </table>
-        
-      </div>
-    </div>
-  </div>
-
-  {% endfor %}
-
-
- </div> {% endcomment %}

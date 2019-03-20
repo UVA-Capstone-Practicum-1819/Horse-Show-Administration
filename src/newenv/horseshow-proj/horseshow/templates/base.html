@@ -29,28 +29,36 @@
 
                     </li>
 
+                    
+
                     <li>
                         <a href="{% url 'add_division' show_date=date %}">Add Division</a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'view_riders' %}">View All Riders</a>
                     </li>
                     {% comment %} <li>
                         <a href="{% url 'select_division' show_date=date %}">Edit Division/View Division Score</a>
                     </li> {% endcomment %}
-                    <li>
+                    {% comment %} <li>
                         <a href="{% url 'select_rider' show_date=date %}">Add Horse-Rider Combo</a>
-                    </li>
-                    <li>
+                    </li> {% endcomment %}
+                    {% comment %} <li>
                         <a href="{% url 'select_rider2' show_date=date %}">Edit Rider Information</a>
-                    </li>
-                    <li>
+                    </li> {% endcomment %}
+                    {% comment %} <li>
                         <a href="{% url 'select_horse2' show_date=date %}">Edit Horse Information</a>
-                    </li>
-                    <li>
+                    </li> {% endcomment %}
+                    {% comment %} <li>
                         <a href="{% url 'add_rider' show_date=date %}">Add Rider</a>
-                    </li>
+                    </li> {% endcomment %}
 
-                    <li>
+                    {% comment %} <li>
                         <a href="{% url 'add_horse' show_date=date %}">Add Horse</a>
-                    </li>
+                    </li> {% endcomment %}
+
+                    
                 {% endif %}
                 <li>
                   <form action="{% url 'log_out' %}" method="post" class="form">{% csrf_token %}

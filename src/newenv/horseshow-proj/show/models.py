@@ -160,7 +160,6 @@ class HorseRiderCombo(models.Model):
         return f"Show: {str(self.show.date)}, Number: {self.num}, Rider: {self.rider.last_name}, Horse: {self.horse.name}"
 
 
-
 def validate_unique(self, exclude=None):
     qs = HorseRiderCombo.objects.filter(rider=self.rider, horse=self.horse)
     if self.pk is None:
