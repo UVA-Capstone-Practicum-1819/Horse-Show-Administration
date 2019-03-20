@@ -1140,7 +1140,7 @@ def calculate_age(born):
     return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
 
-def populate_pdf(request, show_date):
+def populate_pdf(request, show_date): #pragma: no cover
     """ populate pdf for VHSA horse show reports """ #populates text fields of PDF
     show = Show.objects.get(date=show_date)  # get the show by its date
     d = {
