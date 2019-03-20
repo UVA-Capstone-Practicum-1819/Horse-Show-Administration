@@ -8,7 +8,7 @@
   <h3>Show: {{ show_name }}</h3>
 
   {% comment %} show information {% endcomment %}
-  <h4><b>Date:</b> {{ date }}
+  <h4><b>Date:</b> {{date_obj | date:"m-d-Y"}}
     <br><b>Location:</b> {{ location }}</h4>
 
 
