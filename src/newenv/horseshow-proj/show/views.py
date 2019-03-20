@@ -1349,13 +1349,12 @@ def add_rider2(request):
         add_rider_form = RiderForm(request.POST)
         if add_rider_form.is_valid():
             add_rider_form.save()
-            return HttpResponse("Rider succesfully added.")
+            return HttpResponse("Rider succesfully added.", status=200)
         else:
-            print(add_rider_form)
-
-
+            return HttpResponse(add_rider_form.errors, status=404)
+        
 
 def delete_rider(request, rider_pk):
-    rider = Rider.objects.get(pk=rider_pk)
+    rider = get_object_or_404(Rider, pk=rider_pk)
     rider.delete()
-    return HttpResponse("Rider is deleted.")
+    return HttpResponse("Rider is deleted.", status=200)

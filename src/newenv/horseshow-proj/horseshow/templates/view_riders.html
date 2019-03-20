@@ -1,9 +1,5 @@
 {% extends 'base.html' %}
 
-
-
-
-
 {% load crispy_forms_tags %}
 {% block content %}
 <h2> Riders </h2>
@@ -105,16 +101,20 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body ">
-        <form id="addRiderForm" class="form" method="post">
-           {% csrf_token %}
-           {{ add_rider_form | crispy}}
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" id="addRiderButton">Add Rider</button>
-      </div>
+
+      <form id="addRiderForm" class="form" method="post">
+        {% csrf_token %}
+        <div class="modal-body">
+          
+          {{ add_rider_form | crispy}}
+          <div class="container" id="errorBody"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="addRiderButton">Add Rider</button>
+        </div>
+      </form>
+
     </div>
   </div>
 </div>
@@ -136,36 +136,44 @@ $(document).ready(function(){
 $(document).ready(function(){
   $("#addRiderButton").click(function(){
     $.post("{% url 'add_rider2' %}",
-    $("#addRiderForm").serialize(), function() {
-      location.reload();
-      $("#addRiderForm").reset();
+    $("#addRiderForm").serialize(), function(data, status) {
+      if (status="success")
+      {
+        location.reload();
+      }
+      else 
+        $("#errorBody").load("Message: " + data)
     });
   });
 });
 
 {% comment %} click to edit rider {% endcomment %}
-$(document).ready(function(){
+{% comment %} $(document).ready(function(){
   $("#rider-row-{{rider.pk}}").click(function(){
     $.post("{% url 'add_rider2' %}",
     $("#addRiderForm").serialize(), function() {
       location.reload();
       $("#addRiderForm").reset();
+      
+      
     });
   });
-});
+}); {% endcomment %}
 
 {% comment %} click to delete rider {% endcomment %}
-{% for rider in riders %}
-  $(document).ready(function(){
+
+$(document).ready(function(){
+  {% for rider in riders %}
     $("#rider-delete-{{rider.pk}}").click(function(){
       $.get("{% url 'delete_rider' rider_pk=rider.pk %}",
       function() {
-        $("#riderTable").load(location.href + " #riderTable");
+        location.reload();
     
       });
     });
-  });
-{% endfor %}
+  {% endfor %}
+});
+
 
 
 </script> 
