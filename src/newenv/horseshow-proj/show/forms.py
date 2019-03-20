@@ -22,8 +22,10 @@ class ShowForm(forms.Form):
     day_of_price = forms.IntegerField(label="Day-of Price")
     pre_reg_price = forms.IntegerField(label="Preregistration Price")
 
+
 class EditDivisionForm(forms.Form):
     change_name_to = forms.CharField(max_length=100)
+
 
 class RegistrationBillForm(forms.Form):
     """
@@ -91,7 +93,8 @@ class RiderForm(forms.ModelForm):
     This allows you to enter information for an individual Rider. Birth date is necessary for people who are 18 or younger. Form for a rider with name, address, email, birth date, whether it is a member of the VHSA, and its county
     """
 
-    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
+    year_range = list(
+        reversed(range(1920, datetime.date.today().year + 1)))
 
     birth_date = forms.DateField(
         help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range))
@@ -101,9 +104,19 @@ class RiderForm(forms.ModelForm):
     zip_code = USZipCodeField()
 
     class Meta:
+
         model = Rider
-        fields = ('first_name', 'last_name', 'address', 'city', 'state', 'zip_code', 'email',
-                  'adult', 'birth_date', 'member_VHSA', 'member_4H', 'county')
+        fields = '__all__'
+        exclude = ['horses']
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        first_name = cleaned_data['first_name']
+        last_name = cleaned_data['last_name']
+        email = cleaned_data['email']
+        if Rider.objects.filter(first_name=first_name, last_name=last_name, email=email):
+            raise ValidationError(
+                "There already is another rider with the same first name, last name, and email.")
 
 
 class RiderSelectForm(forms.ModelForm):
@@ -131,7 +144,8 @@ class HorseForm(forms.ModelForm):
     coggins_date = forms.DateField(
         widget=forms.SelectDateWidget(years=year_range))
 
-    accession_num = forms.CharField(widget=forms.TextInput(attrs={'autocomplete': 'off', }))
+    accession_num = forms.CharField(
+        widget=forms.TextInput(attrs={'autocomplete': 'off', }))
 
     class Meta:
         model = Horse
@@ -170,7 +184,8 @@ class HorseRiderComboCreateForm(forms.ModelForm):
     """ # This creates the Horse Rider Combo itself. for creating a horse rider combo """
 
     email = forms.EmailField(required=False, label="Email")
-    cell = forms.CharField(max_length=12, required=False, label="Cell Phone #")
+    cell = forms.CharField(max_length=12, required=False,
+                           label="Cell Phone #")
 
     class Meta:
         model = HorseRiderCombo

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
-
+{% load static %}
+{% load js %}
 {% load crispy_forms_tags %}
 {% block content %}
 <h2> Riders </h2>
@@ -61,11 +62,12 @@
 
     <tbody id="riderTable">
       {% for rider in riders %}
-        <tr id="rider-row-{{rider.pk}}">
+        <tr>
           <td> 
           
           <a href="{% url 'edit_rider' rider_pk=rider.pk %}" class="btn btn-sm btn-warning">Edit</a> 
-            <a id="rider-delete-{{rider.pk}}" href="{% url 'delete_rider' rider_pk=rider.pk %}" class="btn btn-sm btn-danger">Remove</a>
+          
+            <a  href="{% url 'delete_rider' rider_pk=rider.pk %}" class="btn btn-sm btn-danger deleteRider">Remove</a>
           </td>
           <td> {{rider.last_name}} </td>
           <td> {{rider.first_name}} </td>
@@ -103,7 +105,7 @@
         </button>
       </div>
 
-      <form id="addRiderForm" class="form" >
+      <form id="addRiderForm" class="form" method="post" action="{% url 'add_rider2' %}">
         {% csrf_token %}
         <div class="modal-body">
           
@@ -121,80 +123,13 @@
 </div>
 </body>
 
-{% comment %} provides filtering for the rider table {% endcomment %}
+<script>
+  riders = "{{ riders | js | escapejs}}";
+  riders = jQuery.parseJSON(riders);
+</script>
 
- <script>
-$(document).ready(function(){
-  $("#searchLastName").on("keyup", function() {
-    var value = $(this).val().toLowerCase();
-    $("#riderTable tr").filter(function() {
-      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-    });
-  });
-});
-
-{% comment %} adds a new rider {% endcomment %}
-$(document).ready(function(){
-  $("#addRiderButton").click(function(){
-    $.post("{% url 'add_rider2' %}",
-    $("#addRiderForm").serialize(), function(data, status) {
-      if (status="success")
-      {
-        location.reload();
-      }
-      else 
-        $("#errorBody").load("Message: " + data)
-    });
-  });
-});
-
-
-// Use validation for the addRiderForm
-$( "#addRiderForm" ).submit(function( event ) {
- 
-    // If .required's value's length is zero
-    if ( $( ".required" ).val().length === 0 ) {
- 
-        // Usually show some kind of error message here
- 
-        // Prevent the form from submitting
-        event.preventDefault();
-    } else {
- 
-        // Run $.ajax() here
-    }
-});
-
-{% comment %} click to edit rider {% endcomment %}
-{% comment %} $(document).ready(function(){
-  $("#rider-row-{{rider.pk}}").click(function(){
-    $.post("{% url 'add_rider2' %}",
-    $("#addRiderForm").serialize(), function() {
-      location.reload();
-      $("#addRiderForm").reset();
-      
-      
-    });
-  });
-}); {% endcomment %}
-
-{% comment %} click to delete rider {% endcomment %}
-
-$(document).ready(function(){
-  {% for rider in riders %}
-    $("#rider-delete-{{rider.pk}}").click(function(){
-      $.get("{% url 'delete_rider' rider_pk=rider.pk %}",
-      function() {
-        location.reload();
-    
-      });
-    });
-  {% endfor %}
-});
-
-
-
-</script> 
-
+<script src="{% static 'js/view_riders.js' %}" type="text/javascript">  
+</script>
 
 {% endblock %}
+

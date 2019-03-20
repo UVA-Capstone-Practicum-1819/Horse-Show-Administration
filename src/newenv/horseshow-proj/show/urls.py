@@ -101,9 +101,11 @@ urlpatterns = [
 
     path('', views.select_show, name="select_show"),
 
+    path('riders', views.view_riders, name="view_riders"),
+
     path('rider/<rider_pk>/', include(rider_patterns)),
 
-
+    path('get_riders', views.get_riders, name="get_riders"),
     path('show-autocomplete', views.ShowAutocomplete.as_view(),
          name="show_autocomplete"),
 
@@ -122,7 +124,7 @@ urlpatterns = [
     path('add-rider2', views.add_rider2, name="add_rider2"),
     path('add', views.add_show, name='add_show'),
 
-    path('view-riders', views.view_riders, name="view_riders"),
+
     path('<show_date>/', include(show_patterns)),
 
 

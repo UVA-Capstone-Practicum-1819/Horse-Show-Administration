@@ -1,9 +1,11 @@
 import random
 import re
+import logging
 import os
 import json
 import pdfrw
 import datetime
+from django.core import serializers
 import io
 from datetime import date
 from django.http import FileResponse
@@ -26,7 +28,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from .labels import generate_show_labels
 
-
+logger = logging.getLogger("loggingP")
 class AuthRequiredMiddleware(object):
     """
     Middleware required so that non-logged-in users cannot see pages they aren't authorized to see
@@ -1342,19 +1344,29 @@ def view_riders(request):
     add_rider_form = RiderForm()
 
     context = {'riders': Rider.objects.all(), 'add_rider_form': add_rider_form}
+    
     return render(request, 'view_riders.html', context)
 
 def add_rider2(request):
     if request.method == "POST":
         add_rider_form = RiderForm(request.POST)
+        
         if add_rider_form.is_valid():
             add_rider_form.save()
             return HttpResponse("Rider succesfully added.", status=200)
         else:
-            return HttpResponse(add_rider_form.errors, status=404)
+            logger.error(add_rider_form.errors)
+            data = {"responseText": add_rider_form.errors['__all__']}
+            data = add_rider_form.errors['__all__']
+            return HttpResponse(json.dumps(data), status=400)
         
 
 def delete_rider(request, rider_pk):
-    rider = get_object_or_404(Rider, pk=rider_pk)
+    rider = Rider.objects.get(pk = rider_pk)
     rider.delete()
-    return HttpResponse("Rider is deleted.", status=200)
+    return HttpResponse("Rider is deleted.")
+
+def get_riders(request):
+    riders = Rider.objects.all()
+    riders_as_json = serializers.serialize('json', riders)
+    return HttpResponse(riders_as_json)
