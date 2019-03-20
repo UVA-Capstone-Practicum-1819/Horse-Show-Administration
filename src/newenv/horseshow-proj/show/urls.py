@@ -92,6 +92,8 @@ show_patterns = [
     path('horse/<horse_pk>/edit', views.edit_horse, name="edit_horse"),
 
     path('populate-pdf', views.populate_pdf, name="populate_pdf"),
+
+    path('populate-excel', views.populate_excel, name="populate_excel"),
 ]
 
 urlpatterns = [
