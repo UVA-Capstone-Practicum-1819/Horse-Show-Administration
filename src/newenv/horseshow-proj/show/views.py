@@ -71,11 +71,12 @@ def view_show(request, show_date):
                         return redirect('view_show', show_date=show_date)
             except ObjectDoesNotExist:
                 messages.error(request, "The combination number entered does not exist in this show.")
-            
+
     form = ComboNumForm()
     context = {
         "show_name": show.name,
         "date": show_date,
+        "date_obj": datetime.datetime.strptime(show_date, "%Y-%m-%d"),
         "location": show.location,
         "divisions": show.divisions.all().order_by('first_class_num'),
         'form': form,
@@ -247,7 +248,7 @@ def delete_division(request, show_date, division_id):
     show = Show.objects.get(date=show_date)
     """get division"""
     division = show.divisions.get(id=division_id)
-    division.delete() 
+    division.delete()
     """delete it"""
     return redirect('view_show', show_date=show_date)
 
@@ -487,7 +488,7 @@ def edit_division(request, show_date, division_id):
             "classes": division_classes,
             "form": form,
         }
-        return render(request, 'edit_division.html', context)        
+        return render(request, 'edit_division.html', context)
 
 
 def view_class(request, show_date, division_id, class_num):
@@ -795,10 +796,10 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
     if division_id != None:
         division = Division.objects.get(id=division_id)
         c = Class.objects.get(show=show, num=class_num)
-        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form, 
+        return render(request, 'edit_combo.html', {'division':division, 'class':c, 'show':show, 'combo': combo, 'edit_form': edit_form,
             'class_combo_form': class_combo_form, 'classes': participations, 'date': show_date})
     else:
-        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form, 
+        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form,
             'classes': participations, 'date': show_date})
 
 
@@ -1139,7 +1140,7 @@ def calculate_age(born):
     return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
 
-def populate_pdf(request, show_date):   
+def populate_pdf(request, show_date):
     """ populate pdf for VHSA horse show reports """ #populates text fields of PDF
     show = Show.objects.get(date=show_date)  # get the show by its date
     d = {
