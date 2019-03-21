@@ -527,7 +527,7 @@ def view_class(request, show_date, division_id, class_num):
                 messages.error(request, "Horse Rider Combo does not exist in this show.")
                 return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
     else:
-        form = AddComboToClassForm()
+        form = AddComboToClassForm(initial={'is_preregistered':True})
     # form = ComboSelectForm()
     context = {
         "combos": combos,
@@ -783,7 +783,7 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
     edit_form = HorseRiderEditForm(
         {'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
 
-    class_combo_form = ClassComboForm()
+    class_combo_form = ClassComboForm(initial={'is_preregistered':True})
     registered_classes = combo.classes.all()
     number_registered_classes = len(registered_classes)
     price = 0
