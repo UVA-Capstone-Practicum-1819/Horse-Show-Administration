@@ -81,11 +81,6 @@ show_patterns = [
 
     path('rider/add', views.add_rider, name="add_rider"),
 
-
-
-
-
-
     path('horse/add', views.add_horse, name="add_horse"),
 
     path('horse/select', views.select_horse, name="select_horse"),
@@ -99,13 +94,15 @@ show_patterns = [
 
 urlpatterns = [
 
+
+
     path('', views.select_show, name="select_show"),
 
-    path('riders', views.view_riders, name="view_riders"),
+
+    path('all_riders', views.view_riders, name="view_riders"),
 
     path('rider/<rider_pk>/', include(rider_patterns)),
 
-    path('get_riders', views.get_riders, name="get_riders"),
     path('show-autocomplete', views.ShowAutocomplete.as_view(),
          name="show_autocomplete"),
 
@@ -121,9 +118,10 @@ urlpatterns = [
          name="division_autocomplete"),
     path('class-autocomplete', views.ClassAutocomplete.as_view(),
          name="classes_autocomplete"),
-    path('add-rider2', views.add_rider2, name="add_rider2"),
-    path('add', views.add_show, name='add_show'),
 
+    path('add-rider2', views.add_rider2, name="add_rider2"),
+
+    path('add', views.add_show, name='add_show'),
 
     path('<show_date>/', include(show_patterns)),
 
@@ -144,37 +142,4 @@ urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
-"""horseshow URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/2.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-
-    Most of our url templates show how certain subdivisions exist in the organization of the horse show, so the information
-    can be passed between different templatesself
-    Obsolete URLs were commented out or removed
-    Autocomplete pages are only used for autocomplete functionality- will not be a functional page for the purpose
-    of organizing a Horse Show
-
- """
-
-""" 
-old paths
-
-    path('rider/select', views.select_rider, name="select_rider"),
-
-    path('rider/select2', views.select_rider2, name="select_rider2"), 
-
-    path('rider/<rider_pk>/edit', views.edit_rider, name="edit_rider"), 
-    """
-
-#     path('division/<division_id>/class<class_num>', include(class_patterns)),
+# old path('division/<division_id>/class<class_num>', include(class_patterns)),

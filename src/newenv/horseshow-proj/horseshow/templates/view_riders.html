@@ -60,6 +60,7 @@
       
     </thead>
 
+    {% comment %} the main body of the table, containing each row and column {% endcomment %}
     <tbody id="riderTable">
       {% for rider in riders %}
         <tr>
@@ -69,18 +70,18 @@
           
             <a  href="{% url 'delete_rider' rider_pk=rider.pk %}" class="btn btn-sm btn-danger deleteRider">Remove</a>
           </td>
-          <td> {{rider.last_name}} </td>
-          <td> {{rider.first_name}} </td>
-          <td> {{rider.email}} </td>
-          <td> {{rider.address}} </td>
-          <td> {{rider.city}} </td>
-          <td> {{rider.state}} </td>
-          <td> {{rider.zip_code}} </td>
-          <td> {{rider.adult}} </td>
-          <td> {{rider.birth_date}} </td>
-          <td> {{rider.member_VHSA}} </td>
-          <td> {{rider.member_4H}} </td>
-          <td> {{rider.county}} </td>
+          <td id="riderLastName"> {{rider.last_name}} </td>
+          <td id="riderFirstName"> {{rider.first_name}} </td>
+          <td id="riderEmail"> {{rider.email}} </td>
+          <td id="riderAddress"> {{rider.address}} </td>
+          <td id="riderCity"> {{rider.city}} </td>
+          <td id="riderState"> {{rider.state}} </td>
+          <td id="riderZipCode"> {{rider.zip_code}} </td>
+          <td id="riderAdult"> {{rider.adult}} </td>
+          <td id="riderBirthDate"> {{rider.birth_date}} </td>
+          <td id="riderMemberVHSA"> {{rider.member_VHSA}} </td>
+          <td id="riderMember4H"> {{rider.member_4H}} </td>
+          <td id="riderCounty"> {{rider.county}} </td>
           
         </tr>
         
@@ -89,7 +90,12 @@
     </tbody>
   </table>
 
-  
+  {% comment %} show a message if there are no riders {% endcomment %}
+  {% if not riders %}
+    <div class="alert alert-secondary"> 
+      No riders currently exist. Feel free to add some.
+    </div>
+  {% endif %}
 
 </div>
 
@@ -123,11 +129,13 @@
 </div>
 </body>
 
+{% comment %} pass Django variable "riders" to the javascript file {% endcomment %}
 <script>
   riders = "{{ riders | js | escapejs}}";
   riders = jQuery.parseJSON(riders);
 </script>
 
+{% comment %} bring in javascript file for performing extra dynamic functionality  {% endcomment %}
 <script src="{% static 'js/view_riders.js' %}" type="text/javascript">  
 </script>
 
