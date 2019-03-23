@@ -1,4 +1,20 @@
-
+/* deletes a rider and also the rider row in which the button was located */
+function deleteRider(event) {
+    event.preventDefault();
+    button = $(this)
+    $.ajax(
+        {
+            url: $(this).attr('href'),
+            method: "get",
+            success: function () {
+                button.parent().parent().remove();
+            },
+            error: function (data) {
+                $("#errorBody").load(data);
+            }
+        }
+    );
+}
 
 /* register the search box to filter through the riders */
 $(document).ready(function () {
@@ -20,7 +36,9 @@ $('#addRiderForm').on('submit', function (event) {
             url: $(this).attr('action'),
             data: $(this).serialize(),
             success: function (data) {
-                $("#riderTable").append(data);
+                riderTable = $("#riderTable")
+                riderTable.append(data);
+                riderTable.find(".delete-rider").on('click', deleteRider);
                 $("#addRiderModal").modal('hide');
             },
             error: function (xhr, errmsg, error) {
@@ -34,23 +52,7 @@ $('#addRiderForm').on('submit', function (event) {
 
 /* register the delete button to delete a rider */
 
-$(".delete-rider").on('click', function (event) {
-    event.preventDefault();
-    button = $(this)
-    $.ajax(
-        {
-            url: $(this).attr('href'),
-            method: "get",
-            success: function (data) {
-
-                button.parent().parent().remove();
-            },
-            error: function (data) {
-                $("#errorBody").load(data);
-            }
-        }
-    )
-});
+$(".delete-rider").on('click', deleteRider);
 
 
 
