@@ -101,7 +101,7 @@ urlpatterns = [
 
     path('all_riders', views.view_riders, name="view_riders"),
 
-    path('rider/<rider_pk>/', include(rider_patterns)),
+    path('rider/<int:rider_pk>/', include(rider_patterns)),
 
     path('show-autocomplete', views.ShowAutocomplete.as_view(),
          name="show_autocomplete"),

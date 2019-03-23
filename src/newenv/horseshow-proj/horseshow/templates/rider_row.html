@@ -1,9 +1,9 @@
-<tr>
+<tr >
           <td> 
           
           <a href="{% url 'edit_rider' rider_pk=rider.pk %}" class="btn btn-sm btn-warning"><i style="font-size:12px" class="fa">&#xf044;</i></a> 
           
-            <a  href="{% url 'delete_rider' rider_pk=rider.pk %}" class="btn btn-sm btn-danger deleteRider">X</a>
+            <a  href="{% url 'delete_rider' rider_pk=rider.pk %}" class="btn btn-sm btn-danger delete-rider">X</a>
           </td>
           <td id="riderLastName"> {{rider.last_name}} </td>
           <td id="riderFirstName"> {{rider.first_name}} </td>

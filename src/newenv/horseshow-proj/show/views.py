@@ -1363,12 +1363,10 @@ def add_rider2(request):
         
 
 def delete_rider(request, rider_pk):
-    deleted_rider = Rider.objects.get(pk = rider_pk)
+    logger.error("This is the rider pk " + str(rider_pk))
+    deleted_rider = Rider.objects.get(pk=rider_pk)
+    print(deleted_rider)
+    
     deleted_rider.delete()
-    deleted_rider_as_json = serializers.serialize('json', deleted_rider)
-    return HttpResponse(deleted_rider_as_json, status=200)
+    return HttpResponse("Deleted rider", status=200)
 
-""" def get_riders(request):
-    riders = Rider.objects.all()
-    riders_as_json = serializers.serialize('json', riders)
-    return HttpResponse(riders_as_json) """
