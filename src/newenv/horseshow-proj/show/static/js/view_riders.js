@@ -17,9 +17,10 @@ function refreshTable(riders) {
     var rows = $("#riderTable > tr:gt(0)");
     for (let i = 0; i < riders.length; ++i) {
         var rider = riders[i];
-        var row = rows[i];
-        console.log(row);
-        row.find("#riderLastName").html = rider['last_name'];
+        var row = rows.find("");
+        console.log("Print all cells:");
+        console.log(rows.find('td#riderLastName'));
+        /* row.find("#riderLastName").html = rider['last_name'];
         row.find("#riderFirstName").html = rider['first_name'];
         row.find("#riderEmail").html = rider['email'];
         row.find("#riderAddress").html = rider['address'];
@@ -29,7 +30,7 @@ function refreshTable(riders) {
         row.find("#riderBirthDate").html = rider['birth_date'];
         row.find("#riderMemberVHSA").html = rider['memberVHSA'];
         row.find("#riderMember4H").html = rider['member_4H'];
-        row.find("#riderCounty").html = rider['county'];
+        row.find("#riderCounty").html = rider['county']; */
     }
 
 }
@@ -77,8 +78,8 @@ $('#addRiderForm').on('submit', function (event) {
             url: $(this).attr('action'),
             data: $(this).serialize(),
             success: function (data) {
-                newRiders = jQuery.parseJSON(data)
-                refreshTable(newRiders);
+                console.log(data);
+                $("#riderTable").append(data);
                 $("#addRiderModal").modal('hide');
             },
             error: function (xhr, errmsg, error) {

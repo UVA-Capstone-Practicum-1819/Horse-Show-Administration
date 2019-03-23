@@ -1352,10 +1352,10 @@ def add_rider2(request):
         add_rider_form = RiderForm(request.POST)
         
         if add_rider_form.is_valid():
-            add_rider_form.save()
-            new_riders = Rider.objects.all()
-            new_riders_as_json = serializers.serialize('json', new_riders)
-            return HttpResponse(new_riders_as_json, status=200)
+            added_rider = add_rider_form.save()
+            
+
+            return render(request, "rider_row.html", {'rider': added_rider})
         else:
             data = {"responseText": add_rider_form.errors['__all__']}
             data = add_rider_form.errors['__all__']
@@ -1363,11 +1363,10 @@ def add_rider2(request):
         
 
 def delete_rider(request, rider_pk):
-    rider = Rider.objects.get(pk = rider_pk)
-    rider.delete()
-    new_riders = Rider.objects.all()
-    new_riders_as_json = serializers.serialize('json', new_riders)
-    return HttpResponse(new_riders_as_JSON, status=200)
+    deleted_rider = Rider.objects.get(pk = rider_pk)
+    deleted_rider.delete()
+    deleted_rider_as_json = serializers.serialize('json', deleted_rider)
+    return HttpResponse(deleted_rider_as_json, status=200)
 
 """ def get_riders(request):
     riders = Rider.objects.all()

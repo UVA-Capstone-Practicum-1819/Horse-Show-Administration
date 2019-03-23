@@ -1,0 +1,20 @@
+<tr>
+          <td> 
+          
+          <a href="{% url 'edit_rider' rider_pk=rider.pk %}" class="btn btn-sm btn-warning"><i style="font-size:12px" class="fa">&#xf044;</i></a> 
+          
+            <a  href="{% url 'delete_rider' rider_pk=rider.pk %}" class="btn btn-sm btn-danger deleteRider">X</a>
+          </td>
+          <td id="riderLastName"> {{rider.last_name}} </td>
+          <td id="riderFirstName"> {{rider.first_name}} </td>
+          <td id="riderEmail"> {{rider.email}} </td>
+          <td id="riderAddress"> {{rider.address}} </td>
+          <td id="riderCity"> {{rider.city}} </td>
+          <td id="riderState"> {{rider.state}} </td>
+          <td id="riderZipCode"> {{rider.zip_code}} </td>
+          <td id="riderAdult"> {{rider.adult}} </td>
+          <td id="riderBirthDate"> {{rider.birth_date}} </td>
+          <td id="riderMemberVHSA"> {{rider.member_VHSA}} </td>
+          <td id="riderMember4H"> {{rider.member_4H}} </td>
+          <td id="riderCounty"> {{rider.county}} </td>
+</tr>
