@@ -1,0 +1,28 @@
+<!-- Add Rider Modal Dialog -->
+<div class="modal fade" id="addRiderModal" tabindex="-1" role="dialog" aria-labelledby="riderModalTitle"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="riderModalTitle">Add Rider</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form id="addRiderForm" class="form" method="post" action="{% url 'add_rider' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+
+          {{ update_rider_form | crispy}}
+          <div class="container" id="errorBody"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success" id="addRiderButton">Add Rider</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

@@ -59,9 +59,11 @@ division_patterns = [
 ]
 
 rider_patterns = [
-    path('edit', views.edit_rider, name="edit_rider"),
+    # path('edit', views.edit_rider, name="edit_rider"),
 
-    path('delete', views.delete_rider, name="delete_rider")
+    path('delete', views.delete_rider, name="delete_rider"),
+
+    path('edit', views.update_rider, name="edit_rider"),
 ]
 
 show_patterns = [
@@ -78,8 +80,6 @@ show_patterns = [
     path('combo/select', views.select_combo, name="select_combo"),
 
     path('combo/<combo_num>/', include(combo_patterns)),
-
-    path('rider/add', views.add_rider, name="add_rider"),
 
     path('horse/add', views.add_horse, name="add_horse"),
 
@@ -101,6 +101,8 @@ urlpatterns = [
 
     path('all_riders', views.view_riders, name="view_riders"),
 
+
+
     path('rider/<int:rider_pk>/', include(rider_patterns)),
 
     path('show-autocomplete', views.ShowAutocomplete.as_view(),
@@ -119,7 +121,7 @@ urlpatterns = [
     path('class-autocomplete', views.ClassAutocomplete.as_view(),
          name="classes_autocomplete"),
 
-    path('add-rider2', views.add_rider2, name="add_rider2"),
+    path('add-rider', views.update_rider, name="add_rider"),
 
     path('add', views.add_show, name='add_show'),
 

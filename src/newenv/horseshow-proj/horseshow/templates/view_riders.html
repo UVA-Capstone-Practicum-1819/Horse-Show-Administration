@@ -6,107 +6,82 @@
 <h2> Riders </h2>
 
 <body>
-<div class="container">
+  <div class="container">
 
-  <p> <input class="form-control" id="searchLastName" type="text" placeholder="Search"> <p>
+    <p> <input class="form-control" id="searchLastName" type="text" placeholder="Search">
+      <p>
 
-    {% comment %} for adding a new rider, triggers modal popup {% endcomment %}
-<p><a class="btn btn-success" data-toggle="modal" data-target="#addRiderModal">
-  + Add New Rider</a></p>
-
-
-  {% comment %} table to hold all the rider records {% endcomment %}
-  <table class="table table-hover table-striped table-bordered">
-    <thead class="bg-info">
-      <th>
-        
-      </th>
-      <th>
-        Last Name
-      </th>
-      <th>
-        First Name
-      </th>
-      <th>
-        Email
-      </th>
-      <th>
-        Address
-      </th>
-      <th>
-        City
-      </th>
-      <th>
-        State
-      </th>
-      <th>
-        Zip Code
-      </th>
-      <th>
-        Adult
-      </th>
-      <th>
-        Birth Date
-      </th>
-      <th>
-        Member VHSA
-      </th>
-      <th>
-        Member 4H
-      </th>
-      <th>
-        County
-      </th>
-      
-    </thead>
-
-    {% comment %} the main body of the table, containing each row and column {% endcomment %}
-    <tbody id="riderTable">
-      {% for rider in riders %}
-        {% include 'rider_row.html' %}
-        
-      {% endfor %}
-      
-    </tbody>
-  </table>
-
-  {% comment %} show a message if there are no riders {% endcomment %}
-  {% if not riders %}
-    <div class="alert alert-secondary"> 
-      No riders currently exist. Feel free to add some.
-    </div>
-  {% endif %}
-
-</div>
+        {% comment %} for adding a new rider, triggers modal popup {% endcomment %}
+        <p><a class="btn btn-success" data-toggle="modal" data-target="#addRiderModal">
+            + Add New Rider</a></p>
 
 
-<!-- Add Rider Modal Dialog -->
-<div class="modal fade" id="addRiderModal" tabindex="-1" role="dialog" aria-labelledby="riderModalTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title" id="riderModalTitle">Add Rider</h3>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
+        {% comment %} table to hold all the rider records {% endcomment %}
+        <table class="table table-hover table-striped table-bordered">
+          <thead class="bg-info">
+            <th>
 
-      <form id="addRiderForm" class="form" method="post" action="{% url 'add_rider2' %}">
-        {% csrf_token %}
-        <div class="modal-body">
-          
-          {{ add_rider_form | crispy}}
-          <div class="container" id="errorBody"></div>
+            </th>
+            <th>
+              Last Name
+            </th>
+            <th>
+              First Name
+            </th>
+            <th>
+              Email
+            </th>
+            <th>
+              Address
+            </th>
+            <th>
+              City
+            </th>
+            <th>
+              State
+            </th>
+            <th>
+              Zip Code
+            </th>
+            <th>
+              Adult
+            </th>
+            <th>
+              Birth Date
+            </th>
+            <th>
+              Member VHSA
+            </th>
+            <th>
+              Member 4H
+            </th>
+            <th>
+              County
+            </th>
+
+          </thead>
+
+          {% comment %} the main body of the table, containing each row and column {% endcomment %}
+          <tbody id="riderTable">
+            {% for rider in riders %}
+            {% include 'rider_row.html' %}
+
+            {% endfor %}
+
+          </tbody>
+        </table>
+
+        {% comment %} show a message if there are no riders {% endcomment %}
+        {% if not riders %}
+        <div class="alert alert-secondary">
+          No riders currently exist. Feel free to add some.
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-success" id="addRiderButton">Add Rider</button>
-        </div>
-      </form>
+        {% endif %}
 
-    </div>
   </div>
-</div>
+
+  {% include 'add_rider_modal.html' %}
+  {% include 'edit_rider_modal.html' %}
 </body>
 
 {% comment %} pass Django variable "riders" to the javascript file {% endcomment %}
@@ -115,9 +90,8 @@
   riders = jQuery.parseJSON(riders);
 </script>
 
-{% comment %} bring in javascript file for performing extra dynamic functionality  {% endcomment %}
-<script src="{% static 'js/view_riders.js' %}" type="text/javascript">  
+{% comment %} bring in javascript file for performing extra dynamic functionality {% endcomment %}
+<script src="{% static 'js/view_riders.js' %}" type="text/javascript">
 </script>
 
 {% endblock %}
-
