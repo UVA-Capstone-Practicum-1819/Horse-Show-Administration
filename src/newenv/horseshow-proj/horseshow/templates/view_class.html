@@ -3,6 +3,14 @@
 {% load static %}
 {% block content %}
 
+<style>
+  @media print {
+  a[href]:after {
+    content: none !important;
+  }
+}
+</style>
+
 <h3><a href="{% url 'view_show' show_date=date %}">Show: {{show_name}}</a> > <a href="{% url 'view_division' show_date=date division_id=id %}"> Division: {{name}}</a> > Class: {{class.num}} - {{class.name}}</h3>
 
 <div class="row">
