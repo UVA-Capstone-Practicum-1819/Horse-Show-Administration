@@ -62,15 +62,12 @@ def view_show(request, show_date):
         form = ComboNumForm(request.POST)
         if form.is_valid():
             num = form.cleaned_data['num']
-            try:
-                for combo in HorseRiderCombo.objects.filter(show = show):
-                    if combo.num==num:
-                        return redirect('edit_combo', combo_num=num, show_date=show_date)
-                    else:
-                        messages.error(request, "The combination number entered does not exist in this show.")
-                        return redirect('view_show', show_date=show_date)
-            except ObjectDoesNotExist:
-                messages.error(request, "The combination number entered does not exist in this show.")
+            for combo in HorseRiderCombo.objects.filter(show = show):
+                if combo.num==num:
+                    return redirect('edit_combo', combo_num=num, show_date=show_date)
+                else:
+                    messages.error(request, "The combination number entered does not exist in this show.")
+                    return redirect('view_show', show_date=show_date)
 
     form = ComboNumForm()
     context = {
@@ -235,7 +232,7 @@ def delete_class(request, show_date, division_id, class_num):
     # gets the division object from the division name that was passed in
     class_obj.delete()  # removes the class object
     if(len(division.classes.all())>0):
-        division.first_class_num = division.classes.all()[0]
+        division.first_class_num = division.classes.all()[0].num
         division.save()
     else:
         division.first_class_num = 1000
@@ -527,7 +524,7 @@ def view_class(request, show_date, division_id, class_num):
                 messages.error(request, "Horse Rider Combo does not exist in this show.")
                 return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
     else:
-        form = AddComboToClassForm()
+        form = AddComboToClassForm(initial={'is_preregistered':True})
     # form = ComboSelectForm()
     context = {
         "combos": combos,
@@ -684,7 +681,7 @@ def select_horse(request, show_date):
     return render(request, 'select_horse.html', {'form': form, 'date': show_date})
 
 
-def add_combo(request, show_date):
+def add_combo(request, show_date): #pragma: no cover
     """
         creates a page for adding a horse-rider combination, taking in the session variables for the primary keys of the chosen horse and rider
         redirects to the edit combo page for the same combination after it is done
@@ -726,7 +723,7 @@ def add_combo(request, show_date):
     return render(request, 'add_combo.html', {'form': form,  'rider': rider, 'horse': horse, 'date': show_date, 'form_errors': form_errors})
 
 
-def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
+def edit_combo(request, show_date, combo_num, division_id=None, class_num=None): #pragma: no cover
     """
     edits the combination that was specified by num
     also handles the addition/removal of classes based on num and the calculation of price
@@ -783,7 +780,7 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
     edit_form = HorseRiderEditForm(
         {'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
 
-    class_combo_form = ClassComboForm()
+    class_combo_form = ClassComboForm(initial={'is_preregistered':True})
     registered_classes = combo.classes.all()
     number_registered_classes = len(registered_classes)
     price = 0

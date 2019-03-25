@@ -160,13 +160,6 @@ class HorseRiderCombo(models.Model):
         return f"Number: {self.num}, Rider: {self.rider.last_name}, Horse: {self.horse.name}, Show: {str(self.show.date)}"
 
 
-def validate_unique(self, exclude=None):
-    qs = HorseRiderCombo.objects.filter(rider=self.rider, horse=self.horse)
-    if self.pk is None:
-        if qs.filter(r=self.rider).exists() and qs.filter(h=self.horse.exists()):
-            raise ValidationError("HRC already exists")
-
-
 class ClassParticipation(models.Model):
     """
     Model for a ClassParticipation. Includes a participating class and a score for that class to be placed under a HorseRider Combo
