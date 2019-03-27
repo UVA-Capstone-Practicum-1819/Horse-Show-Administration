@@ -12,7 +12,8 @@
       <p>
 
         {% comment %} for adding a new rider, triggers modal popup {% endcomment %}
-        <p><a class="btn btn-success" data-toggle="modal" data-target="#addRiderModal">
+        <p><a class="btn btn-success" data-toggle="modal" data-target="#updateRiderModal" data-op="add"
+            data-url="{% url 'add_rider' %}">
             + Add New Rider</a></p>
 
 
@@ -80,8 +81,7 @@
 
   </div>
 
-  {% include 'add_rider_modal.html' %}
-  {% include 'edit_rider_modal.html' %}
+  {% include 'rider_modal.html' %}
 </body>
 
 {% comment %} pass Django variable "riders" to the javascript file {% endcomment %}

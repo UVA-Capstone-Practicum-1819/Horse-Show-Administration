@@ -1367,9 +1367,7 @@ def add_rider(request):
 
 
 def delete_rider(request, rider_pk):
-
     deleted_rider = Rider.objects.get(pk=rider_pk)
-
     deleted_rider.delete()
     return HttpResponse("Deleted rider", status=200)
 

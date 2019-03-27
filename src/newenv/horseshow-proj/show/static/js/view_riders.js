@@ -1,3 +1,18 @@
+$("#updateRiderModal").on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var op = button.data('op');
+    var url = button.data('url');
+    $("#updateRiderForm").attr('action') = url;
+    if (op == "add") {
+        $("#updateRiderButton").val("Add Rider");
+        $("#riderModalTitle").val("Add Rider");
+    } else {
+        $("#updateRiderButton").val("Edit Rider");
+        $("#riderModalTitle").val("Edit Rider");
+
+    }
+});
+
 /* deletes a rider and also the rider row in which the button was located */
 function deleteRider(event) {
     event.preventDefault();
@@ -14,6 +29,8 @@ function deleteRider(event) {
     });
 };
 
+
+
 /* the data will be the row html of the new rider row */
 function addRider(data) {
     var riderTable = $("#riderTable")
@@ -25,18 +42,10 @@ function addRider(data) {
 
 /* the data will be the combined rider row html with the location of the row within the table  */
 function editRider(data) {
-    var riderTable = $("#riderTable");
-    var button
-    riderTable.find("tr:eq() ")
-    $("#addRiderModal").modal('hide');
+    riderPk = data.find("tr").attr('id');
+    $("#row-" + riderPk).replaceWith(data);
+    $("#updateRiderModal").modal('hide');
 };
-
-/* when the edit button is pressed, change the form URL to the URL of the edit button */
-function change_url(event) {
-    event.preventDefault();
-    $("#editRiderForm").attr('action') = $(this).attr('href');
-};
-
 
 /* register the search box to filter through the riders */
 $(document).ready(function () {
@@ -53,11 +62,11 @@ $(document).ready(function () {
 function handle_form_ajax(form, successHandler) {
     $.ajax({
         type: "post",
-        url: $(this).attr('href'),
+        url: $(this).attr('action'),
         data: form.serialize(),
         success: successHandler,
-        error: function (xhr, errmsg, error) {
-            form.find("#errorBody").html(jQuery.parseJSON(xhr.responseText));
+        error: function (response, status, xhr) {
+            form.find("#errorBody").html(jQuery.parseJSON(xhr.statusText));
 
         }
     });
@@ -66,15 +75,20 @@ function handle_form_ajax(form, successHandler) {
 /* register the delete button to delete a rider */
 $(".delete-rider").on('click', deleteRider);
 
-/* register the edit buttons to edit the rider */
-$(".edit-rider").on('click', change_url);
-
-$("#add-form").on('click', function (event) {
+$("#updateRiderForm").on('submit', function (event) {
     event.preventDefault();
-    handle_form_ajax($(this), addRider);
-});
+    updateForm = $(this);
+    $.ajax({
+        type: updateForm.attr('method'),
+        url: updateForm.attr('action'),
+        data: updateForm.serialize(),
+        success: function (response) {
 
-$("#edit-form").on('click', function (event) {
-    event.preventDefault();
-    handle_form_ajax($(this), editRider);
+        },
+        error: function (response, status, xhr) {
+            form.find("#errorBody").html(jQuery.parseJSON(xhr.statusText));
+
+        }
+    });
+
 });
