@@ -1,4 +1,7 @@
-<!-- Add Rider Modal Dialog -->
+{% load crispy_forms_tags %}
+
+{% comment %} Responsible for presenting a popup form in which you can either add or edit a rider and then save the info
+{% endcomment %}
 <div class="modal fade" id="updateRiderModal" tabindex="-1" role="dialog" aria-labelledby="riderModalTitle"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -10,18 +13,8 @@
         </button>
       </div>
 
-      <form id="updateRiderForm" class="form" method="post">
-        {% csrf_token %}
-        <div class="modal-body">
-
-          {{ update_rider_form | crispy}}
-          <div class="container" id="errorBody"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-success" id="updateRiderButton"></button>
-        </div>
-      </form>
+      {% comment %} form wrapper {% endcomment %}
+      {% include 'rider_form.html' %}
 
     </div>
   </div>

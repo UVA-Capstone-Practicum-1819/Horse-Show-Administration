@@ -1347,23 +1347,10 @@ def generate_labels(request, show_date):  # pragma: no cover
 def view_riders(request):
     update_rider_form = RiderForm()
 
-    context = {'riders': Rider.objects.all(), 'update_rider_form': update_rider_form}
+    context = {'riders': Rider.objects.all(
+    ), 'rider_form': update_rider_form}
 
     return render(request, 'view_riders.html', context)
-
-
-def add_rider(request):
-    if request.method == "POST":
-        add_rider_form = RiderForm(request.POST)
-
-        if add_rider_form.is_valid():
-            added_rider = add_rider_form.save()
-
-            return render(request, "rider_row.html", {'rider': added_rider})
-        else:
-            data = {"responseText": add_rider_form.errors['__all__']}
-            data = add_rider_form.errors['__all__']
-            return HttpResponse(json.dumps(data), status=400)
 
 
 def delete_rider(request, rider_pk):
@@ -1373,12 +1360,26 @@ def delete_rider(request, rider_pk):
 
 
 def update_rider(request, rider_pk=None):
-    updated_rider = Rider.objects.get_or_create(pk=rider_pk)
-    update_rider_form = RiderForm(request.POST or None, initial=updated_rider)
-    if request.method == "POST" and update_rider_form.is_valid():
-        update_rider_form.save()
-        return render(request, "rider_row.html", {'rider': updated_rider})
+    if request.method == "POST":
+
+        if rider_pk is None:
+            update_rider_form = RiderForm(request.POST)
+        else:
+            updated_rider = Rider.objects.get(pk=rider_pk)
+            update_rider_form = RiderForm(request.POST, initial=updated_rider)
+
+        if update_rider_form.is_valid():
+            updated_rider = update_rider_form.save()
+            return render(request, "rider_row.html", {'rider': updated_rider})
+        else:
+            data = {"responseText": update_rider_form.errors['__all__']}
+            data = update_rider_form.errors['__all__']
+            return HttpResponse(json.dumps(data), status=400)
+
+def get_rider_form(request, rider_pk=None):
+    if rider_pk is None:
+        rider_form = RiderForm()
     else:
-        data = {"responseText": update_rider_form.errors['__all__']}
-        data = update_rider_form.errors['__all__']
-        return HttpResponse(json.dumps(data), status=400)
+        rider = Rider.objects.get(pk=rider_pk)
+        rider_form = RiderForm(initial=rider)
+    return render(request, "rider_form.html", {"rider_form" : rider_form})
