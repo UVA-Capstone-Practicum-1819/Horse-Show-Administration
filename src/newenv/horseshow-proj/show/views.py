@@ -1295,7 +1295,9 @@ def generate_labels(request, show_date):  # pragma: no cover
         return render(request, 'labels.html', {'date': str(show_date)})
 
 
+
 def view_riders(request):
+    """ Renders the rider page, where one can see a table of all the riders and be able to filter through them by their information. You are also able to add, edit, or delete riders as desired. """
     update_rider_form = RiderForm()
 
     context = {'riders': Rider.objects.all(
@@ -1305,12 +1307,14 @@ def view_riders(request):
 
 
 def delete_rider(request, rider_pk):
+    """ Deletes a rider from the database """
     deleted_rider = Rider.objects.get(pk=rider_pk)
     deleted_rider.delete()
     return HttpResponse("Deleted rider", status=200)
 
 
 def update_rider(request, rider_pk=None):
+    """ Updates a rider (adds if doesn't exist or edits it if it does) """
     if request.method == "POST":
         if rider_pk is None:
             update_rider_form = RiderForm(request.POST)
@@ -1327,6 +1331,7 @@ def update_rider(request, rider_pk=None):
 
 
 def get_rider_form(request, rider_pk=None):
+    """ Gets a normal form or a prepopulated form if given the rider pk """
     if rider_pk is None:
         rider_form = RiderForm()
     else:
