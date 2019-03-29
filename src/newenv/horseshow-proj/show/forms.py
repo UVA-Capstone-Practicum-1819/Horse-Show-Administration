@@ -214,24 +214,6 @@ class HorseRiderEditForm(forms.ModelForm):
         fields = ('contact', 'email', 'cell')
 
 
-class RiderEditForm(forms.ModelForm):
-    """ for updating a rider """
-
-    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
-
-    birth_date = forms.DateField(
-        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range))
-
-    state = USStateField(widget=USStateSelect())
-
-    zip_code = USZipCodeField(required=False)
-
-    class Meta:
-        model = Rider
-        fields = ('first_name', 'last_name', 'address', 'city', 'state', 'zip_code',
-                  'birth_date', 'member_VHSA', 'member_4H', 'county')
-
-
 class HorseEditForm(forms.ModelForm):
     """ for editing a horse """
 

@@ -1316,17 +1316,19 @@ def delete_rider(request, rider_pk):
 def update_rider(request, rider_pk=None):
     """ Updates a rider (adds if doesn't exist or edits it if it does) """
     if request.method == "POST":
+        # determine if the rider is specified or not
         if rider_pk is None:
             update_rider_form = RiderForm(request.POST)
         else:
             updated_rider = Rider.objects.get(pk=rider_pk)
             update_rider_form = RiderForm(request.POST, instance=updated_rider)
 
+
         if update_rider_form.is_valid():
             updated_rider = update_rider_form.save()
             return render(request, "rider_row.html", {'rider': updated_rider})
         else:
-
+            # if the form is invalid, render the HTML errors
             return render(request, "form_errors.html", {'form': update_rider_form}, status=400)
 
 

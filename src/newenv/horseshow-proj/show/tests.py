@@ -201,7 +201,7 @@ class ViewsTestCases(TestCase):
         request = HttpRequest()
         response = self.client.post(
             '/show/add', {'name': 'test', 'date': '2018-12-10', 'location': 'here', 'day_of_price': 10, 'pre_reg_price': 5})
-        self.assertRedirects(response, '/show/2018-12-10/')
+        self.assertRedirects(response, '/show/2018-12-10/view')
 
     def test_view_show(self):
         self.client.login(username='john', password='johnpassword')
@@ -462,39 +462,38 @@ class CheckRider(TestCase):
         self.rider1.show = self.show
         self.rider2.show = self.show
 
-    def test_select_rider_get_ok(self):
+    def test_view_riders_get(self):
+        response = self.client.get(reverse('view_riders'))
+    
+    def test_delete_rider_get(self):
         response = self.client.get(
-            reverse('select_rider', kwargs={"show_date": self.show.date}))
+            reverse('delete_rider', kwargs={"rider_pk": self.rider1.pk}))
 
-
-    def test_select_rider_post_ok(self):
-        response = self.client.post(reverse('select_rider', kwargs={"show_date": self.show.date}), data={'rider' : self.rider1.pk})
-        
-
-    def test_select_rider2_get_ok(self):
-        response = self.client.get(
-            reverse('select_rider2', kwargs={"show_date": self.show.date}))
-        
-
-    def test_select_rider2_post_ok(self):
-        response = self.client.post(reverse('select_rider2', kwargs={"show_date": self.show.date}), data={'rider' : self.rider1.pk})
-
-    def test_edit_rider_get_ok(self):
-        response = self.client.get(
-            reverse('edit_rider', kwargs={"show_date": self.show.date, "rider_pk": self.rider1.pk}))
-
-    def test_edit_rider_post_ok(self):
+    def test_update_rider_add_post(self):
         
         response = self.client.post(
-            reverse('edit_rider', kwargs={"show_date": self.show.date, "rider_pk": self.rider1.pk}), data={'name': "some new name", 'address': "some new address", 'city': "some city", 'state': "VA", 'zip_code': 22903,
+            reverse('add_rider'), data={'name': "some new name", 'address': "some new address", 'city': "some city", 'state': "VA", 'zip_code': 22903,
              'birth_date': self.rider2.birth_date, 'member_VHSA': False, 'county': "some county"})
 
-    def test_add_rider_get_ok(self):
-        response = self.client.get(reverse('add_rider', kwargs={"show_date": self.show.date}))
+    def test_update_rider_edit_post(self):
+        
+        response = self.client.post(
+            reverse('edit_rider', kwargs={"rider_pk": self.rider1.pk}), data={'name': "some new name", 'address': "some new address", 'city': "some city", 'state': "VA", 'zip_code': 22903,
+             'birth_date': self.rider2.birth_date, 'member_VHSA': False, 'county': "some county"})             
 
-    def test_add_rider_post_ok(self):
-        response = self.client.post(reverse('add_rider', kwargs={"show_date" : self.show.date}), data={'first_name': self.rider1.first_name, 'last_name':self.rider1.last_name, 'address': self.rider1.address, 'city': self.rider1.city, 'state': self.rider1.state, 'zip_code': self.rider1.zip_code, 'email': "thisisarandomemail@gmail.com",
-                  'adult': True, 'birth_date': self.rider1.birth_date, 'member_VHSA': self.rider1.member_VHSA, 'county': self.rider1.county})
+    def test_update_rider_valid(self):
+        
+        response = self.client.post(
+            reverse('add_rider'), data={'first_name': "firstname", "last_name": "LastName", 'address': "some new address", 'city': "some city", 'state': "VA", 'zip_code': 22903, 'email': "someemail@virignia.edu",
+             'birth_date': self.rider2.birth_date, 'member_VHSA': False, 'county': "some county"})
+
+    def test_get_rider_form_add_get(self):
+        response = self.client.get(reverse('get_rider_form'))
+    
+    def test_get_rider_form_edit_get(self):
+        response = self.client.get(reverse('get_rider_form_edit', kwargs={"rider_pk": self.rider1.pk}))
+
+    
 
 class CheckHorse(TestCase):
     def setUp(self):
@@ -597,7 +596,7 @@ class ShowViewTestCases(TestCase):
         self.client.login(username='john', password='johnpassword')
         request = HttpRequest()
         response = self.client.post('/show/add', {'name':'test', 'date':'2018-12-10', 'location':'here', 'day_of_price':10, 'pre_reg_price':5})
-        self.assertRedirects(response, '/show/2018-12-10/')
+        self.assertRedirects(response, '/show/2018-12-10/view')
 
     def test_view_show(self):
         self.client.login(username='john', password='johnpassword')
@@ -609,7 +608,7 @@ class ShowViewTestCases(TestCase):
         self.client.login(username='john', password='johnpassword')
         show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
         request = HttpRequest()
-        response = self.client.post('/show/2018-12-10/', {'num':200})
+        response = self.client.post(reverse('view_show', kwargs={'show_date': show.date}), data={'num':200})
         response.content
 
     def test_select_show(self):

@@ -103,7 +103,8 @@ urlpatterns = [
 
     path('all_riders', views.view_riders, name="view_riders"),
 
-    path('get_rider_form/<rider_pk>', views.get_rider_form),
+    path('get_rider_form/<rider_pk>',
+         views.get_rider_form, name="get_rider_form_edit"),
 
     path('get_rider_form', views.get_rider_form, name="get_rider_form"),
 

@@ -16,6 +16,7 @@
       <form class="form" method="post" id="updateRiderForm">
         {% csrf_token %}
 
+        {% comment %} The container for the actual form {% endcomment %}
         <div class="modal-body" id="formContainer">
           {% include 'rider_form.html' %}
         </div>
