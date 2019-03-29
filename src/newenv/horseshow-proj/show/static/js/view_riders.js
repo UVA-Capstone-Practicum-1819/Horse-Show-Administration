@@ -3,21 +3,25 @@ $("#updateRiderModal").on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var op = button.data('op');
     var url = button.data('url');
+
+    var formContainer = $("#formContainer");
+    var updateRiderForm = $("#updateRiderForm");
     var updateRiderButton = $("#updateRiderButton");
-    updateRiderButton.data('url', url);
-    updateRiderButton.data('op', op);
+    var riderModalTitle = $("#riderModalTitle");
     form_url = $("#formURL").data('url');
 
     if (op == "add") {
-        $("#updateRiderButton").html("Add Rider");
-        $("#riderModalTitle").html("Add Rider");
+
+        riderModalTitle.html("Add Rider");
 
         $.ajax({
             type: "get",
             url: form_url,
             success: function (response) {
-                $("#updateRiderForm").replaceWith(response);
-                $("#updateRiderButton").html("Add Rider");
+                formContainer.html(response);
+                updateRiderForm.attr('action', url);
+                updateRiderForm.data('op', op);
+                updateRiderButton.html("Add Rider");
             },
             error: function (response, status, xhr) {
                 console.log(response.responseText);
@@ -26,15 +30,17 @@ $("#updateRiderModal").on('show.bs.modal', function (event) {
         });
 
     } else {
-        $("#riderModalTitle").html("Edit Rider");
-        $("#riderModalTitle").html("Edit Rider");
+        riderModalTitle.html("Edit Rider");
+
         var riderPk = button.data('riderpk');
         $.ajax({
             type: "get",
             url: form_url + "/" + riderPk,
             success: function (response) {
-                $("#updateRiderForm").replaceWith(response);
-                $("#updateRiderButton").html("Edit Rider");
+                formContainer.html(response);
+                updateRiderForm.attr('action', url);
+                updateRiderForm.data('op', op);
+                updateRiderButton.html("Edit Rider");
             },
             error: function (response, status, xhr) {
                 console.log(response.responseText);
@@ -74,7 +80,6 @@ function addRider(response) {
 function editRider(response) {
     var riderRow = $($.parseHTML(response));
     var rowPk = riderRow.attr('id');
-    console.log("rowPk: " + rowPk);
     $("#" + rowPk).replaceWith(response);
 };
 
@@ -91,21 +96,22 @@ $(document).ready(function () {
 
 
 /*  perform the AJAX request to add/edit rider with approp. form info */
-$("#updateRiderButton").on('click', function (event) {
+$("#updateRiderForm").on('submit', function (event) {
     event.preventDefault();
-    updateButton = $(this);
-    updateForm = $("#updateRiderForm");
+    updateForm = $(this);
+
     $.ajax({
-        type: "post",
-        url: updateButton.data('url'),
+        type: updateForm.attr('method'),
+        url: updateForm.attr('action'),
         data: updateForm.serialize(),
         success: function (response) {
             $("#updateRiderModal").modal('hide');
-            updateButton.data('op') == "add" ? addRider(response) : editRider(response);
+            updateForm.data('op') == "add" ? addRider(response) : editRider(response);
 
         },
         error: function (response, status, xhr) {
-            updateForm.find("#errorBody").html(jQuery.parseJSON(response.responseText));
+            console.log(response);
+            $("#formContainer").find("#errorBody").html(response.responseText);
 
         }
     });

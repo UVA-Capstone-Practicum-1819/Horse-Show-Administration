@@ -107,9 +107,9 @@ class Rider(models.Model):
 
     address = models.CharField(
         max_length=200, verbose_name="Street Address", blank=True)
-    city = models.CharField(default="", max_length=200, blank=True)
-    state = USStateField(default="VA")
-    zip_code = USZipCodeField()
+    city = models.CharField(max_length=200, blank=True)
+    state = USStateField(default="VA", blank=True)
+    zip_code = USZipCodeField(blank=True)
     adult = models.BooleanField(
         default=False, verbose_name="Adult")
     birth_date = models.DateField(

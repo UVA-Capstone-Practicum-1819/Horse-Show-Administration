@@ -1,11 +1,5 @@
 {% load crispy_forms_tags %}
 
-<form id="updateRiderForm" class="form" method="post">
-    {% csrf_token %}
-
-    {% comment %} Body of the modal (form) {% endcomment %}
-    <div class="modal-body">
-        {{ rider_form | crispy}}
-        <div class="container" id="errorBody"></div>
-    </div>
-</form>
+{% comment %} The rider form with the associated error body {% endcomment %}
+{{ rider_form | crispy}}
+<div class="container" id="errorBody"></div>

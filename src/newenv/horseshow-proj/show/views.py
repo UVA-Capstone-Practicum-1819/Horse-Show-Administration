@@ -1361,7 +1361,6 @@ def delete_rider(request, rider_pk):
 
 def update_rider(request, rider_pk=None):
     if request.method == "POST":
-
         if rider_pk is None:
             update_rider_form = RiderForm(request.POST)
         else:
@@ -1372,15 +1371,18 @@ def update_rider(request, rider_pk=None):
             updated_rider = update_rider_form.save()
             return render(request, "rider_row.html", {'rider': updated_rider})
         else:
-            data = {"responseText": update_rider_form.errors['__all__']}
-            data = update_rider_form.errors['__all__']
-            return HttpResponse(json.dumps(data), status=400)
+            """ data = {'responseText': update_rider_form.errors}
+            logger.error(update_rider_form.errors)
+            return HttpResponse(json.dumps(data), status=400) """
+
+            return render(request, "form_errors.html", {'form': update_rider_form}, status=400)
+
 
 def get_rider_form(request, rider_pk=None):
     if rider_pk is None:
         rider_form = RiderForm()
     else:
         rider = Rider.objects.get(pk=rider_pk)
-        rider_form = RiderForm(initial=model_to_dict(rider))
-        logger.error("form is filled")
-    return render(request, "rider_form.html", {"rider_form" : rider_form})
+        rider_form = RiderForm(instance=rider)
+        
+    return render(request, "rider_form.html", {"rider_form": rider_form})

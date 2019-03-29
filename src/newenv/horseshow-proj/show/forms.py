@@ -97,11 +97,11 @@ class RiderForm(forms.ModelForm):
         reversed(range(1920, datetime.date.today().year + 1)))
 
     birth_date = forms.DateField(
-        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range))
+        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range), required=False)
 
-    state = USStateField(widget=USStateSelect(), initial="VA")
+    state = USStateField(widget=USStateSelect(), initial="VA", required=False)
 
-    zip_code = USZipCodeField()
+    zip_code = USZipCodeField(required=False)
 
     class Meta:
 
@@ -110,13 +110,12 @@ class RiderForm(forms.ModelForm):
         exclude = ['horses']
 
     def clean(self):
-        cleaned_data = self.cleaned_data
-        first_name = cleaned_data['first_name']
-        last_name = cleaned_data['last_name']
-        email = cleaned_data['email']
-        if Rider.objects.filter(first_name=first_name, last_name=last_name, email=email):
+        cleaned_data = super().clean()
+        if cleaned_data['member_4H'] and not cleaned_data['county']:
             raise ValidationError(
-                "There already is another rider with the same first name, last name, and email.")
+                "You must specify a county if the rider is a member of 4H.")
+        if not (cleaned_data['adult'] or cleaned_data['birth_date']):
+            raise ValidationError("You must specify a birth date for minors.")
 
 
 class RiderSelectForm(forms.ModelForm):
@@ -225,7 +224,7 @@ class RiderEditForm(forms.ModelForm):
 
     state = USStateField(widget=USStateSelect())
 
-    zip_code = USZipCodeField()
+    zip_code = USZipCodeField(required=False)
 
     class Meta:
         model = Rider
