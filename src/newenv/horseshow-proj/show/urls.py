@@ -64,10 +64,12 @@ rider_patterns = [
     path('delete', views.delete_rider, name="delete_rider"),
 
     path('edit', views.update_rider, name="edit_rider"),
+
+
 ]
 
 show_patterns = [
-    path('', views.view_show, name='view_show'),
+    path('view', views.view_show, name='view_show'),
 
     path('division/add', views.add_division, name="add_division"),
 
@@ -96,12 +98,14 @@ urlpatterns = [
 
 
 
-    path('', views.select_show, name="select_show"),
+    path('select', views.select_show, name="select_show"),
 
 
     path('all_riders', views.view_riders, name="view_riders"),
 
+    path('get_rider_form/<rider_pk>', views.get_rider_form),
 
+    path('get_rider_form', views.get_rider_form, name="get_rider_form"),
 
     path('rider/<int:rider_pk>/', include(rider_patterns)),
 

@@ -83,10 +83,11 @@
   </div>
 
   {% include 'rider_modal.html' %}
+
+  <input class="btn btn-primary" type="hidden" id="formURL" data-url="{% url 'get_rider_form'  %}" />
 </body>
 
-{% comment %} pass Django variable "riders" to the javascript file {% endcomment %}
-<script>
+{% comment %} pass Django variable " riders" to the javascript file {% endcomment %} <script>
   riders = "{{ riders | js | escapejs}}";
   riders = jQuery.parseJSON(riders);
 </script>

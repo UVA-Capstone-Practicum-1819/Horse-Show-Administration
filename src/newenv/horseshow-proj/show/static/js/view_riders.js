@@ -3,17 +3,44 @@ $("#updateRiderModal").on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var op = button.data('op');
     var url = button.data('url');
-    var updateForm = $("#updateRiderForm");
-    updateForm.attr('action', url);
-    updateForm.data('op', op);
+    var updateRiderButton = $("#updateRiderButton");
+    updateRiderButton.data('url', url);
+    updateRiderButton.data('op', op);
+    form_url = $("#formURL").data('url');
+
     if (op == "add") {
         $("#updateRiderButton").html("Add Rider");
         $("#riderModalTitle").html("Add Rider");
 
-    } else {
-        $("#updateRiderButton").html("Edit Rider");
-        $("#riderModalTitle").html("Edit Rider");
+        $.ajax({
+            type: "get",
+            url: form_url,
+            success: function (response) {
+                $("#updateRiderForm").replaceWith(response);
+                $("#updateRiderButton").html("Add Rider");
+            },
+            error: function (response, status, xhr) {
+                console.log(response.responseText);
+            }
 
+        });
+
+    } else {
+        $("#riderModalTitle").html("Edit Rider");
+        $("#riderModalTitle").html("Edit Rider");
+        var riderPk = button.data('riderpk');
+        $.ajax({
+            type: "get",
+            url: form_url + "/" + riderPk,
+            success: function (response) {
+                $("#updateRiderForm").replaceWith(response);
+                $("#updateRiderButton").html("Edit Rider");
+            },
+            error: function (response, status, xhr) {
+                console.log(response.responseText);
+            }
+
+        });
     }
 
 });
@@ -35,29 +62,20 @@ function deleteRider(event) {
 };
 
 /* register the delete button on every delete button in the rider table to delete a rider */
-$("#riderTable").on('click', '#deleteRider', deleteRider);
+$("#riderTable").on('click', '.deleteRider', deleteRider);
 
 /* the data will be the row html of the new rider row */
 function addRider(response) {
     var riderTable = $("#riderTable");
     riderTable.append(response);
-    $.ajax({
-        type: "get",
-        url: "{% url 'get_rider_form' %}",
-        success: function (response) {
-
-        },
-        error: function (response, status, xhr) {
-            console.log(response.responseText)
-        }
-
-    })
 };
 
 /* the data will be the combined rider row html with the location of the row within the table  */
 function editRider(response) {
-    riderPk = response.find("tr").attr('id');
-    $("#row-" + riderPk).replaceWith(data);
+    var riderRow = $($.parseHTML(response));
+    var rowPk = riderRow.attr('id');
+    console.log("rowPk: " + rowPk);
+    $("#" + rowPk).replaceWith(response);
 };
 
 /* register the search box to filter through the riders */
@@ -72,17 +90,18 @@ $(document).ready(function () {
 
 
 
-/* perform the AJAX request to add/edit rider with approp. form info */
-$("#updateRiderForm").on('submit', function (event) {
+/*  perform the AJAX request to add/edit rider with approp. form info */
+$("#updateRiderButton").on('click', function (event) {
     event.preventDefault();
-    updateForm = $(this);
+    updateButton = $(this);
+    updateForm = $("#updateRiderForm");
     $.ajax({
-        type: updateForm.attr('method'),
-        url: updateForm.attr('action'),
+        type: "post",
+        url: updateButton.data('url'),
         data: updateForm.serialize(),
         success: function (response) {
             $("#updateRiderModal").modal('hide');
-            updateForm.data('op') == "add" ? addRider(response) : editRider(response);
+            updateButton.data('op') == "add" ? addRider(response) : editRider(response);
 
         },
         error: function (response, status, xhr) {

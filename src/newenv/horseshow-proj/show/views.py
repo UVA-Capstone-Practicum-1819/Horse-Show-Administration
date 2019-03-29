@@ -1366,7 +1366,7 @@ def update_rider(request, rider_pk=None):
             update_rider_form = RiderForm(request.POST)
         else:
             updated_rider = Rider.objects.get(pk=rider_pk)
-            update_rider_form = RiderForm(request.POST, initial=updated_rider)
+            update_rider_form = RiderForm(request.POST, instance=updated_rider)
 
         if update_rider_form.is_valid():
             updated_rider = update_rider_form.save()
@@ -1381,5 +1381,6 @@ def get_rider_form(request, rider_pk=None):
         rider_form = RiderForm()
     else:
         rider = Rider.objects.get(pk=rider_pk)
-        rider_form = RiderForm(initial=rider)
+        rider_form = RiderForm(initial=model_to_dict(rider))
+        logger.error("form is filled")
     return render(request, "rider_form.html", {"rider_form" : rider_form})

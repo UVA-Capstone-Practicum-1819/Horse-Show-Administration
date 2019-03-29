@@ -2,7 +2,8 @@
   <td>
     {% comment %} button for editing the rider, brings up a modal window with the edit form {% endcomment %}
     <a class="btn btn-sm btn-warning editRider" data-toggle="modal" data-target="#updateRiderModal" data-op="edit"
-      data-url="{% url 'edit_rider' rider_pk=rider.pk %}"><i style="font-size:12px" class="fa">&#xf044;</i></a>
+      data-riderpk="{{rider.pk}}" , data-url="{% url 'edit_rider' rider_pk=rider.pk %}"><i style="font-size:12px"
+        class="fa">&#xf044;</i></a>
 
     {% comment %} button for deleting the rider {% endcomment %}
     <a href="{% url 'delete_rider' rider_pk=rider.pk %}" class="btn btn-sm btn-danger deleteRider">X</a>
