@@ -581,55 +581,6 @@ def select_division(request, show_date):  # pragma: no cover
     return render(request, 'select_division.html', {'form': form, 'date': show_date})
 
 
-def select_rider(request, show_date):
-    """ selects a rider from a dropdown and stores its primary key into a session """
-    if request.method == "POST":
-        request.session['rider_pk'] = request.POST['rider']
-        return redirect('select_horse', show_date=show_date)
-    form = RiderSelectForm()
-    return render(request, 'select_rider.html', {'form': form, 'date': show_date})
-
-
-def select_rider2(request, show_date):
-    """ select rider function exclusively for editing a rider """
-    if request.method == "POST":
-        rider_pk = request.POST['rider']
-        return redirect('edit_rider', rider_pk=rider_pk, show_date=show_date)
-    form = RiderSelectForm()
-    return render(request, 'select_rider2.html', {'form': form, 'date': show_date})
-
-
-def edit_rider(request, rider_pk):
-    pass
-
-
-""" def edit_rider(request, show_date, rider_pk):
-    # allows user to change the given fields in rider and save changes
-
-    rider = Rider.objects.get(pk=rider_pk)
-    if request.method == "POST":
-        edit_form = RiderEditForm(request.POST)
-        if edit_form.is_valid():
-            rider.first_name = edit_form.cleaned_data['first_name']
-            rider.last_name = edit_form.cleaned_data['last_name']
-            rider.address = edit_form.cleaned_data['address']
-            rider.city = edit_form.cleaned_data['city']
-            rider.state = edit_form.cleaned_data['state']
-            rider.zip_code = edit_form.cleaned_data['zip_code']
-            rider.birth_date = edit_form.cleaned_data['birth_date']
-            rider.member_VHSA = edit_form.cleaned_data['member_VHSA']
-            rider.member_4H = edit_form.cleaned_data['member_4H']
-            rider.county = edit_form.cleaned_data['county']
-            rider.save()
-    else:
-        edit_form = RiderEditForm(
-            {'first_name': rider.first_name, 'last_name': rider.last_name, 'address': rider.address, 'city': rider.city, 'state': rider.state, 'zip_code': rider.zip_code,
-             'birth_date': rider.birth_date, 'member_VHSA': rider.member_VHSA, 'member_4H': rider.member_4H, 'county': rider.county},
-            instance=rider)
-    return render(request, 'edit_rider.html', {'rider': rider, 'edit_rider_form': edit_form, 'date': show_date})
- """
-
-
 def select_horse2(request, show_date):
     """ select horse function exclusively for editing a horse """
     if request.method == "POST":
@@ -1371,9 +1322,6 @@ def update_rider(request, rider_pk=None):
             updated_rider = update_rider_form.save()
             return render(request, "rider_row.html", {'rider': updated_rider})
         else:
-            """ data = {'responseText': update_rider_form.errors}
-            logger.error(update_rider_form.errors)
-            return HttpResponse(json.dumps(data), status=400) """
 
             return render(request, "form_errors.html", {'form': update_rider_form}, status=400)
 
@@ -1384,5 +1332,5 @@ def get_rider_form(request, rider_pk=None):
     else:
         rider = Rider.objects.get(pk=rider_pk)
         rider_form = RiderForm(instance=rider)
-        
+
     return render(request, "rider_form.html", {"rider_form": rider_form})
