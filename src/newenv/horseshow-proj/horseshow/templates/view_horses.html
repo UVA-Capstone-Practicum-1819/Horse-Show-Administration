@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load js %}
+{% load crispy_forms_tags %}
+{% block content %}
+<h2> Horses </h2>
+
+<body>
+    <div class="container">
+
+        {% comment %} search filter for each horse {% endcomment %}
+        <p> <input class="form-control" id="search" type="text" placeholder="Search">
+            <p>
+
+                {% comment %} for adding a new horse, triggers modal popup {% endcomment %}
+                <p><a class="btn btn-success" data-toggle="modal" data-target="#updateHorseModal" data-op="add"
+                        data-url="{% url 'add_horse' %}">
+                        + Add New Horse</a></p>
+
+
+                {% comment %} table to hold all the horse records {% endcomment %}
+                <table class="table table-hover table-striped table-bordered">
+                    <thead class="bg-primary">
+                        <th>
+
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Accession Num
+                        </th>
+                        <th>
+                            Coggins Date
+                        </th>
+                        <th>
+                            Owner
+                        </th>
+                        <th>
+                            Type
+                        </th>
+                        <th>
+                            Size
+                        </th>
+
+
+                    </thead>
+
+                    {% comment %} the main body of the table, containing each row and column {% endcomment %}
+                    <tbody id="horseTable">
+                        {% for horse in horses %}
+                        {% include 'horse_row.html' %}
+
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+                {% comment %} show a message if there are no horses {% endcomment %}
+                {% if not horses %}
+                <div class="alert alert-warning">
+                    No horses currently exist. Feel free to add some.
+                </div>
+                {% endif %}
+
+    </div>
+
+    {% include 'horse_modal.html' %}
+
+    <input class="btn btn-primary" type="hidden" id="formURL" data-url="{% url 'get_horse_form'  %}" />
+</body>
+
+{% comment %} pass Django variable " horses" to the javascript file {% endcomment %} <script>
+    horses = "{{ horses | js | escapejs}}";
+    horses = jQuery.parseJSON(horses);
+</script>
+
+{% comment %} bring in javascript file for performing extra dynamic functionality {% endcomment %}
+<script src="{% static 'js/view_horses.js' %}" type="text/javascript">
+</script>
+
+{% endblock %}

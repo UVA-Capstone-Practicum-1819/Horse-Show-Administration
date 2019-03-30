@@ -97,7 +97,7 @@ class RiderForm(forms.ModelForm):
         reversed(range(1920, datetime.date.today().year + 1)))
 
     birth_date = forms.DateField(
-        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range), required=False)
+        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range), )
 
     state = USStateField(widget=USStateSelect(), initial="VA", required=False)
 
@@ -148,8 +148,14 @@ class HorseForm(forms.ModelForm):
 
     class Meta:
         model = Horse
-        fields = ('name', 'coggins_date', 'accession_num',
-                  'owner', 'type', 'size', )
+        fields = ('__all__')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        horse_type = cleaned_data['type']
+        size = cleaned_data['size']
+        if horse_type == "pony" and size == "NA":
+            raise ValidationError("A pony must have its size specified.")
 
 
 class ComboSelectForm(forms.ModelForm):
@@ -212,20 +218,6 @@ class HorseRiderEditForm(forms.ModelForm):
     class Meta:
         model = HorseRiderCombo
         fields = ('contact', 'email', 'cell')
-
-
-class HorseEditForm(forms.ModelForm):
-    """ for editing a horse """
-
-    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
-
-    coggins_date = forms.DateField(
-        widget=forms.SelectDateWidget(years=year_range))
-
-    class Meta:
-        model = Horse
-        fields = ('accession_num', 'coggins_date',
-                  'owner', 'type', 'size')
 
 
 class ShowSelectForm(forms.ModelForm):

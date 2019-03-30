@@ -514,38 +514,44 @@ class CheckHorse(TestCase):
         self.horse2.show = self.show
         
 
-    def test_select_horse_get_ok(self):
+    
+    def test_view_horses_get(self):
+        response = self.client.get(reverse('view_horses'))
+    
+    def test_delete_horse_get(self):
         response = self.client.get(
-            reverse('select_horse', kwargs={"show_date": self.show.date}))
+            reverse('delete_horse', kwargs={"horse_pk": self.horse1.pk}))
 
-
-    def test_select_horse_post_ok(self):
-        response = self.client.post(reverse('select_horse', kwargs={"show_date": self.show.date}), data={'horse' : self.horse1.pk})
+    def test_update_horse_add_post(self):
         
-
-    def test_select_horse2_get_ok(self):
-        response = self.client.get(
-            reverse('select_horse2', kwargs={"show_date": self.show.date}))
-        
-
-    def test_select_horse2_post_ok(self):
-        response = self.client.post(reverse('select_horse2', kwargs={"show_date": self.show.date}), data={'horse' : self.horse1.pk})
-
-    def test_edit_horse_get_ok(self):
-        response = self.client.get(
-            reverse('edit_horse', kwargs={"show_date": self.show.date, "horse_pk": self.horse1.pk}))
-
-    def test_edit_horse_post_ok(self):
         response = self.client.post(
-            reverse('edit_horse', kwargs={"show_date": self.show.date, "horse_pk": self.horse1.pk}), data={'accession_num': self.horse2.accession_num, 'coggins_date': self.horse2.coggins_date,
-                  'owner': self.horse2.owner, 'type': self.horse2.type, 'size': self.horse2.size})
+            reverse('add_horse'), data={'name': "Some Horse Name", 'accession_num': "3DBA", 'coggins_date': self.horse2.coggins_date, 'owner': "Grumpsy", 'type': "pony",
+             'size': "small",})
 
-    def test_add_horse_get_ok(self):
-        response = self.client.get(reverse('add_horse', kwargs={"show_date": self.show.date}))
+    def test_update_horse_edit_post(self):
+        
+        response = self.client.post(
+            reverse('edit_horse', kwargs={"horse_pk": self.horse1.pk}), data={'name': "Some Horse Name", 'accession_num': "3DBA", 'coggins_date': self.horse2.coggins_date, 'owner': "Grumpsy", 'type': "pony",
+             'size': "small",})             
 
-    def test_add_horse_post_ok(self):
-        response = self.client.post(reverse('add_horse', kwargs={"show_date" : self.show.date}), data={'name': "somename", 'accession_num': self.horse1.accession_num, 'coggins_date': self.horse1.coggins_date,
-                  'owner': self.horse1.owner, 'type': self.horse1.type, 'size': self.horse1.size})
+    def test_update_rider_valid(self):
+        
+        response = self.client.post(
+            reverse('add_horse'), data={'name': "Some Horse Name", 'accession_num': "3DBA", 'coggins_date': self.horse2.coggins_date, 'owner': "Grumpsy", 'type': "pony",
+             'size': "small",})
+
+    def test_update_rider_invalid(self):
+        
+        response = self.client.post(
+            reverse('add_horse'), data={'name': "Some Horse Name", 'accession_num': "3DBA", 'coggins_date': self.horse2.coggins_date, 'owner': "Grumpsy", 'type': "pony",
+             'size': "NA",})
+
+    def test_get_horse_form_add_get(self):
+        response = self.client.get(reverse('get_horse_form'))
+    
+    def test_get_horse_form_edit_get(self):
+        response = self.client.get(reverse('get_horse_form_edit', kwargs={"horse_pk": self.horse1.pk}))
+
 
 class Labels(TestCase):
     def generate_labels_test(self):

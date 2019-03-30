@@ -59,11 +59,21 @@ division_patterns = [
 ]
 
 rider_patterns = [
-    # path('edit', views.edit_rider, name="edit_rider"),
+
 
     path('delete', views.delete_rider, name="delete_rider"),
 
     path('edit', views.update_rider, name="edit_rider"),
+
+
+]
+
+horse_patterns = [
+
+
+    path('delete', views.delete_horse, name="delete_horse"),
+
+    path('edit', views.update_horse, name="edit_horse"),
 
 
 ]
@@ -83,14 +93,6 @@ show_patterns = [
 
     path('combo/<combo_num>/', include(combo_patterns)),
 
-    path('horse/add', views.add_horse, name="add_horse"),
-
-    path('horse/select', views.select_horse, name="select_horse"),
-
-    path('horse/select2', views.select_horse2, name="select_horse2"),
-
-    path('horse/<horse_pk>/edit', views.edit_horse, name="edit_horse"),
-
     path('populate-pdf', views.populate_pdf, name="populate_pdf"),
 ]
 
@@ -103,12 +105,21 @@ urlpatterns = [
 
     path('all_riders', views.view_riders, name="view_riders"),
 
+    path('all_horses', views.view_horses, name="view_horses"),
+
     path('get_rider_form/<rider_pk>',
          views.get_rider_form, name="get_rider_form_edit"),
 
+    path('get_horse_form/<horse_pk>',
+         views.get_horse_form, name="get_horse_form_edit"),
+
     path('get_rider_form', views.get_rider_form, name="get_rider_form"),
 
+    path('get_horse_form', views.get_horse_form, name="get_horse_form"),
+
     path('rider/<int:rider_pk>/', include(rider_patterns)),
+
+    path('horse/<int:horse_pk>/', include(horse_patterns)),
 
     path('show-autocomplete', views.ShowAutocomplete.as_view(),
          name="show_autocomplete"),
@@ -123,10 +134,13 @@ urlpatterns = [
 
     path('division-autocomplete', views.DivisionAutocomplete.as_view(),
          name="division_autocomplete"),
+
     path('class-autocomplete', views.ClassAutocomplete.as_view(),
          name="classes_autocomplete"),
 
     path('add-rider', views.update_rider, name="add_rider"),
+
+    path('add-horse', views.update_horse, name="add_horse"),
 
     path('add', views.add_show, name='add_show'),
 

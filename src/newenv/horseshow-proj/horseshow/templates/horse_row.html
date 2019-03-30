@@ -1,0 +1,19 @@
+<tr id="row-{{horse.pk}}">
+    <td>
+        {% comment %} button for editing the horse, brings up a modal window with the edit form {% endcomment %}
+        <a class="btn btn-sm btn-warning editHorse" data-toggle="modal" data-target="#updateHorseModal" data-op="edit"
+            data-horsepk="{{horse.pk}}" , data-url="{% url 'edit_horse' horse_pk=horse.pk %}">Edit</a>
+
+        {% comment %} button for deleting the horse {% endcomment %}
+        <a href="{% url 'delete_horse' horse_pk=horse.pk %}" class="btn btn-sm btn-danger deleteHorse">X</a>
+    </td>
+
+    {% comment %} all the cells containing the horse information {% endcomment %}
+    <td> {{horse.name}} </td>
+    <td> {{horse.accession_num}} </td>
+    <td> {{horse.coggins_date}} </td>
+    <td> {{horse.owner}} </td>
+    <td> {{horse.type}} </td>
+    <td> {{horse.size}} </td>
+
+</tr>

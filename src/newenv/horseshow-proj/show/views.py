@@ -581,57 +581,6 @@ def select_division(request, show_date):  # pragma: no cover
     return render(request, 'select_division.html', {'form': form, 'date': show_date})
 
 
-def select_horse2(request, show_date):
-    """ select horse function exclusively for editing a horse """
-    if request.method == "POST":
-        horse_pk = request.POST['horse']
-        return redirect('edit_horse', horse_pk=horse_pk, show_date=show_date)
-    form = HorseSelectForm()
-    return render(request, 'select_horse2.html', {'form': form, 'date': show_date})
-
-
-def edit_horse(request, horse_pk, show_date):
-    """ allows user to change the given fields in rider and save changes """
-    horse = Horse.objects.get(pk=horse_pk)
-    if request.method == "POST":
-        edit_form = HorseEditForm(request.POST)
-        if edit_form.is_valid():
-            horse.accession_num = edit_form.cleaned_data['accession_num']
-            horse.coggins_date = edit_form.cleaned_data['coggins_date']
-            horse.owner = edit_form.cleaned_data['owner']
-            horse.type = edit_form.cleaned_data['type']
-            horse.size = edit_form.cleaned_data['size']
-            horse.save()
-
-    edit_horse_form = HorseEditForm(
-        {'accession_num': horse.accession_num, 'coggins_date': horse.coggins_date,
-         'owner': horse.owner, 'type': horse.type, 'size': horse.size},
-        instance=horse)
-    return render(request, 'edit_horse.html', {'horse': horse, 'edit_horse_form': edit_horse_form, 'date': show_date})
-
-
-def add_horse(request, show_date):
-    """ creates a new horse in a form and stores its primary key into a session, then redirects to add_combo """
-    if request.method == "POST":
-        form = HorseForm(request.POST)
-        if form.is_valid():
-            horse = form.save()
-            request.session['horse_pk'] = horse.pk
-            return redirect('add_combo', show_date=show_date)
-    form = HorseForm()
-    return render(request, 'add_horse.html', {'form': form, 'date': show_date})
-
-
-def select_horse(request, show_date):
-    """ selects a horse from a dropdown and stores its primary key into a session """
-    if request.method == 'POST':
-        horse = request.POST['horse']
-        request.session['horse_pk'] = request.POST['horse']
-        return redirect('add_combo', show_date=show_date)
-    form = HorseSelectForm()
-    return render(request, 'select_horse.html', {'form': form, 'date': show_date})
-
-
 def add_combo(request, show_date):
     """
         creates a page for adding a horse-rider combination, taking in the session variables for the primary keys of the chosen horse and rider
@@ -1340,4 +1289,50 @@ def get_rider_form(request, rider_pk=None):
         rider = Rider.objects.get(pk=rider_pk)
         rider_form = RiderForm(instance=rider)
 
-    return render(request, "rider_form.html", {"rider_form": rider_form})
+    return render(request, "simple_form.html", {"form": rider_form})
+
+
+def view_horses(request):
+    """ Renders the horse page, where one can see a table of all the horses and be able to filter through them by their information. You are also able to add, edit, or delete horses as desired. """
+    update_horse_form = HorseForm()
+
+    context = {'horses': Horse.objects.all(), 'horse_form': update_horse_form}
+
+    return render(request, 'view_horses.html', context)
+
+
+def delete_horse(request, horse_pk):
+    """ Deletes a horse from the database """
+    deleted_horse = Horse.objects.get(pk=horse_pk)
+    deleted_horse.delete()
+    return HttpResponse("Deleted horse", status=200)
+
+
+def update_horse(request, horse_pk=None):
+    """ Updates a horse (adds if doesn't exist or edits it if it does) """
+    if request.method == "POST":
+        # determine if the horse is specified or not
+        if horse_pk is None:
+            update_horse_form = HorseForm(request.POST)
+        else:
+            updated_horse = Horse.objects.get(pk=horse_pk)
+            update_horse_form = HorseForm(request.POST, instance=updated_horse)
+
+
+        if update_horse_form.is_valid():
+            updated_horse = update_horse_form.save()
+            return render(request, "horse_row.html", {'horse': updated_horse})
+        else:
+            # if the form is invalid, render the HTML errors
+            return render(request, "form_errors.html", {'form': update_horse_form}, status=400)
+
+
+def get_horse_form(request, horse_pk=None):
+    """ Gets a normal form or a prepopulated form if given the horse pk """
+    if horse_pk is None:
+        horse_form = HorseForm()
+    else:
+        horse = Horse.objects.get(pk=horse_pk)
+        horse_form = HorseForm(instance=horse)
+
+    return render(request, "simple_form.html", {"form": horse_form})

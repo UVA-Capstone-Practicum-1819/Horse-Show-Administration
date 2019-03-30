@@ -1,27 +1,27 @@
 /* when modal pops up, send button information (url, operation (e.g. add, edit) to the modal */
-$("#updateRiderModal").on('show.bs.modal', function (event) {
+$("#updateHorseModal").on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var op = button.data('op');
     var url = button.data('url');
 
     var formContainer = $("#formContainer");
-    var updateRiderForm = $("#updateRiderForm");
-    var updateRiderButton = $("#updateRiderButton");
-    var riderModalTitle = $("#riderModalTitle");
+    var updateHorseForm = $("#updateHorseForm");
+    var updateHorseButton = $("#updateHorseButton");
+    var horseModalTitle = $("#horseModalTitle");
     form_url = $("#formURL").data('url');
 
     if (op == "add") {
 
-        riderModalTitle.html("Add Rider");
+        horseModalTitle.html("Add Horse");
 
         $.ajax({
             type: "get",
             url: form_url,
             success: function (response) {
                 formContainer.html(response);
-                updateRiderForm.attr('action', url);
-                updateRiderForm.data('op', op);
-                updateRiderButton.html("Add Rider");
+                updateHorseForm.attr('action', url);
+                updateHorseForm.data('op', op);
+                updateHorseButton.html("Add Horse");
             },
             error: function (response, status, xhr) {
                 console.log(response.responseText);
@@ -30,17 +30,17 @@ $("#updateRiderModal").on('show.bs.modal', function (event) {
         });
 
     } else {
-        riderModalTitle.html("Edit Rider");
+        horseModalTitle.html("Edit Horse");
 
-        var riderPk = button.data('riderpk');
+        var horsePk = button.data('horsepk');
         $.ajax({
             type: "get",
-            url: form_url + "/" + riderPk,
+            url: form_url + "/" + horsePk,
             success: function (response) {
                 formContainer.html(response);
-                updateRiderForm.attr('action', url);
-                updateRiderForm.data('op', op);
-                updateRiderButton.html("Edit Rider");
+                updateHorseForm.attr('action', url);
+                updateHorseForm.data('op', op);
+                updateHorseButton.html("Edit Horse");
             },
             error: function (response, status, xhr) {
                 console.log(response.responseText);
@@ -51,8 +51,8 @@ $("#updateRiderModal").on('show.bs.modal', function (event) {
 
 });
 
-/* deletes a rider and also the rider row in which the button was located */
-function deleteRider(event) {
+/* deletes a horse and also the horse row in which the button was located */
+function deleteHorse(event) {
     event.preventDefault();
     button = $(this)
     $.ajax({
@@ -67,27 +67,27 @@ function deleteRider(event) {
     });
 };
 
-/* register the delete button on every delete button in the rider table to delete a rider */
-$("#riderTable").on('click', '.deleteRider', deleteRider);
+/* register the delete button on every delete button in the horse table to delete a horse */
+$("#horseTable").on('click', '.deleteHorse', deleteHorse);
 
-/* the data will be the row html of the new rider row */
-function addRider(response) {
-    var riderTable = $("#riderTable");
-    riderTable.append(response);
+/* the data will be the row html of the new horse row */
+function addHorse(response) {
+    var horseTable = $("#horseTable");
+    horseTable.append(response);
 };
 
-/* the data will be the combined rider row html with the location of the row within the table  */
-function editRider(response) {
-    var riderRow = $($.parseHTML(response));
-    var rowPk = riderRow.attr('id');
+/* the data will be the combined horse row html with the location of the row within the table  */
+function editHorse(response) {
+    var horseRow = $($.parseHTML(response));
+    var rowPk = horseRow.attr('id');
     $("#" + rowPk).replaceWith(response);
 };
 
-/* register the search box to filter through the riders */
+/* register the search box to filter through the horses */
 $(document).ready(function () {
     $("#search").on("keyup", function () {
         var value = $(this).val().toLowerCase();
-        $("#riderTable tr").filter(function () {
+        $("#horseTable tr").filter(function () {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
         });
     });
@@ -95,8 +95,8 @@ $(document).ready(function () {
 
 
 
-/*  perform the AJAX request to add/edit rider with approp. form info */
-$("#updateRiderForm").on('submit', function (event) {
+/*  perform the AJAX request to add/edit horse with approp. form info */
+$("#updateHorseForm").on('submit', function (event) {
     event.preventDefault();
     updateForm = $(this);
 
@@ -105,12 +105,12 @@ $("#updateRiderForm").on('submit', function (event) {
         url: updateForm.attr('action'),
         data: updateForm.serialize(),
         success: function (response) {
-            $("#updateRiderModal").modal('hide');
-            updateForm.data('op') == "add" ? addRider(response) : editRider(response);
+            $("#updateHorseModal").modal('hide');
+            updateForm.data('op') == "add" ? addHorse(response) : editHorse(response);
 
         },
         error: function (response, status, xhr) {
-
+            console.log(response);
             $("#formContainer").find("#errorBody").html(response.responseText);
 
         }

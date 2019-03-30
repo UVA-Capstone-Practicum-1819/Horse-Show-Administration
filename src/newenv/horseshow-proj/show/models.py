@@ -73,18 +73,21 @@ class Horse(models.Model):
     """
     Model for a horse, includes possible sizes of the horse and the choice to refer to it as a horse or a Pony coggins date is important for health consideration and the owner is not necessarily the riders
     """
+
+    class Meta:
+        unique_together = ('name', 'owner')
+
     alphanumeric_validator = RegexValidator(
         r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
 
     size_choices = (("NA", "N/A"), ("small", "SM"),
                     ("medium", "MED"), ("large", "LG"), )
     type_choices = (("horse", "Horse"), ("pony", "Pony"), )
-    name = models.CharField(primary_key=True, max_length=200,
-                            verbose_name="Name (Barn Name)")
+    name = models.CharField(max_length=200, verbose_name="Name (Barn Name)")
     accession_num = models.CharField(
         max_length=20, verbose_name="Accession Number", validators=[alphanumeric_validator])
     coggins_date = models.DateField(
-        default=datetime.date.today,  verbose_name="Coggins Date", )
+        default=datetime.date.today,  verbose_name="Coggins Date",)
     owner = models.CharField(max_length=200, verbose_name="Owner")
     type = models.CharField(
         max_length=200, choices=type_choices, default="Horse", verbose_name="Type")
@@ -113,7 +116,7 @@ class Rider(models.Model):
     adult = models.BooleanField(
         default=False, verbose_name="Adult")
     birth_date = models.DateField(
-        blank=True, null=True, verbose_name="Birth Date", )
+        default=datetime.date.today, verbose_name="Birth Date", )
     member_VHSA = models.BooleanField(
         default=False, blank=True, verbose_name="Member of the VHSA")
     member_4H = models.BooleanField(
@@ -143,7 +146,7 @@ class HorseRiderCombo(models.Model):
     rider = models.ForeignKey(
         Rider, on_delete=models.CASCADE, related_name='combos')
     horse = models.ForeignKey(
-        Horse, on_delete=models.CASCADE, verbose_name="Horse", related_name='combos')
+        Horse, on_delete=models.CASCADE,  related_name='combos')
     classes = models.ManyToManyField(
         Class, blank=True, through='ClassParticipation', related_name="combos")
     contact = models.CharField(
