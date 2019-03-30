@@ -25,9 +25,9 @@ class_patterns = [
     path('delete',
          views.delete_class, name="delete_class"),
 
-    path('combo/<combo_num>/', include(combo_patterns)),
+    path('combo/<combo_pk>/', include(combo_patterns)),
 
-    path('combo/<combo_num>/delete', views.delete_combo, name="delete_combo"),
+    path('combo/<combo_pk>/delete', views.delete_combo, name="delete_combo"),
 
 ]
 
@@ -89,9 +89,9 @@ show_patterns = [
 
     path('combo/add', views.add_combo, name="add_combo"),
 
-    path('combo/select', views.select_combo, name="select_combo"),
+    path('all_combos', views.view_combos, name="view_combos"),
 
-    path('combo/<combo_num>/', include(combo_patterns)),
+    path('combo/<combo_pk>/', include(combo_patterns)),
 
     path('populate-pdf', views.populate_pdf, name="populate_pdf"),
 ]
@@ -110,6 +110,9 @@ urlpatterns = [
     path('get_rider_form/<rider_pk>',
          views.get_rider_form, name="get_rider_form_edit"),
 
+    path('get_combo_form/<combo_pk>',
+         views.get_combo_form, name="get_combo_form_edit"),
+
     path('get_horse_form/<horse_pk>',
          views.get_horse_form, name="get_horse_form_edit"),
 
@@ -117,7 +120,13 @@ urlpatterns = [
 
     path('get_horse_form', views.get_horse_form, name="get_horse_form"),
 
+    path('get_combo_form', views.get_combo_form, name="get_combo_form"),
+
+    path('rider/select', views.select_rider, name="select_rider"),
+
     path('rider/<int:rider_pk>/', include(rider_patterns)),
+
+    path('horse/select', views.select_horse, name="select_horse"),
 
     path('horse/<int:horse_pk>/', include(horse_patterns)),
 

@@ -1254,6 +1254,17 @@ def view_riders(request):
 
     return render(request, 'view_riders.html', context)
 
+def select_rider(request):
+    """ For selecting a rider and submitting a JSON response of the rider list """
+    if request.GET.get('q'):
+        q = request.GET['q']
+        riders = Rider.objects.filter(last_name__startswith=q)
+        json = [{ "value": rider.pk, "text" : (rider.last_name + ", " + rider.first_name)} for rider in riders]
+        logger.error(json)
+        return JsonResponse(json, safe=False)
+    else:
+        HttpResponse("No cookies")
+
 
 def delete_rider(request, rider_pk):
     """ Deletes a rider from the database """
@@ -1301,6 +1312,17 @@ def view_horses(request):
     return render(request, 'view_horses.html', context)
 
 
+def select_horse(request):
+    """ For selecting a horse and submitting a JSON response of the horse list """
+    if request.GET.get('q'):
+        q = request.GET['q']
+        horses = Horse.objects.filter(name__startswith=q)
+        json = [ {"value": horse.pk, "text" : horse.name} for horse in horses]
+        return JsonResponse(json, safe=False)
+    else:
+        HttpResponse("No cookies")
+
+
 def delete_horse(request, horse_pk):
     """ Deletes a horse from the database """
     deleted_horse = Horse.objects.get(pk=horse_pk)
@@ -1336,3 +1358,56 @@ def get_horse_form(request, horse_pk=None):
         horse_form = HorseForm(instance=horse)
 
     return render(request, "simple_form.html", {"form": horse_form})
+
+def view_combos(request, show_date):
+    """ Renders the combos page, where one can see a table of all the combos and be able to filter through them by their information. You are also able to add, edit, or delete combos as desired. """
+    combo_form = ComboForm()
+
+    context = {'combos': HorseRiderCombo.objects.filter(show=show_date), 'combo_form': combo_form, 'show_date': show_date}
+
+    return render(request, 'view_combos.html', context)
+
+
+def delete_combo(request, combo_pk):
+    """ Deletes a combo from the database """
+    deleted_combo = HorseRiderCombo.objects.filter(pk=combo_pk)
+    deleted_combo.delete()
+    return HttpResponse("Deleted combo", status=200)
+
+
+def add_combo(request, show_date):
+    """ adds a new combo to the show """
+    if request.method == "POST":
+        logger.error("show date:" + str(show_date))
+        show = Show.objects.get(pk=show_date)
+        add_combo_form = ComboForm(request.POST)
+        if add_combo_form.is_valid():
+            added_combo = add_combo_form.save(commit=False)
+            added_combo.show = show
+            added_combo.save()
+            return render(request, "combo_row.html", {'combo': added_combo})
+        else:
+            return render(request, "form_errors.html", {'form': add_combo_form}, status=400)
+
+def edit_combo(request, combo_pk):
+    """ edits an existing combo """
+    if request.method == "POST":
+        edited_combo = HorseRiderCombo.objects.get(pk=combo_pk)
+        edit_combo_form = ComboForm(request.POST, instance=edited_combo)
+        if edit_combo_form.is_valid():
+            edited_combo = add_combo_form.save()
+            edited_combo.save()
+            return render(request, "combo_row.html", {'combo': edited_combo})
+        else:
+            return render(request, "form_errors.html", {'form': edit_combo_form}, status=400)
+
+
+def get_combo_form(request, combo_pk=None):
+    """ Gets a normal form or a prepopulated form if given the combo pk """
+    if combo_pk is None:
+        combo_form = ComboForm()
+    else:
+        combo = Combo.objects.get(pk=combo_pk)
+        combo_form = ComboForm(instance=combo)
+
+    return render(request, "simple_form.html", {"form": combo_form})

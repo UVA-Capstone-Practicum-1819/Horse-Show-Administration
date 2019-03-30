@@ -3,6 +3,7 @@ from django.utils import timezone
 from show.models import *
 from .models import *
 import datetime
+from django.urls import reverse_lazy
 from django.forms import HiddenInput, formset_factory
 from dal import autocomplete
 from django.core.exceptions import ValidationError
@@ -118,22 +119,6 @@ class RiderForm(forms.ModelForm):
             raise ValidationError("You must specify a birth date for minors.")
 
 
-class RiderSelectForm(forms.ModelForm):
-    """
-    Form for selecting a rider and returning its primary key. Used to select a rider from the database and prepopulate with options
-    """
-
-    rider = forms.ModelChoiceField(
-        queryset=Rider.objects.all(),
-        widget=autocomplete.ModelSelect2(
-            url='rider_autocomplete')
-    )
-
-    class Meta:
-        model = Rider
-        fields = ('rider',)
-
-
 class HorseForm(forms.ModelForm):
     """
     This form allows you to enter information about an individual Horse. The form for a horse, which has a coggins_date, name, accession number, owner, type, and size
@@ -206,6 +191,42 @@ class HorseRiderComboCreateForm(forms.ModelForm):
 
         if not email and not cell:
             print("do something!")
+            raise forms.ValidationError(
+                'Have to include at least 1 contact (email or cell)')
+
+        return cleaned_data
+
+
+class ComboForm(forms.ModelForm):
+    class Meta:
+        model = HorseRiderCombo
+        fields = '__all__'
+        exclude = ('classes', 'show')
+
+    email = forms.EmailField(required=False, label="Email")
+    cell = forms.CharField(max_length=12, required=False,
+                           label="Cell Phone #")
+
+    """ widget=forms.TextInput(
+        attrs={
+
+            'class': 'basicAutoComplete',
+            'data-url': reverse_lazy('select_rider')
+        }
+    ) """
+
+    rider = forms.ModelChoiceField(queryset=Rider.objects.all(
+    ), widget=autocomplete.ModelSelect2(url='rider_autocomplete'))
+
+    horse = forms.ModelChoiceField(queryset=Horse.objects.all(
+    ), widget=autocomplete.ModelSelect2(url='horse_autocomplete'))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email')
+        cell = cleaned_data.get('cell')
+
+        if not email and not cell:
             raise forms.ValidationError(
                 'Have to include at least 1 contact (email or cell)')
 
