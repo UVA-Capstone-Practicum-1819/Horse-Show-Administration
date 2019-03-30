@@ -117,6 +117,7 @@ class RiderForm(forms.ModelForm):
                 "You must specify a county if the rider is a member of 4H.")
         if not (cleaned_data['adult'] or cleaned_data['birth_date']):
             raise ValidationError("You must specify a birth date for minors.")
+        return cleaned_data
 
 
 class HorseForm(forms.ModelForm):
@@ -141,6 +142,7 @@ class HorseForm(forms.ModelForm):
         size = cleaned_data['size']
         if horse_type == "pony" and size == "NA":
             raise ValidationError("A pony must have its size specified.")
+        return cleaned_data
 
 
 class ComboSelectForm(forms.ModelForm):
@@ -186,11 +188,8 @@ class HorseRiderComboCreateForm(forms.ModelForm):
         email = cleaned_data.get('email')
         cell = cleaned_data.get('cell')
 
-        print("This is the email: " + email)
-        print("This is the cell: " + cell)
-
         if not email and not cell:
-            print("do something!")
+
             raise forms.ValidationError(
                 'Have to include at least 1 contact (email or cell)')
 
@@ -200,9 +199,15 @@ class HorseRiderComboCreateForm(forms.ModelForm):
 class ComboForm(forms.ModelForm):
     class Meta:
         model = HorseRiderCombo
-        fields = '__all__'
+        fields = ('__all__')
         exclude = ('classes', 'show')
+        widgets = {
+            'rider': autocomplete.ModelSelect2(url='rider_autocomplete'),
+            'horse': autocomplete.ModelSelect2(url='horse_autocomplete'),
+        }
 
+    rider = forms.ModelChoiceField(queryset=Rider.objects.all())
+    horse = forms.ModelChoiceField(queryset=Horse.objects.all())
     email = forms.EmailField(required=False, label="Email")
     cell = forms.CharField(max_length=12, required=False,
                            label="Cell Phone #")
@@ -215,12 +220,6 @@ class ComboForm(forms.ModelForm):
         }
     ) """
 
-    rider = forms.ModelChoiceField(queryset=Rider.objects.all(
-    ), widget=autocomplete.ModelSelect2(url='rider_autocomplete'))
-
-    horse = forms.ModelChoiceField(queryset=Horse.objects.all(
-    ), widget=autocomplete.ModelSelect2(url='horse_autocomplete'))
-
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get('email')
@@ -232,13 +231,30 @@ class ComboForm(forms.ModelForm):
 
         return cleaned_data
 
+    def validate_unique(self):
+        exclude = self._get_validation_exclusions()
+        exclude.remove('show')  # allow checking against the missing attribute
 
-class HorseRiderEditForm(forms.ModelForm):
-    """ for updating a horse-rider combo """
+        try:
+            self.instance.validate_unique(exclude=exclude)
+        except ValidationError as e:
+            self._update_errors(e.message_dict)
 
-    class Meta:
-        model = HorseRiderCombo
-        fields = ('contact', 'email', 'cell')
+    """ def full_clean(self):
+        cleaned_data = super(ComboForm, self).full_clean()
+        try:
+            self.instance.validate_unique()
+            email = cleaned_data.get('email')
+            cell = cleaned_data.get('cell')
+
+            if not email and not cell:
+                raise forms.ValidationError(
+                    'Have to include at least 1 contact (email or cell)')
+
+        except forms.ValidationError as e:
+            self._update_errors(e)
+
+        return cleaned_data """
 
 
 class ShowSelectForm(forms.ModelForm):
@@ -258,17 +274,6 @@ class ShowSelectForm(forms.ModelForm):
         if showobj in shows:
             showobj.date = showobj.date + "foo"
             return showobj
-
-
-class HorseSelectForm(forms.ModelForm):
-    horse = forms.ModelChoiceField(
-        queryset=Horse.objects.all(),
-        widget=autocomplete.ModelSelect2(url='horse_autocomplete')
-    )  # form with horse autocomplete dropdown
-
-    class Meta:
-        model = Horse
-        fields = ('horse',)
 
 
 class ClassForm(forms.ModelForm):

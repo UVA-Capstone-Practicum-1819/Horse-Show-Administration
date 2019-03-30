@@ -581,53 +581,10 @@ def select_division(request, show_date):  # pragma: no cover
     return render(request, 'select_division.html', {'form': form, 'date': show_date})
 
 
-def add_combo(request, show_date):
-    """
-        creates a page for adding a horse-rider combination, taking in the session variables for the primary keys of the chosen horse and rider
-        redirects to the edit combo page for the same combination after it is done
-     """
-    show = Show.objects.get(date=show_date)
-    form_errors = ""
-    if request.method == 'POST':
-        form = HorseRiderComboCreateForm(request.POST)
-        if form.is_valid():
-            num = form.cleaned_data['num']
-            email = form.cleaned_data['email']
-            cell = form.cleaned_data['cell']
-            contact = form.cleaned_data['contact']
-            rider_pk = request.session['rider_pk']
-            horse_pk = request.session['horse_pk']
-            rider = get_object_or_404(Rider, pk=rider_pk)
-            horse = get_object_or_404(Horse, pk=horse_pk)
-            try:
-                HorseRiderCombo.objects.create(num=num, rider=rider, horse=horse,
-                                               cell=cell, email=email, show=show)
-            except IntegrityError:
-                #messages.error(request, "HRC already exists!")
-                messages.info(
-                    request, 'Combo for selected horse and rider already exists!')
-                return redirect('select_rider', show_date=show.date)
-            return redirect('edit_combo', show_date=show.date, combo_num=num)
-        else:
-            form_errors = form.non_field_errors
-    rider_pk = request.session['rider_pk']
-    if rider_pk is None:
-        return redirect('select_show')
-    horse_pk = request.session['horse_pk']
-    if horse_pk is None:
-        return redirect('select_show')
-    rider = get_object_or_404(Rider, pk=rider_pk)
-    horse = get_object_or_404(Horse, pk=horse_pk)
-    form = HorseRiderComboCreateForm()
-
-    return render(request, 'add_combo.html', {'form': form,  'rider': rider, 'horse': horse, 'date': show_date, 'form_errors': form_errors})
-
+""" 
 
 def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
-    """
-    edits the combination that was specified by num
-    also handles the addition/removal of classes based on num and the calculation of price
-     """
+
     show = Show.objects.get(date=show_date)
     combo = show.combos.get(num=combo_num)
     edit_form = HorseRiderEditForm(
@@ -707,7 +664,7 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
         return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form,
                                                    'classes': participations, 'date': show_date})
 
-
+ """
 class ShowAutocomplete(autocomplete.Select2QuerySetView):  # pragma: no cover
     """ Autocomplete functionality for the select page """
 
@@ -716,7 +673,7 @@ class ShowAutocomplete(autocomplete.Select2QuerySetView):  # pragma: no cover
             # return Horse.objects.none()
         qs = Show.objects.all().order_by('date')
         if self.q:
-            qs = qs.filter(show_name__istartswith=self.q)
+            qs = qs.filter(date__istartswith=self.q)
         return qs
 
 
@@ -746,7 +703,7 @@ class RiderAutocomplete(autocomplete.Select2QuerySetView):  # pragma: no cover
     def get_queryset(self):
         qs = Rider.objects.all().order_by('last_name')
         if self.q:
-            qs = qs.filter(name__istartswith=self.q)
+            qs = qs.filter(last_name__istartswith=self.q)
         return qs
 
 
@@ -1395,10 +1352,11 @@ def edit_combo(request, combo_pk):
         edited_combo = HorseRiderCombo.objects.get(pk=combo_pk)
         edit_combo_form = ComboForm(request.POST, instance=edited_combo)
         if edit_combo_form.is_valid():
-            edited_combo = add_combo_form.save()
-            edited_combo.save()
+            edited_combo = edit_combo_form.save()
+            
             return render(request, "combo_row.html", {'combo': edited_combo})
         else:
+            logger.error("this is invalid")
             return render(request, "form_errors.html", {'form': edit_combo_form}, status=400)
 
 
@@ -1407,7 +1365,7 @@ def get_combo_form(request, combo_pk=None):
     if combo_pk is None:
         combo_form = ComboForm()
     else:
-        combo = Combo.objects.get(pk=combo_pk)
+        combo = HorseRiderCombo.objects.get(pk=combo_pk)
         combo_form = ComboForm(instance=combo)
 
     return render(request, "simple_form.html", {"form": combo_form})
