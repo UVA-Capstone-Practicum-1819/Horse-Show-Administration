@@ -11,5 +11,5 @@
   - The populate pdf functionality utilizes pdfrw code that was not written by the members of the team and additionally is difficult to test, so this code will not be tested.
 - show\tests.py
   - The unit tests in this file already assess the test coverage of the project so it is not necessary to test this file.
-- show\views.py sign_up function 
-  - This function uses middleware code that was not written by the members of the team, so this code will not be tested.
+- show\views.py sign_up function, obsolete functions, populate pdf functions, label functions
+  - The sign up function uses middleware code that was not written by the members of the team, so this code will not be tested. Obsolete functions are eventually going to be removed from the project, so that code will not be tested either. The functions for populate pdf and labels are difficult to test and make use of code that was not fully written by the members of the team so that code will not be tested. 
