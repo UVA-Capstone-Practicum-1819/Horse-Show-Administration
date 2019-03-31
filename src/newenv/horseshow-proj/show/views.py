@@ -1369,3 +1369,21 @@ def get_combo_form(request, combo_pk=None):
         combo_form = ComboForm(instance=combo)
 
     return render(request, "simple_form.html", {"form": combo_form})
+
+def view_combo(request, combo_pk):
+    viewed_combo = HorseRiderCombo.objects.get(pk=combo_pk)
+
+
+    show = viewed_combo.show
+
+    return render(request, 'view_combo.html', {"combo" : viewed_combo, "show": show})
+
+def search_combo(request, show_date):
+    """ redirects to the combo page given a show """
+    
+    if request.method == "POST":
+        show = Show.objects.get(pk=show_date)
+        combo_num = request.POST['combo_num']
+        if combo_num >= 100 and combo_num <= 999:
+            found_combo = show.combos.get(num=combo_num)
+            return redirect('view_combo', combo_pk=found_combo.pk)

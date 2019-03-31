@@ -22,26 +22,30 @@
             <li style="color:#fff;font-size: 18px;line-height: 60px;">
                 Horse Show Administration
             </li>
-            {% comment %} if a show is currently selected {% endcomment %}
-            {% if date %}
             <li>
                 <a href="{% url 'select_show' %}">Select Show</a>
             </li>
+
+            {% comment %} if a show is currently selected {% endcomment %}
+            {% if date %}
+
             <li>
 
                 <a href="{% url 'view_show' show_date=date %}">Show Home Page</a>
 
             </li>
 
-
-
             <li>
+
+                <a href="{% url 'view_combos' show_date=date %}">Combos</a>
+
+            </li>
+
+            {% comment %} <li>
                 <a href="{% url 'add_division' show_date=date %}">Add Division</a>
-            </li>
+            </li> {% endcomment %}
 
-            <li>
-                <a href="{% url 'view_riders' %}">View All Riders</a>
-            </li>
+
             {% comment %} <li>
                 <a href="{% url 'select_division' show_date=date %}">Edit Division/View Division Score</a>
             </li> {% endcomment %}
@@ -61,9 +65,28 @@
             {% comment %} <li>
                 <a href="{% url 'add_horse' show_date=date %}">Add Horse</a>
             </li> {% endcomment %}
+            <li>
+                {% comment %} <input class="btn btn-primary" type="hidden" id="viewURL"
+                    data-url="{% url 'search_combo' %}"> {% endcomment %}
+                <form id="viewComboForm" action="{% url 'search_combo' show_date=date %}" class="form-inline"
+                    method="post">
+                    <input type="text" name="combo_num" class="form-control-sm" placeholder="Enter combo num">
+                    <button class="btn btn-primary" type="submit">View</a>
+                </form>
 
+            </li>
 
             {% endif %}
+            <li>
+                <a href="{% url 'view_riders' %}">Riders</a>
+            </li>
+
+            <li>
+                <a href="{% url 'view_horses' %}">Horses</a>
+            </li>
+
+
+
             <li>
                 <form action="{% url 'log_out' %}" method="post" class="form">{% csrf_token %}
                     <button class="btn btn-sm btn-danger" type="submit">Log Out</button>

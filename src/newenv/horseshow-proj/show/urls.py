@@ -93,7 +93,7 @@ show_patterns = [
 
     path('all_combos', views.view_combos, name="view_combos"),
 
-
+    path('search-combo', views.search_combo, name="search_combo"),
 
     path('populate-pdf', views.populate_pdf, name="populate_pdf"),
 ]
