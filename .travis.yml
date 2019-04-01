@@ -10,6 +10,9 @@ install:
   - pip3 install django-localflavor
   - pip3 install pylabels
   - pip3 install reportlab
+  - pip3 install xlutils
+  - pip3 install xlwt
+  - pip3 install xlrd
 
 script:
   - python3 src/newenv/horseshow-proj/manage.py makemigrations
