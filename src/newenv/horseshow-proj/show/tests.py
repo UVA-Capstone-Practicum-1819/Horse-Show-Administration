@@ -726,12 +726,14 @@ class ComboTestCases(TestCase):
         combo1 = HorseRiderCombo.objects.create(
             num=200, rider=rider1, horse=horse1, show=show)
         c1 = Class.objects.create(name="Test", num="1")
+        c1.show = show
+        c1.save()
         c2 = Class.objects.create(name="Test2", num="2")
         class_participation = ClassParticipation.objects.create(participated_class=c1, combo=combo1, is_preregistered=False)
         class_participation = ClassParticipation.objects.create(participated_class=c2, combo=combo1, is_preregistered=True)
         self.client.login(username='john', password='johnpassword')
         request = HttpRequest()
-        response = self.client.get('/show/2018-12-10/combo/200/scratch', {'cnum':c1.num})
+        response = self.client.get('/show/2018-12-10/combo/200/scratch', {'cnum':c1.num, 'show':c1.show})
 
 class DivisionsTestCases(TestCase):
     def test_add_division(self):
