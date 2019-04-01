@@ -184,7 +184,7 @@ def scratch_combo(request, show_date, combo_num):
     show = Show.objects.get(date=show_date)
     combo = show.combos.get(num=combo_num)
     class_num = request.GET["cnum"]
-    class_obj = Class.objects.get(num=class_num)
+    class_obj = Class.objects.get(show=show, num=class_num)
     selected_class = ClassParticipation.objects.filter(
         combo=combo).get(participated_class=class_obj)
     selected_class.delete()
