@@ -4,18 +4,22 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-
+{% comment %} breadcrumbs for navigation's sake {% endcomment %}
 <p>
-    <h3><a href="{% url 'view_show' show_date=show.date %}">Show: {{show.name}}</a></h3>
+    <h3><a href="{% url 'view_show' show_date=combo.show.date %}">Show: {{combo.show.name}}</a></h3>
 </p>
 
+{% comment %} combo heading {% endcomment %}
 <p>
     <h3>Combo #{{combo.num}} - {{combo.rider.last_name}}, {{combo.horse.name}} </h3>
 </p>
 
+
 <div class="container">
+    {% comment %} button for editing the combo information (not for editing classes) {% endcomment %}
     <button type="submit" name="edit" class="btn btn-success">Edit Combo Information </button>
 
+    {% comment %} table for the combo info {% endcomment %}
     <table class="table table-striped table-bordered table-hover">
 
         <tbody>
@@ -38,58 +42,54 @@
 
 <div class="container">
 
+    {% comment %} add class button {% endcomment %}
+    <button data-url="{% url 'add_class_to_combo' combo_pk=combo.pk %}" class="btn btn-primary"
+        id="addClassToComboButton">Add Class</button>
 
-    <form class='form-inline' method="post">
-        <input type="text" class="form-control" name="" </form> <table
-            class="table table-striped table-bordered table-hover">
+    {% comment %} table for all classes that are registered under this combo {% endcomment %}
+    <table class="table table-striped table-bordered table-hover">
         <tr>
             <thead>
                 <th scope="col">Class #</th>
                 <th scope="col">Class Name</th>
+                <th scope="col">From Division</th>
                 <th scope="col">Preregistered?</th>
                 <th scope="col">Scratch</th>
             </thead>
         </tr>
         <tbody>
-            {% for class in classes %}
-            <tr scope=" row">
-                <td>{{class.participated_class.num}}</td>
-                <td>{{class.participated_class.name}}</td>
-                <td>{% if class.is_preregistered %}
+            {% for participation in combo.participations %}
+            {% with class=participation.participated_class %}
+            <tr scope="row">
+
+                <td>{{class.num}}</td>
+                <td>{{class.name}}</td>
+                <td><a href="{% url 'view_division' division_id=class.division.pk %}">{{class.division.name}}</a></td>
+                <td>{% if participation.is_preregistered %}
                     Yes
                     {% else %}
                     No
                     {% endif %}
                 </td>
                 <td>
-                    {% comment %} <form method="post" class="form">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-danger" name="remove_class"
-                            value="{{class.participated_class.num}}">X</button>
-                    </form> {% endcomment %}
-                    <button class="btn btn-danger btn-sm" data-url="{% url 'remove_class' %}">X</button>
+                    <button class="btn btn-danger btn-sm"
+                        data-url="{% url 'remove_class_from_combo' combo_pk=combo.pk class_pk=class.pk %}">X</button>
                 </td>
             </tr>
-            {% endfor %}
-        </tbody>
-        </table>
+            {% endwith %}
+            <tr scope="row">
+                <td>
+                    <form action="post" {{ add_class_to_combo_form | crispy }} </td> </tr> {% endfor %} </tbody>
+                        </table> {% comment %} any messages that we want to display {% endcomment %}
+                        {% for message in messages %} <div class="alert alert-danger">
+                        <a class="close" href="" data-dismiss="alert">×</a>
+                        {{ message }}
+</div>
+{% endfor %}
 
-        {% for message in messages %}
-        <div class="alert alert-danger">
-            <a class="close" href="" data-dismiss="alert">×</a>
-            {{ message }}
-        </div>
-        {% endfor %}
-
-        {% comment %} <form class="form" method="post">
-            {% csrf_token %}
-            {{ class_combo_form | crispy }}
-            {{ class_combo_form.media }}
-            <button class="btn btn-primary" name="add_class" value="Add" type="submit">Add Class</button>
-            {% endcomment %}
-        </form>
-        <p><a class="btn btn-primary" href="{% url 'view_billing' show_date=date combo_num=combo.num %}">Bill a
-                Rider</a></p>
+{% comment %} show the billing page for the combo (needs to be moved to sidebar) {% endcomment %}
+<p><a class="btn btn-primary" href="{% url 'view_billing' show_date=combo.show.date combo_num=combo.num %}">Bill a
+        Rider</a></p>
 </div>
 </div>
 </div>

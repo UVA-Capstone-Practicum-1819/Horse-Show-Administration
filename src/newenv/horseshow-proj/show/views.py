@@ -665,6 +665,8 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
                                                    'classes': participations, 'date': show_date})
 
  """
+
+
 class ShowAutocomplete(autocomplete.Select2QuerySetView):  # pragma: no cover
     """ Autocomplete functionality for the select page """
 
@@ -1201,7 +1203,6 @@ def generate_labels(request, show_date):  # pragma: no cover
         return render(request, 'labels.html', {'date': str(show_date)})
 
 
-
 def view_riders(request):
     """ Renders the rider page, where one can see a table of all the riders and be able to filter through them by their information. You are also able to add, edit, or delete riders as desired. """
     update_rider_form = RiderForm()
@@ -1211,12 +1212,14 @@ def view_riders(request):
 
     return render(request, 'view_riders.html', context)
 
+
 def select_rider(request):
     """ For selecting a rider and submitting a JSON response of the rider list """
     if request.GET.get('q'):
         q = request.GET['q']
         riders = Rider.objects.filter(last_name__startswith=q)
-        json = [{ "value": rider.pk, "text" : (rider.last_name + ", " + rider.first_name)} for rider in riders]
+        json = [{"value": rider.pk, "text": (
+            rider.last_name + ", " + rider.first_name)} for rider in riders]
         logger.error(json)
         return JsonResponse(json, safe=False)
     else:
@@ -1239,7 +1242,6 @@ def update_rider(request, rider_pk=None):
         else:
             updated_rider = Rider.objects.get(pk=rider_pk)
             update_rider_form = RiderForm(request.POST, instance=updated_rider)
-
 
         if update_rider_form.is_valid():
             updated_rider = update_rider_form.save()
@@ -1274,7 +1276,7 @@ def select_horse(request):
     if request.GET.get('q'):
         q = request.GET['q']
         horses = Horse.objects.filter(name__startswith=q)
-        json = [ {"value": horse.pk, "text" : horse.name} for horse in horses]
+        json = [{"value": horse.pk, "text": horse.name} for horse in horses]
         return JsonResponse(json, safe=False)
     else:
         HttpResponse("No cookies")
@@ -1297,7 +1299,6 @@ def update_horse(request, horse_pk=None):
             updated_horse = Horse.objects.get(pk=horse_pk)
             update_horse_form = HorseForm(request.POST, instance=updated_horse)
 
-
         if update_horse_form.is_valid():
             updated_horse = update_horse_form.save()
             return render(request, "horse_row.html", {'horse': updated_horse})
@@ -1316,11 +1317,13 @@ def get_horse_form(request, horse_pk=None):
 
     return render(request, "simple_form.html", {"form": horse_form})
 
+
 def view_combos(request, show_date):
     """ Renders the combos page, where one can see a table of all the combos and be able to filter through them by their information. You are also able to add, edit, or delete combos as desired. """
     combo_form = ComboForm()
 
-    context = {'combos': HorseRiderCombo.objects.filter(show=show_date), 'combo_form': combo_form, 'show_date': show_date}
+    context = {'combos': HorseRiderCombo.objects.filter(
+        show=show_date), 'combo_form': combo_form, 'show_date': show_date}
 
     return render(request, 'view_combos.html', context)
 
@@ -1346,6 +1349,7 @@ def add_combo(request, show_date):
         else:
             return render(request, "form_errors.html", {'form': add_combo_form}, status=400)
 
+
 def edit_combo(request, combo_pk):
     """ edits an existing combo """
     if request.method == "POST":
@@ -1353,7 +1357,7 @@ def edit_combo(request, combo_pk):
         edit_combo_form = ComboForm(request.POST, instance=edited_combo)
         if edit_combo_form.is_valid():
             edited_combo = edit_combo_form.save()
-            
+
             return render(request, "combo_row.html", {'combo': edited_combo})
         else:
             logger.error("this is invalid")
@@ -1370,20 +1374,41 @@ def get_combo_form(request, combo_pk=None):
 
     return render(request, "simple_form.html", {"form": combo_form})
 
+
 def view_combo(request, combo_pk):
     viewed_combo = HorseRiderCombo.objects.get(pk=combo_pk)
+    return render(request, 'view_combo.html', {"combo": viewed_combo})
 
-
-    show = viewed_combo.show
-
-    return render(request, 'view_combo.html', {"combo" : viewed_combo, "show": show})
 
 def search_combo(request, show_date):
     """ redirects to the combo page given a show """
-    
+
     if request.method == "POST":
         show = Show.objects.get(pk=show_date)
         combo_num = request.POST['combo_num']
         if combo_num >= 100 and combo_num <= 999:
             found_combo = show.combos.get(num=combo_num)
             return redirect('view_combo', combo_pk=found_combo.pk)
+
+
+def add_class_to_combo(request, combo_pk):
+    if request.method == "POST":
+        combo = HorseRiderCombo.objects.get(pk=combo_pk)
+        add_class_form = RegisterClassForm(request.POST)
+        if add_class_form.is_valid():
+            class_num = add_class_form.cleaned_data['num']
+            existing_class = combo.show.classes.filter(num=class_num)
+            if existing_class:
+                is_preregistered = add_class_form.cleaned_data['is_preregistered']
+                participation = ClassParticipation.objects.create(
+                    combo=combo, participated_class=existing_class[0], is_preregistered=is_preregistered)
+                participation.save()
+                
+                return render(request, 'class_in_combo_row.html', {'class':existing_class})
+            else:
+                response = {'responseText': "Class with that number does not exist in this show"}
+                return JsonResponse(data, status=400)
+
+def get_register_class_form(request):
+    register_class_form = RegisterClassForm()
+    return render(request, 'simple_form.html', {'form': register_class_form})
