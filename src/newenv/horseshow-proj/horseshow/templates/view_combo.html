@@ -4,20 +4,26 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-{% comment %} breadcrumbs for navigation's sake {% endcomment %}
-<p>
-    <h3><a href="{% url 'view_show' show_date=combo.show.date %}">Show: {{combo.show.name}}</a></h3>
-</p>
+<div class="container">
+    {% comment %} breadcrumbs for navigation's sake {% endcomment %}
+    <p>
+        <h3><a href="{% url 'view_show' show_date=combo.show.date %}">Show: {{combo.show.name}}</a></h3>
+    </p>
 
-{% comment %} combo heading {% endcomment %}
-<p>
-    <h3>Combo #{{combo.num}} - {{combo.rider.last_name}}, {{combo.horse.name}} </h3>
-</p>
+    {% comment %} combo heading {% endcomment %}
+    <p>
+        <h3>Combo #{{combo.num}} - {{combo.rider.last_name}}, {{combo.horse.name}} </h3>
+    </p>
+</div>
 
 
 <div class="container">
     {% comment %} button for editing the combo information (not for editing classes) {% endcomment %}
-    <button type="submit" name="edit" class="btn btn-success">Edit Combo Information </button>
+    <button data-combopk="{{rider.pk}}" data-target="#updateComboModal" data-toggle="modal"
+        data-url="{% url 'edit_combo' combo_pk=combo.pk %}" name="edit" class="btn btn-success">Edit Combo Information
+    </button>
+
+
 
     {% comment %} table for the combo info {% endcomment %}
     <table class="table table-striped table-bordered table-hover">
@@ -35,6 +41,17 @@
                 <td> Cell Phone # </td>
                 <td> {{combo.cell}} </td>
             </tr>
+            <tr>
+                <td> Preregistered? </td>
+                <td> {% if combo.is_preregistered %} Yes {% else %} No {% endif %}</td>
+            </tr>
+            <tr>
+                <td> Total Bill </td>
+
+                <td id="billCell">
+                    ${{ combo_bill }}
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>
@@ -42,55 +59,45 @@
 
 <div class="container">
 
-    {% comment %} add class button {% endcomment %}
-    <button data-url="{% url 'add_class_to_combo' combo_pk=combo.pk %}" class="btn btn-primary"
-        id="addClassToComboButton">Add Class</button>
-
     {% comment %} table for all classes that are registered under this combo {% endcomment %}
     <table class="table table-striped table-bordered table-hover">
+        {% comment %} row headers {% endcomment %}
         <tr>
             <thead>
                 <th scope="col">Class #</th>
                 <th scope="col">Class Name</th>
                 <th scope="col">From Division</th>
-                <th scope="col">Preregistered?</th>
                 <th scope="col">Scratch</th>
             </thead>
         </tr>
+        {% comment %} table body for each class {% endcomment %}
         <tbody>
+            {% comment %} for each class {% endcomment %}
             {% for participation in combo.participations %}
             {% with class=participation.participated_class %}
-            <tr scope="row">
+            {% include 'class_in_combo_row.html' %}
 
-                <td>{{class.num}}</td>
-                <td>{{class.name}}</td>
-                <td><a href="{% url 'view_division' division_id=class.division.pk %}">{{class.division.name}}</a></td>
-                <td>{% if participation.is_preregistered %}
-                    Yes
-                    {% else %}
-                    No
-                    {% endif %}
-                </td>
-                <td>
-                    <button class="btn btn-danger btn-sm"
-                        data-url="{% url 'remove_class_from_combo' combo_pk=combo.pk class_pk=class.pk %}">X</button>
-                </td>
-            </tr>
             {% endwith %}
-            <tr scope="row">
-                <td>
-                    <form action="post" {{ add_class_to_combo_form | crispy }} </td> </tr> {% endfor %} </tbody>
-                        </table> {% comment %} any messages that we want to display {% endcomment %}
-                        {% for message in messages %} <div class="alert alert-danger">
-                        <a class="close" href="" data-dismiss="alert">×</a>
-                        {{ message }}
-</div>
-{% endfor %}
+            {% endfor %}
+        </tbody>
 
-{% comment %} show the billing page for the combo (needs to be moved to sidebar) {% endcomment %}
-<p><a class="btn btn-primary" href="{% url 'view_billing' show_date=combo.show.date combo_num=combo.num %}">Bill a
-        Rider</a></p>
+    </table>
+
+    {% comment %} form for adding new classes {% endcomment %}
+    <form action="post" class="form-inline" action="{% url 'add_class_to_combo' combo_pk=combo.pk %}">
+        <div class="form-group">
+            {% comment %} form is just a number {% endcomment %}
+            <input id="classNumField" type="number" class="form-control">
+            <input type="submit" class="btn btn-success btn-sm" name="class_num" value="Add Class">
+            <small id="classNumHelp" class="text-muted">
+
+            </small>
+        </div>
+    </form>
+
+
 </div>
-</div>
-</div>
-{% endblock %}
+
+<input class="btn btn-primary" type="hidden" id="formURL" data-url="{% url 'get_combo_form'  %}" />
+
+{% include 'combo_modal.html' %}

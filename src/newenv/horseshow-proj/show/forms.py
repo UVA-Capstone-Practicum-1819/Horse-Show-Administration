@@ -290,11 +290,10 @@ class RemoveClassForm(forms.Form):
 
 class RegisterClassForm(forms.ModelForm):
     """ # This allows the user to add classes to a combo by entering the class number, while also specifying if the class was preregistered """
-    is_preregistered = forms.BooleanField(required=False)
 
     class Meta:
         model = Class
-        fields = ('num', 'is_preregistered')
+        fields = ('num',)
 
 
 class ClassSelectForm(forms.ModelForm):

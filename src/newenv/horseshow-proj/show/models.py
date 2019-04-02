@@ -157,6 +157,7 @@ class HorseRiderCombo(models.Model):
                             verbose_name="Contact Cell Phone Number")
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, null=True, related_name='combos')
+    is_preregistered = models.BooleanField(default=False)
 
     def __str__(self):
 
@@ -176,6 +177,7 @@ class ClassParticipation(models.Model):
     """
     class Meta:
         unique_together = ('participated_class', 'combo')
+
     participated_class = models.ForeignKey(
         Class, on_delete=models.CASCADE, related_name="participations")
 
@@ -183,7 +185,6 @@ class ClassParticipation(models.Model):
                               on_delete=models.CASCADE, related_name="participations")
 
     score = models.IntegerField(default=0)
-    is_preregistered = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Combo #{self.combo.num} participates in class {self.participated_class.num}"

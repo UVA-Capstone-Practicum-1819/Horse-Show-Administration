@@ -581,92 +581,6 @@ def select_division(request, show_date):  # pragma: no cover
     return render(request, 'select_division.html', {'form': form, 'date': show_date})
 
 
-""" 
-
-def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
-
-    show = Show.objects.get(date=show_date)
-    combo = show.combos.get(num=combo_num)
-    edit_form = HorseRiderEditForm(
-        {'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
-
-    class_combo_form = ClassComboForm()
-
-    registered_classes = combo.classes.all()
-    number_registered_classes = len(registered_classes)
-    participations = combo.participations.all()
-    if request.method == "POST":
-        if request.POST.get('remove_class'):
-            num = request.POST['remove_class']
-            class_obj = Class.objects.filter(show=show_date).get(num=num)
-            selected_class = ClassParticipation.objects.filter(
-                combo=combo).get(participated_class=class_obj)
-            selected_class.delete()
-
-        if request.POST.get('add_class'):
-            class_combo_form = ClassComboForm(request.POST)
-
-            if class_combo_form.is_valid():
-                selected_class = class_combo_form.cleaned_data['num']
-                is_prereg = class_combo_form.cleaned_data['is_preregistered']
-                try:  # checks to see if class creation is valid
-                    class_obj = Class.objects.filter(
-                        show=show_date).get(num=selected_class)
-                    classParticipation = ClassParticipation(
-                        participated_class=class_obj, combo=combo, is_preregistered=is_prereg)
-                    classParticipation.save()
-                    participations = combo.participations.all()
-                    if division_id != None:  # determines whether or not we are navigating from the class or from select
-                        division = Division.objects.get(id=division_id)
-                        c = Class.objects.get(show=show, num=class_num)
-                        return render(request, 'edit_combo.html', {'division': division, 'class': c, 'show': show, 'combo': combo, 'edit_form': edit_form,
-                                                                   'class_combo_form': class_combo_form, 'classes': participations, 'date': show_date})
-                    else:
-                        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form,
-                                                                   'classes': participations, 'date': show_date})
-                except IntegrityError:  # if combo already in class, show error on edit combo page
-                    messages.info(
-                        request, "Combo is already registered for class "+str(class_combo_form.cleaned_data['num']))
-                    if division_id != None:
-                        division = Division.objects.get(id=division_id)
-                        c = Class.objects.get(show=show, num=class_num)
-                        return render(request, 'edit_combo.html', {'division': division, 'class': c, 'show': show, 'combo': combo, 'edit_form': edit_form,
-                                                                   'class_combo_form': class_combo_form, 'classes': participations, 'date': show_date})
-                    else:
-                        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form,
-                                                                   'classes': participations, 'date': show_date})
-                except ObjectDoesNotExist:  # if class does not exist to add, show error on edit combo page
-                    messages.info(
-                        request, "Class " + str(class_combo_form.cleaned_data['num']) + " does not exist in this show.")
-                    if division_id != None:
-                        division = Division.objects.get(id=division_id)
-                        c = Class.objects.get(show=show, num=class_num)
-                        return render(request, 'edit_combo.html', {'division': division, 'class': c, 'show': show, 'combo': combo, 'edit_form': edit_form,
-                                                                   'class_combo_form': class_combo_form, 'classes': participations, 'date': show_date})
-                    else:
-                        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form,
-                                                                   'classes': participations, 'date': show_date})
-        elif request.POST.get('edit'):
-            edit_form = HorseRiderEditForm(request.POST)
-
-            if edit_form.is_valid():
-                combo.email = edit_form.cleaned_data['email']
-                combo.cell = edit_form.cleaned_data['cell']
-                combo.contact = edit_form.cleaned_data['contact']
-                combo.save()
-
-    if division_id != None:
-        division = Division.objects.get(id=division_id)
-        c = Class.objects.get(show=show, num=class_num)
-        return render(request, 'edit_combo.html', {'division': division, 'class': c, 'show': show, 'combo': combo, 'edit_form': edit_form,
-                                                   'class_combo_form': class_combo_form, 'classes': participations, 'date': show_date})
-    else:
-        return render(request, 'edit_combo.html', {'combo': combo, 'edit_form': edit_form, 'class_combo_form': class_combo_form,
-                                                   'classes': participations, 'date': show_date})
-
- """
-
-
 class ShowAutocomplete(autocomplete.Select2QuerySetView):  # pragma: no cover
     """ Autocomplete functionality for the select page """
 
@@ -1220,7 +1134,6 @@ def select_rider(request):
         riders = Rider.objects.filter(last_name__startswith=q)
         json = [{"value": rider.pk, "text": (
             rider.last_name + ", " + rider.first_name)} for rider in riders]
-        logger.error(json)
         return JsonResponse(json, safe=False)
     else:
         HttpResponse("No cookies")
@@ -1330,9 +1243,9 @@ def view_combos(request, show_date):
 
 def delete_combo(request, combo_pk):
     """ Deletes a combo from the database """
-    deleted_combo = HorseRiderCombo.objects.filter(pk=combo_pk)
+    deleted_combo = HorseRiderCombo.objects.get(pk=combo_pk)
     deleted_combo.delete()
-    return HttpResponse("Deleted combo", status=200)
+    return HttpResponse("Deleted the horse-rider combination successfully", status=200)
 
 
 def add_combo(request, show_date):
@@ -1374,41 +1287,53 @@ def get_combo_form(request, combo_pk=None):
 
     return render(request, "simple_form.html", {"form": combo_form})
 
+def calculate_combo_bill(combo):
+    """ calculates the total bill of a horse-rider combo (calculates price of all the classes) """
+    num_classes = len(combo.classes)
+    show = combo.show
+    if combo.is_preregistered:
+        combo_bill = num_classes * show.pre_reg_price
+    else:
+        combo_bill = num_classes * show.day_of_price
+    return combo_bill
 
 def view_combo(request, combo_pk):
     viewed_combo = HorseRiderCombo.objects.get(pk=combo_pk)
-    return render(request, 'view_combo.html', {"combo": viewed_combo})
-
-
-def search_combo(request, show_date):
-    """ redirects to the combo page given a show """
-
-    if request.method == "POST":
-        show = Show.objects.get(pk=show_date)
-        combo_num = request.POST['combo_num']
-        if combo_num >= 100 and combo_num <= 999:
-            found_combo = show.combos.get(num=combo_num)
-            return redirect('view_combo', combo_pk=found_combo.pk)
+    return render(request, 'view_combo.html', {"combo": viewed_combo, 'combo_bill': calculate_combo_bill(viewed_combo)})
 
 
 def add_class_to_combo(request, combo_pk):
+    """ registering a class for a combo """
     if request.method == "POST":
         combo = HorseRiderCombo.objects.get(pk=combo_pk)
-        add_class_form = RegisterClassForm(request.POST)
-        if add_class_form.is_valid():
-            class_num = add_class_form.cleaned_data['num']
-            existing_class = combo.show.classes.filter(num=class_num)
-            if existing_class:
-                is_preregistered = add_class_form.cleaned_data['is_preregistered']
-                participation = ClassParticipation.objects.create(
-                    combo=combo, participated_class=existing_class[0], is_preregistered=is_preregistered)
-                participation.save()
-                
-                return render(request, 'class_in_combo_row.html', {'class':existing_class})
-            else:
-                response = {'responseText': "Class with that number does not exist in this show"}
-                return JsonResponse(data, status=400)
+        class_num = request.POST['class_num']
+        selected_class = combo.show.classes.filter(num=class_num)
+        if selected_class:
+            participation = ClassParticipation.objects.create(
+                combo=combo, participated_class=selected_class[0])
+            participation.save()
+            response = {
+                'template': render(request, 'class_in_combo_row.html', {'class': selected_class}),
+                'combo_bill': calculate_combo_bill(combo)
+            }
+            return JsonResponse(response, status=200)
+        else:
+            response = {'responseText': "Class with that number does not exist in this show"}
+            return JsonResponse(response, status=400)
 
-def get_register_class_form(request):
-    register_class_form = RegisterClassForm()
-    return render(request, 'simple_form.html', {'form': register_class_form})
+def delete_class_from_combo(request, combo_pk, class_pk):
+    """ removes a class (deregisters) from a combo  """
+    combo = HorseRiderCombo.objects.get(combo_pk)
+    deleted_class = combo.classes.filter(pk=class_pk)
+    if deleted_class:
+        deleted_class.delete()
+        response = {
+            'responseText': "Successfully de-registered the class from the horse-rider combination.",
+            'combo_bill' : calculate_combo_bill(combo)
+        }
+        return JsonResponse(response, status=200)
+    else:
+        response = {
+            'responseText' : "De-registering the class from the horse-rider combination was unsuccessful. The removed class may not exist."
+        }
+        return JsonResponse(response, status=400)

@@ -7,14 +7,18 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
 combo_patterns = [
-    path('billing',
-         views.view_billing, name="view_billing"),
+    path('view', views.view_combo, name="view_combo"),
 
     path('scratch', views.scratch_combo, name="scratch_combo"),
 
     path('edit', views.edit_combo, name="edit_combo"),
 
     path('delete', views.delete_combo, name="delete_combo"),
+
+    path('add-class', views.add_class_to_combo, name="add_class_to_combo"),
+
+    path('delete-class/<class_pk>', views.delete_class_from_combo,
+         name="delete_class_from_combo")
 ]
 
 class_patterns = [
@@ -93,9 +97,10 @@ show_patterns = [
 
     path('all_combos', views.view_combos, name="view_combos"),
 
-    path('search-combo', views.search_combo, name="search_combo"),
 
     path('populate-pdf', views.populate_pdf, name="populate_pdf"),
+
+    path('generate_labels', views.generate_labels, name="generate_labels"),
 ]
 
 urlpatterns = [
@@ -121,11 +126,7 @@ urlpatterns = [
 
     path('get_horse_form', views.get_horse_form, name="get_horse_form"),
 
-
-
     path('combo/<combo_pk>/', include(combo_patterns)),
-
-
 
     path('rider/select', views.select_rider, name="select_rider"),
 
@@ -169,7 +170,7 @@ urlpatterns = [
 
     path('logout', auth_views.LogoutView.as_view(), name='log_out'),
 
-    path('<show_date>/generate_labels', views.generate_labels, name="labels"),
+
 
 
 

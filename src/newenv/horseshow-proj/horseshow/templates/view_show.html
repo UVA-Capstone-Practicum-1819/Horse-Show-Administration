@@ -15,7 +15,7 @@
   {% comment %} table containing all the divisions and their respective classes {% endcomment %}
   <table class="table table-striped table-bordered">
     {% comment %} the table header (division, classes) {% endcomment %}
-    <thead class="bg-info">
+    <thead class="bg-primary">
 
       <th>Division</th>
       <th colspan="10">Classes</th>
@@ -79,16 +79,6 @@
 
   </div>
   {% endfor %}
-
-  <form method="POST" class="form">
-    {% csrf_token %}
-    <button class="btn btn-primary" type="submit">Edit Horse Rider Combo</button>
-    {{ form.as_table }}
-
-  </form>
-  <p><a class="btn btn-primary" href="{% url 'select_combo' show_date=date %}">Bill a Rider</a></p>
-  <p><a class="btn btn-primary" href="{% url 'populate_pdf' show_date=date%}">Generate VHSA PDF</a></p>
-  <p><a href="{% url 'labels' show_date=date %}">Generate Horse Rider Combo Labels</a></p>
 
 
 </body>

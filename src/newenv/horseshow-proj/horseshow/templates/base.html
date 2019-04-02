@@ -17,11 +17,12 @@
     {% comment %} Sidebar {% endcomment %}
     {% comment %} This is used for navigating the different functionality options of the database {% endcomment %}
     <div id="sidebar-wrapper">
-        <ul class="sidebar-nav">
+        <ul class="sidebar-nav navbar-primary">
 
             <li style="color:#fff;font-size: 18px;line-height: 60px;">
                 Horse Show Administration
             </li>
+
             <li>
                 <a href="{% url 'select_show' %}">Select Show</a>
             </li>
@@ -36,47 +37,21 @@
             </li>
 
             <li>
+                <a href="{% url 'populate_pdf' show_date=date %}">Generate VHSA PDF</a>
+            </li>
+
+            <li>
+                <a href="{% url 'generate_labels' show_date=date %}">Generate Combo Labels</a>
+            </li>
+
+            <li>
 
                 <a href="{% url 'view_combos' show_date=date %}">Combos</a>
 
             </li>
 
-            {% comment %} <li>
-                <a href="{% url 'add_division' show_date=date %}">Add Division</a>
-            </li> {% endcomment %}
-
-
-            {% comment %} <li>
-                <a href="{% url 'select_division' show_date=date %}">Edit Division/View Division Score</a>
-            </li> {% endcomment %}
-            {% comment %} <li>
-                <a href="{% url 'select_rider' show_date=date %}">Add Horse-Rider Combo</a>
-            </li> {% endcomment %}
-            {% comment %} <li>
-                <a href="{% url 'select_rider2' show_date=date %}">Edit Rider Information</a>
-            </li> {% endcomment %}
-            {% comment %} <li>
-                <a href="{% url 'select_horse2' show_date=date %}">Edit Horse Information</a>
-            </li> {% endcomment %}
-            {% comment %} <li>
-                <a href="{% url 'add_rider' show_date=date %}">Add Rider</a>
-            </li> {% endcomment %}
-
-            {% comment %} <li>
-                <a href="{% url 'add_horse' show_date=date %}">Add Horse</a>
-            </li> {% endcomment %}
-            <li>
-                {% comment %} <input class="btn btn-primary" type="hidden" id="viewURL"
-                    data-url="{% url 'search_combo' %}"> {% endcomment %}
-                <form id="viewComboForm" action="{% url 'search_combo' show_date=date %}" class="form-inline"
-                    method="post">
-                    <input type="text" name="combo_num" class="form-control-sm" placeholder="Enter combo num">
-                    <button class="btn btn-primary" type="submit">View</a>
-                </form>
-
-            </li>
-
             {% endif %}
+
             <li>
                 <a href="{% url 'view_riders' %}">Riders</a>
             </li>
@@ -84,6 +59,7 @@
             <li>
                 <a href="{% url 'view_horses' %}">Horses</a>
             </li>
+
 
 
 

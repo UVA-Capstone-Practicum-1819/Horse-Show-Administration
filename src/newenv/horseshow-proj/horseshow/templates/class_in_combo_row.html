@@ -1,0 +1,10 @@
+<tr scope="row">
+
+    <td>{{class.num}}</td>
+    <td>{{class.name}}</td>
+    <td><a href="{% url 'view_division' division_id=class.division.pk %}">{{class.division.name}}</a></td>
+    <td>
+        <button class="btn btn-danger btn-sm deleteClassFromComboButton"
+            data-url="{% url 'remove_class_from_combo' combo_pk=combo.pk class_pk=class.pk %}">X</button>
+    </td>
+</tr>
