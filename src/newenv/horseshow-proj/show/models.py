@@ -80,9 +80,9 @@ class Horse(models.Model):
     alphanumeric_validator = RegexValidator(
         r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
 
-    size_choices = (("NA", "N/A"), ("small", "SM"),
-                    ("medium", "MED"), ("large", "LG"), )
-    type_choices = (("horse", "Horse"), ("pony", "Pony"), )
+    size_choices = (("NA", "N/A"), ("SM", "SM"),
+                    ("MED", "MED"), ("LG", "LG"), )
+    type_choices = (("Horse", "Horse"), ("Pony", "Pony"), )
     name = models.CharField(max_length=200, verbose_name="Name (Barn Name)")
     accession_num = models.CharField(
         max_length=20, verbose_name="Accession Number", validators=[alphanumeric_validator])
@@ -141,8 +141,8 @@ class HorseRiderCombo(models.Model):
     num = models.IntegerField(validators=[MinValueValidator(
         100), MaxValueValidator(999)], verbose_name="Combination Number")
 
-    contact_choices = (("rider", "Rider"), ("owner", "Owner"),
-                       ("parent", "Parent"), ("trainer", "Trainer"))
+    contact_choices = (("Rider", "Rider"), ("Owner", "Owner"),
+                       ("Parent", "Parent"), ("Trainer", "Trainer"))
     rider = models.ForeignKey(
         Rider, on_delete=models.CASCADE, related_name='combos')
     horse = models.ForeignKey(
@@ -157,7 +157,9 @@ class HorseRiderCombo(models.Model):
                             verbose_name="Contact Cell Phone Number")
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, null=True, related_name='combos')
-    is_preregistered = models.BooleanField(default=False)
+
+    is_preregistered = models.BooleanField(
+        default=False, verbose_name="Preregistered")
 
     def __str__(self):
 

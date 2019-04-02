@@ -172,9 +172,8 @@ class AddComboToClassForm(forms.Form):
     preregistered = forms.BooleanField(required=False)
 
 
-class HorseRiderComboCreateForm(forms.ModelForm):
-    """ # This creates the Horse Rider Combo itself. for creating a horse rider combo """
-
+""" class HorseRiderComboCreateForm(forms.ModelForm):
+    
     email = forms.EmailField(required=False, label="Email")
     cell = forms.CharField(max_length=12, required=False,
                            label="Cell Phone #")
@@ -193,7 +192,7 @@ class HorseRiderComboCreateForm(forms.ModelForm):
             raise forms.ValidationError(
                 'Have to include at least 1 contact (email or cell)')
 
-        return cleaned_data
+        return cleaned_data """
 
 
 class ComboForm(forms.ModelForm):
@@ -212,14 +211,6 @@ class ComboForm(forms.ModelForm):
     cell = forms.CharField(max_length=12, required=False,
                            label="Cell Phone #")
 
-    """ widget=forms.TextInput(
-        attrs={
-
-            'class': 'basicAutoComplete',
-            'data-url': reverse_lazy('select_rider')
-        }
-    ) """
-
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get('email')
@@ -229,32 +220,15 @@ class ComboForm(forms.ModelForm):
             raise forms.ValidationError(
                 'Have to include at least 1 contact (email or cell)')
 
-        return cleaned_data
-
     def validate_unique(self):
         exclude = self._get_validation_exclusions()
+
         exclude.remove('show')  # allow checking against the missing attribute
 
         try:
             self.instance.validate_unique(exclude=exclude)
         except ValidationError as e:
             self._update_errors(e.message_dict)
-
-    """ def full_clean(self):
-        cleaned_data = super(ComboForm, self).full_clean()
-        try:
-            self.instance.validate_unique()
-            email = cleaned_data.get('email')
-            cell = cleaned_data.get('cell')
-
-            if not email and not cell:
-                raise forms.ValidationError(
-                    'Have to include at least 1 contact (email or cell)')
-
-        except forms.ValidationError as e:
-            self._update_errors(e)
-
-        return cleaned_data """
 
 
 class ShowSelectForm(forms.ModelForm):

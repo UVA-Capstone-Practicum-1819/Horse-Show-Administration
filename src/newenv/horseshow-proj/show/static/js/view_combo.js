@@ -36,8 +36,8 @@ $("#addClassToComboForm").on('submit', function (event) {
     event.preventDefault();
     addClassForm = $(this);
     $.ajax({
-        url: addClassForm.data('action'),
-        type: "post",
+        url: addClassForm.attr('action'),
+        type: addClassForm.attr('method'),
         data: addClassForm.serialize(),
         success: function (response) {
             $("#riderTable").append(response['template']);

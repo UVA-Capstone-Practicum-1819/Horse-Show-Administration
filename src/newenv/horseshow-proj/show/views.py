@@ -28,7 +28,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from .labels import generate_show_labels
 
-logger = logging.getLogger("loggingP")
+logger = logging.getLogger("logging")
 
 
 class AuthRequiredMiddleware(object):
@@ -1251,9 +1251,10 @@ def delete_combo(request, combo_pk):
 def add_combo(request, show_date):
     """ adds a new combo to the show """
     if request.method == "POST":
-        logger.error("show date:" + str(show_date))
         show = Show.objects.get(pk=show_date)
-        add_combo_form = ComboForm(request.POST)
+        
+        
+        add_combo_form = ComboForm(request.POST, instance=HorseRiderCombo(show=show))
         if add_combo_form.is_valid():
             added_combo = add_combo_form.save(commit=False)
             added_combo.show = show
@@ -1289,7 +1290,7 @@ def get_combo_form(request, combo_pk=None):
 
 def calculate_combo_bill(combo):
     """ calculates the total bill of a horse-rider combo (calculates price of all the classes) """
-    num_classes = len(combo.classes)
+    num_classes = len(combo.classes.all())
     show = combo.show
     if combo.is_preregistered:
         combo_bill = num_classes * show.pre_reg_price
@@ -1313,7 +1314,7 @@ def add_class_to_combo(request, combo_pk):
                 combo=combo, participated_class=selected_class[0])
             participation.save()
             response = {
-                'template': render(request, 'class_in_combo_row.html', {'class': selected_class}),
+                'template': render(request, 'class_in_combo_row.html', {'class': selected_class, 'combo': combo}),
                 'combo_bill': calculate_combo_bill(combo)
             }
             return JsonResponse(response, status=200)
