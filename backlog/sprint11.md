@@ -2,7 +2,7 @@ coverage, debugging, and thesis formatting -- Shannon
 
 STS technical thesis, User Manual -- everyone
 
-excel and debugging -- Anna
+export 4-H excel -- Anna (Developed: Y, Tested: Y, Tested by Client: TBD)
 
 cleaning up code, fixing functionality -- Gina and Shivani
 
