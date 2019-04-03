@@ -91,13 +91,17 @@
         {% csrf_token %}
         <div class="form-group">
             {% comment %} form is just a number {% endcomment %}
-            <input id="classNumField" name="class_num" type="number" class="form-control">
+            <input id="classNumField" name="class_num" type="number" class="form-control"
+                placeholder="Enter class number">
             <input type="submit" class="btn btn-success btn-sm" value="Add Class">
-            <small id="classNumHelp" class="text-muted">
 
-            </small>
+
+
         </div>
+
     </form>
+
+    <small id="messages" muted="true"></small>
 
 
 </div>

@@ -40,30 +40,42 @@ $("#addClassToComboForm").on('submit', function (event) {
         type: addClassForm.attr('method'),
         data: addClassForm.serialize(),
         success: function (response) {
-            $("#riderTable").append(response['template']);
+            console.log("hey i'm here");
+            var data = response.responseJSON;
+            var participation = data['participation'];
+            $.ajax({
+                url:
+            })
+            $("#classTable").append(data['template']);
             $("#classNumField").html("");
             $("#classNumHelp").html("");
-            $("#billCell").html(response['combo_bill']);
+            $("#billCell").html(data['combo_bill']);
+
         },
         error: function (response, status, xhr) {
-            $("#classNumHelp").html(response['responseText']);
+
+            var data = response.responseJSON
+            $("#messages").html(data['message']);
         }
-    });
+    })
 });
 
 /* button listener for deleting a class from a combo */
-$("#classTable").on('click', '.deleteClassFromCombo', function (event) {
+$("#classTable").on('click', '.deleteClassFromComboButton', function (event) {
     event.preventDefault();
     var deleteButton = $(this);
+    console.log(deleteButton.data('url'));
     $.ajax({
         url: deleteButton.data('url'),
         type: "get",
         success: function (response) {
+            var data = response.responseJSON;
             deleteButton.parent().parent().remove();
-            $("#billCell").html(response['combo_bill']);
+            $("#billCell").html(data['combo_bill']);
         },
         error: function (response, status, xhr) {
-
+            var data = response.responseJSON;
+            $("#messages").html(data['message']);
         }
     });
 });

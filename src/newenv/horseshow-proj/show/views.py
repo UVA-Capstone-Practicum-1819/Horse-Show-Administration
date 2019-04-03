@@ -1252,9 +1252,9 @@ def add_combo(request, show_date):
     """ adds a new combo to the show """
     if request.method == "POST":
         show = Show.objects.get(pk=show_date)
-        
-        
-        add_combo_form = ComboForm(request.POST, instance=HorseRiderCombo(show=show))
+
+        add_combo_form = ComboForm(
+            request.POST, instance=HorseRiderCombo(show=show))
         if add_combo_form.is_valid():
             added_combo = add_combo_form.save(commit=False)
             added_combo.show = show
@@ -1288,6 +1288,7 @@ def get_combo_form(request, combo_pk=None):
 
     return render(request, "simple_form.html", {"form": combo_form})
 
+
 def calculate_combo_bill(combo):
     """ calculates the total bill of a horse-rider combo (calculates price of all the classes) """
     num_classes = len(combo.classes.all())
@@ -1298,6 +1299,7 @@ def calculate_combo_bill(combo):
         combo_bill = num_classes * show.day_of_price
     return combo_bill
 
+
 def view_combo(request, combo_pk):
     viewed_combo = HorseRiderCombo.objects.get(pk=combo_pk)
     return render(request, 'view_combo.html', {"combo": viewed_combo, 'combo_bill': calculate_combo_bill(viewed_combo)})
@@ -1307,34 +1309,47 @@ def add_class_to_combo(request, combo_pk):
     """ registering a class for a combo """
     if request.method == "POST":
         combo = HorseRiderCombo.objects.get(pk=combo_pk)
+
         class_num = request.POST['class_num']
+
         selected_class = combo.show.classes.filter(num=class_num)
+
         if selected_class:
+            existing_participation = ClassParticipation.objects.filter(
+                combo=combo, participated_class=selected_class[0])
+            if existing_participation:
+                response = {
+                    'message': "Cannot add a class to the combo that it already has."}
+                return JsonResponse(response, status=400)
+
             participation = ClassParticipation.objects.create(
                 combo=combo, participated_class=selected_class[0])
-            participation.save()
             response = {
-                'template': render(request, 'class_in_combo_row.html', {'class': selected_class, 'combo': combo}),
+                'participation': participation,
                 'combo_bill': calculate_combo_bill(combo)
             }
             return JsonResponse(response, status=200)
         else:
-            response = {'responseText': "Class with that number does not exist in this show"}
+            response = {
+                'message': "Class with that number does not exist in this show"}
             return JsonResponse(response, status=400)
+
 
 def delete_class_from_combo(request, combo_pk, class_pk):
     """ removes a class (deregisters) from a combo  """
-    combo = HorseRiderCombo.objects.get(combo_pk)
-    deleted_class = combo.classes.filter(pk=class_pk)
-    if deleted_class:
-        deleted_class.delete()
+    combo = HorseRiderCombo.objects.get(pk=combo_pk)
+    deleted_class = Class.objects.get(pk=class_pk)
+    participation = ClassParticipation.objects.filter(
+        combo=combo, participated_class=deleted_class)
+    if participation:
+        participation.delete()
         response = {
-            'responseText': "Successfully de-registered the class from the horse-rider combination.",
-            'combo_bill' : calculate_combo_bill(combo)
+            'message': "Successfully de-registered the class from the horse-rider combination.",
+            'combo_bill': calculate_combo_bill(combo)
         }
         return JsonResponse(response, status=200)
     else:
         response = {
-            'responseText' : "De-registering the class from the horse-rider combination was unsuccessful. The removed class may not exist."
+            'message': "De-registering the class from the horse-rider combination was unsuccessful. The removed class may not exist."
         }
         return JsonResponse(response, status=400)

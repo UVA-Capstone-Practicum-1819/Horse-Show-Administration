@@ -1,5 +1,8 @@
 <tr scope="row">
 
+    {% with class=participation.participated_class %}
+    {% with combo=participation.combo %}
+
     <td>{{class.num}}</td>
     <td>{{class.name}}</td>
     <td>{{class.division.name}}</td>
