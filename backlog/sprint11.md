@@ -1,4 +1,4 @@
-coverage, debugging, and thesis formatting -- Shannon
+coverage, debugging, and thesis formatting -- Shannon (Developed: Y, Tested: Y, Tested by Client: Y)
 
 STS technical thesis, User Manual -- everyone
 
