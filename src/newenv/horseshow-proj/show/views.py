@@ -1314,21 +1314,31 @@ def add_class_to_combo(request, combo_pk):
 
         selected_class = combo.show.classes.filter(num=class_num)
 
+        # if the selected class exists in the show
         if selected_class:
             existing_participation = ClassParticipation.objects.filter(
                 combo=combo, participated_class=selected_class[0])
+            # if the class already has been added to the combo
             if existing_participation:
                 response = {
                     'message': "Cannot add a class to the combo that it already has."}
                 return JsonResponse(response, status=400)
-
+            # create the pairing between the combo and class
             participation = ClassParticipation.objects.create(
                 combo=combo, participated_class=selected_class[0])
+
+            participated_class = selected_class[0]
+
+
             response = {
-                'participation': participation,
+                """ 'class_num': participated_class.num,
+                'class_name': participated_class.name,
+                'div_name': participated_class.division.name,
+                'delete_url': reverse('delete_class_from_combo', combo_pk=combo.pk, class_pk=participated_class.pk), """
+                'class_row_template': render(request, 'class_in_combo_row.html', {'participation': participation}),
                 'combo_bill': calculate_combo_bill(combo)
             }
-            return JsonResponse(response, status=200)
+            return HttpResponse(response, status=200)
         else:
             response = {
                 'message': "Class with that number does not exist in this show"}

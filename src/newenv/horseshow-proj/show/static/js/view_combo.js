@@ -30,6 +30,16 @@ $("#updateComboModal").on('show.bs.modal', function (event) {
 
 });
 
+function addClass(data) {
+    var class_num = data['class_num'];
+    var class_name = data['class_name'];
+    var div_name = data['div_name'];
+    var delete_url = data['delete_url'];
+    var combo_bill = data['combo_bill'];
+
+
+
+}
 
 /* button listener for adding a class to the combo */
 $("#addClassToComboForm").on('submit', function (event) {
@@ -40,12 +50,10 @@ $("#addClassToComboForm").on('submit', function (event) {
         type: addClassForm.attr('method'),
         data: addClassForm.serialize(),
         success: function (response) {
-            console.log("hey i'm here");
+
             var data = response.responseJSON;
             var participation = data['participation'];
-            $.ajax({
-                url:
-            })
+
             $("#classTable").append(data['template']);
             $("#classNumField").html("");
             $("#classNumHelp").html("");

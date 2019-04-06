@@ -3,9 +3,9 @@
     {% with class=participation.participated_class %}
     {% with combo=participation.combo %}
 
-    <td>{{class.num}}</td>
-    <td>{{class.name}}</td>
-    <td>{{class.division.name}}</td>
+    <td id="classNumCell">{{class.num}}</td>
+    <td id="classNameCell">{{class.name}}</td>
+    <td id="classDivCell">{{class.division.name}}</td>
     <td>
         <button class="btn btn-danger btn-sm deleteClassFromComboButton"
             data-url="{% url 'delete_class_from_combo' combo_pk=combo.pk class_pk=class.pk %}">X</button>
