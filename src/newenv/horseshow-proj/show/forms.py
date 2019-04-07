@@ -140,7 +140,7 @@ class HorseForm(forms.ModelForm):
         cleaned_data = super().clean()
         horse_type = cleaned_data['type']
         size = cleaned_data['size']
-        if horse_type == "pony" and size == "NA":
+        if horse_type == "Pony" and size == "N/A":
             raise ValidationError("A pony must have its size specified.")
         return cleaned_data
 

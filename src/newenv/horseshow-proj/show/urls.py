@@ -9,7 +9,6 @@ from . import views
 combo_patterns = [
     path('view', views.view_combo, name="view_combo"),
 
-    path('scratch', views.scratch_combo, name="scratch_combo"),
 
     path('edit', views.edit_combo, name="edit_combo"),
 
@@ -133,11 +132,11 @@ urlpatterns = [
 
     path('combo/<combo_pk>/', include(combo_patterns)),
 
-    path('rider/select', views.select_rider, name="select_rider"),
+
 
     path('rider/<int:rider_pk>/', include(rider_patterns)),
 
-    path('horse/select', views.select_horse, name="select_horse"),
+
 
     path('horse/<int:horse_pk>/', include(horse_patterns)),
 

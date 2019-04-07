@@ -80,7 +80,7 @@ class Horse(models.Model):
     alphanumeric_validator = RegexValidator(
         r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
 
-    size_choices = (("NA", "N/A"), ("SM", "SM"),
+    size_choices = (("N/A", "N/A"), ("SM", "SM"),
                     ("MED", "MED"), ("LG", "LG"), )
     type_choices = (("Horse", "Horse"), ("Pony", "Pony"), )
     name = models.CharField(max_length=200, verbose_name="Name (Barn Name)")
