@@ -102,6 +102,10 @@ show_patterns = [
     path('all_combos', views.view_combos, name="view_combos"),
 
     path('generate_labels', views.generate_labels, name="generate_labels"),
+
+    path('populate-pdf', views.populate_pdf, name="populate_pdf"),
+
+    path('populate-excel', views.populate_excel, name="populate_excel"),
 ]
 
 urlpatterns = [
@@ -119,9 +123,9 @@ urlpatterns = [
          views.get_combo_form, name="get_combo_form_edit"),
 
 
-    path('populate-pdf', views.populate_pdf, name="populate_pdf"),
 
-    path('populate-excel', views.populate_excel, name="populate_excel"),
+
+
 
 
     path('get_combo_form', views.get_combo_form, name="get_combo_form"),
