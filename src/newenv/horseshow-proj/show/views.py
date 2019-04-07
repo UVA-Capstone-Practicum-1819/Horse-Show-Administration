@@ -66,33 +66,14 @@ class AuthRequiredMiddleware(object):
 def view_show(request, show_date):
     """ used as the home page for a selected show """
     show = Show.objects.get(date=show_date)
-    if request.method == "POST":
-        form = ComboNumForm(request.POST)
-        if form.is_valid():
-            num = form.cleaned_data['num']
-            combo = show.combos.filter(num=num)
-            if combo:
-                return redirect('edit_combo', combo_num=num, show_date=show_date)
-            else:
-                messages.error(request, "The combination number entered does not exist in this show.")
-                return redirect('view_show', show_date=show_date)
-    #for combo in HorseRiderCombo.objects.filter(show = show):
-    #    if combo.num==num:
-    #        return redirect('edit_combo', combo_num=num, show_date=show_date)
-    #    else:
-    #        print(combo.num)
-    #        print(num)
-    #        messages.error(request, "The combination number entered does not exist in this show.")
-    #        return redirect('view_show', show_date=show_date)
-
-    form = ComboNumForm()
+    
     context = {
         "show_name": show.name,
         "date": show_date,
         "date_obj": datetime.datetime.strptime(show_date, "%Y-%m-%d"),
         "location": show.location,
         "divisions": show.divisions.all().order_by('first_class_num'),
-        'form': form,
+
 
     }
     return render(request, 'view_show.html', context)
@@ -121,19 +102,12 @@ def add_show(request):
 
 
 def select_show(request):
-    """ view that allows the user to select a show """
-    if request.method == "POST":
-        form = ShowSelectForm(request.POST)
-        if form.is_valid():
-            show = form.cleaned_data['date']
-            # for some reason, the regular show select autocompletion menu doesn't work, so to fix that, we need to add a few characters ("foo") to the show date and then strip them away (as they are here)
-            show.date = show.date[:-3]
-            show_date = show.date
-            request.session['show_date'] = show_date
-            return redirect('view_show', show_date)
-    else:
-        form = ShowSelectForm()
-    return render(request, 'select_show.html', {'form': form})
+
+    context = {
+        'shows': Show.objects.all()
+    }
+
+    return render(request, 'select_show.html', context)
 
 
 def sign_up(request):  # pragma: no cover # what does this comment mean?

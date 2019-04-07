@@ -1,16 +1,40 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-<h3>Show Select</h3>
-<div>
-    <form class="form" action="{% url 'select_show' %}" method="post">
-        {% csrf_token %}
-        <p>{{ form | crispy }} </p>
-        <p><button type="submit" class="btn btn-success">Select Show</button></p>
-    </form>
-    <a href="{% url 'add_show' %}">Can't find it? Create a New Show</a>
-</div>
 
-{{ form.media }}
+<h3>Select Show</h3>
+
+<table class="table table-striped table-hover table-bordered">
+    <thead class="bg-info">
+        <th> Show </th>
+        <th> Date </th>
+        <th> Location </th>
+        <th> Day-of Price </th>
+        <th> Preregistration Price </th>
+    </thead>
+    <tbody>
+        {% for show in shows %}
+        <tr>
+            <td>
+                <a class="viewShowLink" data-show="{{show.pk}}"
+                    href="{% url 'view_show' show_date=show.date %}">{{ show.name}}</a>
+            </td>
+            <td>
+                {{ show.date}}
+            </td>
+
+            <td>
+                {{ show.location}}
+            </td>
+            <td>
+                {{ show.day_of_price}}
+            </td>
+            <td>
+                {{ show.pre_reg_price}}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 {% endblock %}
