@@ -25,8 +25,8 @@
             {% endwith %}
           </td>
           <td>
-            <a class="btn btn-danger deleteComboFromClassButton"
-              href="{% url 'delete_participation' combo_pk=combo.pk class_pk=class.pk %}">X</a>
+            <button class="btn btn-danger deleteComboFromClassButton"
+              data-url="{% url 'delete_participation' combo_pk=combo.pk class_pk=class.pk %}">X</button>
 
           </td>
         </tr>

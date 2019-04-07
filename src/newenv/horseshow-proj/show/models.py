@@ -150,7 +150,7 @@ class HorseRiderCombo(models.Model):
     classes = models.ManyToManyField(
         Class, blank=True, through='ClassParticipation', related_name="combos")
     contact = models.CharField(
-        max_length=100, choices=contact_choices, default="rider")
+        max_length=100, choices=contact_choices, default="Rider")
     email = models.EmailField(blank=True, null=True,
                               verbose_name="Contact Email")
     cell = models.CharField(max_length=12, blank=True,

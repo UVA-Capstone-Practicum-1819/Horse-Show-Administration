@@ -24,8 +24,8 @@ class BillTests(TestCase):
         combo = HorseRiderCombo.objects.create(
             num=555, rider=rider1, horse=horse1)
         class_participation = ClassParticipation(
-            participated_class=c1, combo=combo, is_preregistered=False)
-        self.assertFalse(class_participation.is_preregistered)
+            participated_class=c1, combo=combo)
+        #self.assertFalse(class_participation.is_preregistered)
 
     def test_billpage_pricecheck(self):
         horse1 = Horse.objects.create(name="Lollipop", coggins_date="2011-10-11",
@@ -36,8 +36,8 @@ class BillTests(TestCase):
         combo = HorseRiderCombo.objects.create(
             num=555, rider=rider1, horse=horse1)
         class_participation = ClassParticipation(
-            participated_class=c2, combo=combo, is_preregistered=True)
-        self.assertTrue(class_participation.is_preregistered)
+            participated_class=c2, combo=combo)
+        # self.assertTrue(class_participation.is_preregistered)
 
 
 class Add_Combo_Classes(TestCase):
@@ -50,7 +50,7 @@ class Add_Combo_Classes(TestCase):
         combo = HorseRiderCombo.objects.create(
             num=555, rider=rider1, horse=horse1)
         class_participation = ClassParticipation(
-            participated_class=c1, combo=combo, is_preregistered=False)
+            participated_class=c1, combo=combo)
         self.assertEqual(c1, class_participation.participated_class)
 
     def wrong_class_for_combo(self):
@@ -62,12 +62,12 @@ class Add_Combo_Classes(TestCase):
         combo = HorseRiderCombo.objects.create(
             num=555, rider=rider1, horse=horse1)
         class_participation = ClassParticipation(
-            participated_class=c1, combo=combo, is_preregistered=False)
+            participated_class=c1, combo=combo)
         self.assertFalse(combo, class_participation.combo)
 
     def classparticipation_form_invalid(self):
         class_participation = ClassParticipation(
-            participated_class=c1, combo=combo, is_preregistered=True)
+            participated_class=c1, combo=combo)
         self.assertTrue(isinstance(class_participation, ClassParticipation))
 
 
@@ -224,32 +224,12 @@ class ViewsTestCases(TestCase):
         request = HttpRequest()
         response = self.client.get(reverse('select_show'))
 
-    def test_select_combo(self):
-        self.client.login(username='john', password='johnpassword')
-        request = HttpRequest()
-        response = self.client.get(
-            reverse('select_combo', kwargs={'show_date': '2018-12-10'}))
-
     def test_select_show_post(self):
         self.client.login(username='john', password='johnpassword')
         show = Show.objects.create(
             name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
         request = HttpRequest()
         response = self.client.post('/show/', {'date': '2018-12-10'})
-
-    def test_select_combo_post(self):
-        horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
-            '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
-        rider1 = Rider.objects.create(first_name="Anna",last_name= "Wu", address="address1", city="cville", state="VA",
-                                      zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
-        combo1 = HorseRiderCombo.objects.create(
-            num=200, rider=rider1, horse=horse1)
-        self.client.login(username='john', password='johnpassword')
-        show = Show.objects.create(
-            name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
-        request = HttpRequest()
-        response = self.client.post(
-            '/show/2018-12-10/combo/select', {'combo': '200'})
 
 
 class CheckAdult(TestCase):
@@ -525,25 +505,25 @@ class CheckHorse(TestCase):
     def test_update_horse_add_post(self):
         
         response = self.client.post(
-            reverse('add_horse'), data={'name': "Some Horse Name", 'accession_num': "3DBA", 'coggins_date': self.horse2.coggins_date, 'owner': "Grumpsy", 'type': "pony",
-             'size': "small",})
+            reverse('add_horse'), data={'name': "Some Horse Name", 'accession_num': "3DBA", 'coggins_date': self.horse2.coggins_date, 'owner': "Grumpsy", 'type': "Pony",
+             'size': "SM",})
 
     def test_update_horse_edit_post(self):
         
         response = self.client.post(
-            reverse('edit_horse', kwargs={"horse_pk": self.horse1.pk}), data={'name': "Some Horse Name", 'accession_num': "3DBA", 'coggins_date': self.horse2.coggins_date, 'owner': "Grumpsy", 'type': "pony",
-             'size': "small",})             
+            reverse('edit_horse', kwargs={"horse_pk": self.horse1.pk}), data={'name': "Some Horse Name", 'accession_num': "3DBA", 'coggins_date': self.horse2.coggins_date, 'owner': "Grumpsy", 'type': "Pony",
+             'size': "SM",})             
 
-    def test_update_rider_valid(self):
+    def test_update_horse_valid(self):
         
         response = self.client.post(
-            reverse('add_horse'), data={'name': "Some Horse Name", 'accession_num': "3DBA", 'coggins_date': self.horse2.coggins_date, 'owner': "Grumpsy", 'type': "pony",
-             'size': "small",})
+            reverse('add_horse'), data={'name': "Some Horse Name", 'accession_num': "3DBA", 'coggins_date': self.horse2.coggins_date, 'owner': "Grumpsy", 'type': "Pony",
+             'size': "SM",})
 
-    def test_update_rider_invalid(self):
+    def test_update_horse_invalid(self):
         
         response = self.client.post(
-            reverse('add_horse'), data={'name': "Some Horse Name", 'accession_num': "3DBA", 'coggins_date': self.horse2.coggins_date, 'owner': "Grumpsy", 'type': "pony",
+            reverse('add_horse'), data={'name': "Some Horse Name", 'accession_num': "3DBA", 'coggins_date': self.horse2.coggins_date, 'owner': "Grumpsy", 'type': "Pony",
              'size': "NA",})
 
     def test_get_horse_form_add_get(self):
@@ -632,44 +612,108 @@ class ComboTestCases(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+        self.show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        self.rider = Rider.objects.create(first_name="Anna", last_name="Wu", address="address1", city="cville", state="VA",
+                                     zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
+        self.horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
+            '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="Horse", size="NA")
+        
+        self.horse2 = Horse.objects.create(name="Rubio", coggins_date=datetime.datetime.strptime(
+            '20100522', "%Y%m%d").date(), accession_num="ace345", owner="Anna Wu", type="Horse", size="NA")
 
-    def test_select_combo(self):
-        self.client.login(username='john', password='johnpassword')
-        request = HttpRequest()
-        response = self.client.get(reverse('select_combo', kwargs={'show_date':'2018-12-10'}))
+        self.combo1 = HorseRiderCombo.objects.create(
+            num=200, rider=self.rider, horse=self.horse, show=self.show)
 
-    def test_select_combo_billing_post(self):
-        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
-        horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
-            '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
-        rider1 = Rider.objects.create(first_name="Anna",last_name= "Wu", address="address1", city="cville", state="VA",
-                                      zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
-        combo1 = HorseRiderCombo.objects.create(
-            num=200, rider=rider1, horse=horse1, show=show)
-        c1 = Class.objects.create(name="Test", num="1")
-        c2 = Class.objects.create(name="Test2", num="2")
-        class_participation = ClassParticipation.objects.create(participated_class=c1, combo=combo1, is_preregistered=False)
-        class_participation = ClassParticipation.objects.create(participated_class=c2, combo=combo1, is_preregistered=True)
-        self.client.login(username='john', password='johnpassword')
-        request = HttpRequest()
-        response = self.client.post('/show/2018-12-10/combo/select', {'combo':combo1.pk})
-        self.assertRedirects(response, '/show/2018-12-10/combo/200/billing')
 
-    def test_scratch_combo_billing(self):
-        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
-        horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
-            '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
-        rider1 = Rider.objects.create(first_name="Anna",last_name= "Wu", address="address1", city="cville", state="VA",
-                                      zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
-        combo1 = HorseRiderCombo.objects.create(
-            num=200, rider=rider1, horse=horse1, show=show)
-        c1 = Class.objects.create(name="Test", num="1")
-        c2 = Class.objects.create(name="Test2", num="2")
-        class_participation = ClassParticipation.objects.create(participated_class=c1, combo=combo1, is_preregistered=False)
-        class_participation = ClassParticipation.objects.create(participated_class=c2, combo=combo1, is_preregistered=True)
-        self.client.login(username='john', password='johnpassword')
-        request = HttpRequest()
-        response = self.client.get('/show/2018-12-10/combo/200/scratch', {'cnum':c1.num})
+        self.division = Division.objects.create(name="jump", show=self.show)
+
+        self.class1 = Class.objects.create(name="Test", num="1", division=self.division, show=self.show)
+
+        self.class2 = Class.objects.create(name="Test2", num="0", division=self.division, show=self.show)
+
+        self.participation = ClassParticipation.objects.create(participated_class=self.class1, combo=self.combo1)
+
+    def test_view_combos_get(self):
+        response = self.client.get(reverse('view_combos', kwargs={'show_date': self.show.date}))
+        self.assertEqual(response.status_code(), 200)
+        
+    def test_delete_combo(self):
+        response = self.client.get(reverse('delete_combo', kwargs={'combo_pk': self.combo1.pk}))
+        self.assertEqual(response.status_code(), 200)
+
+    def test_add_combo_valid(self):
+        response = self.client.post(reverse('add_combo', kwargs={'show_date': self.show.pk}), data={
+            'rider': self.rider.pk,
+            'horse': self.horse2.pk,
+            'email': "coudlbyanyting@gmail.com",
+            'is_preregistered': True,
+            'contact': "Parent"
+        })
+        self.assertEqual(response.status_code(), 200)
+
+    def test_add_combo_invalid(self):
+        response = self.client.post(reverse('add_combo', kwargs={'show_date': self.show.pk}), data={
+            'rider': self.rider.pk,
+            'horse': self.horse1.pk,
+            'email': "coudlbyanyting@gmail.com",
+            'is_preregistered': True,
+            'contact': "Parent"
+        })
+        self.assertEqual(response.status_code(), 400)
+    
+    def test_edit_combo_valid(self):
+        response = self.client.post(reverse('edit_combo', kwargs={'combo_pk': self.combo1.pk}), data={
+            'rider': self.rider.pk,
+            'horse': self.horse1.pk,
+            'email': "heyheyhey@gmail.com",
+            'is_preregistered': True,
+            'contact': "Rider"
+        })
+        self.assertEqual(response.status_code(), 200)
+
+    def test_edit_combo_invalid(self):
+        response = self.client.post(reverse('edit_combo', kwargs={'combo_pk': self.combo1.pk}), data={
+            'rider': self.rider.pk,
+            'horse': self.horse1.pk,
+            'email': "heyheyhe",
+            'is_preregistered': True,
+            'contact': "Rider"
+        })
+        self.assertEqual(response.status_code(), 400)
+
+    def test_get_combo_form_combo_exists(self):
+        response = self.client.get(reverse('get_combo_form', kwargs={'combo_pk': self.combo1.pk}))
+        self.assertEqual(response.status_code(), 200)
+
+    def test_get_combo_form_combo_nones(self):
+        response = self.client.get(reverse('get_combo_form'))
+        self.assertEqual(response.status_code(), 200)
+
+
+    def test_get_class_in_combo_row_get(self):
+        response = self.client.get(reverse('get_class_in_combo_form', kwargs={'participation_pk': self.participation.pk}))
+        self.assertEqual(response.status_code(), 200)
+
+    def test_add_class_to_combo_class_exists_non_duplicate(self):
+        response = self.client.post(reverse('add_class_to_combo', kwargs={'combo_pk': self.combo1.pk}), data={'class_num': 0})
+        self.assertEqual(response.status_code(), 200)
+
+    def test_add_class_to_combo_class_exists_duplicate(self):
+        response = self.client.post(reverse('add_class_to_combo', kwargs={'combo_pk': self.combo1.pk}), data={'class_num': 1})
+        self.assertEqual(response.status_code(), 400)
+
+    def test_add_class_to_combo_class_does_not_exist(self):
+        response = self.client.post(reverse('add_class_to_combo', kwargs={'combo_pk': self.combo1.pk}), data={'class_num': 300})
+        self.assertEqual(response.status_code(), 400)
+
+    def test_delete_participation_part_exists(self):
+        response = self.client.get(reverse('delete_participation', kwargs={'combo_pk': self.combo1.pk, 'class_pk': self.class1.pk}))
+        self.assertEqual(response.status_code(), 200)
+
+    def test_delete_participation_part_does_not_exist(self):
+        response = self.client.get(reverse('delete_participation', kwargs={'combo_pk': self.combo1.pk, 'class_pk': 30}))
+        self.assertEqual(response.status_code(), 400)
+    
 
 class DivisionsTestCases(TestCase):
     def test_add_division(self):
@@ -725,8 +769,8 @@ class RankTestCases(TestCase):
         combo2 = HorseRiderCombo.objects.create(
             num=300, rider=rider1, horse=horse2, show=show)
         c1 = Class.objects.create(name="Test", num="1", division=d1, show=show)
-        class_participation = ClassParticipation.objects.create(participated_class=c1, combo=combo1, is_preregistered=False)
-        class_participation = ClassParticipation.objects.create(participated_class=c1, combo=combo2, is_preregistered=True)
+        class_participation = ClassParticipation.objects.create(participated_class=c1, combo=combo1)
+        class_participation = ClassParticipation.objects.create(participated_class=c1, combo=combo2)
         request = HttpRequest()
         response = self.client.post('/show/2018-12-10/division/1/class/1/rank', {'first':200, 'second':300})
 
@@ -855,7 +899,7 @@ class TestViewClassTestCase(TestCase):
                                       zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
         combo1 = HorseRiderCombo.objects.create(
             num=200, rider=rider1, horse=horse1, show=show)
-        class_participation = ClassParticipation.objects.create(participated_class=c1, combo=combo1, is_preregistered=False)
+        class_participation = ClassParticipation.objects.create(participated_class=c1, combo=combo1)
         self.client.login(username='john', password='johnpassword')
         request = HttpRequest()
         response = self.client.post('/show/2018-12-10/division/1/class/1/', {'num':'200'})
@@ -890,21 +934,7 @@ class TestViewClassTestCase(TestCase):
         request = HttpRequest()
         response = self.client.get('/show/2018-12-10/division/1/class/1/')
 
-    def test_view_class_delete_combo(self):
-        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
-        d1 = Division.objects.create(name="jump", show=show)
-        c1 = Class.objects.create(name="Test", num="1", division=d1, show=show)
-        horse1 = Horse.objects.create(name="Ruby", coggins_date=datetime.datetime.strptime(
-            '20100522', "%Y%m%d").date(), accession_num="ace123", owner="Anna Wu", type="horse", size="NA")
-        rider1 = Rider.objects.create(first_name="Anna",last_name= "Wu", address="address1", city="cville", state="VA",
-                                      zip_code="22903", email="aw@email.com", adult=False, birth_date=datetime.datetime.strptime('20040122', "%Y%m%d").date())
-        combo1 = HorseRiderCombo.objects.create(
-            num=200, rider=rider1, horse=horse1, show=show)
-        class_participation = ClassParticipation.objects.create(participated_class=c1, combo=combo1, is_preregistered=False)
-        self.client.login(username='john', password='johnpassword')
-        request = HttpRequest()
-        response = self.client.get('/show/2018-12-10/division/1/class/1/combo/200/delete')
-
+    
 class AddDuplicateClass(TestCase):
     def test_failed_add_class(self):
         show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)

@@ -146,59 +146,6 @@ def sign_up(request):  # pragma: no cover # what does this comment mean?
     return render(request, 'sign_up.html', {'form': form})
 
 
-def select_combo(request, show_date):
-    """ Used to retrieve information necessary for billing a rider """
-    if request.method == "POST":
-        form = ComboSelectForm(request.POST)
-        # allows the user to select from the pre-existing horse-rider combos
-        if form.is_valid():
-            combo = form.cleaned_data['combo']
-            return redirect('view_billing', show_date=show_date, combo_num=combo.num)
-    else:
-        form = ComboSelectForm()
-    return render(request, 'select_combo.html', {'form': form, 'date': show_date})
-
-
-def view_billing(request, show_date, combo_num):
-    """ Billing list shows what horse rider combos need to be billed for and their total price based on
-    whether or not they are pregistered for each class """
-    show = Show.objects.get(date=show_date)
-    combo = show.combos.filter(show=show_date).get(num=combo_num)
-    participations = combo.participations.all()
-    classes = combo.classes.all()
-    total = classes.count()
-    price = 0
-    for classe in classes:
-        class_pre_reg = ClassParticipation.objects.filter(
-            combo=combo).get(participated_class=classe)
-        if class_pre_reg.is_preregistered == True:
-            price += show.pre_reg_price
-        else:
-            price += show.day_of_price
-    #total = classes.count()
-    #price = show.pre_reg_price * total
-    # for minimum requirements, only calculates price based on pre-registration price
-    context = {'name': combo.rider, 'show_date': show_date,
-               'classes': participations, 'combo_num': combo_num, 'tot': total, 'price': price}
-    # the context will help create the table for the list of classes a user is currently in
-    return render(request, 'view_billing.html', context)
-
-
-def scratch_combo(request, show_date, combo_num):
-    """ This view allows you to scratch from a show """
-    show = Show.objects.get(date=show_date)
-    combo = show.combos.get(num=combo_num)
-    class_num = request.GET["cnum"]
-    class_obj = Class.objects.get(num=class_num)
-    selected_class = ClassParticipation.objects.filter(
-        combo=combo).get(participated_class=class_obj)
-    selected_class.delete()
-    return redirect('view_billing', show_date=show_date, combo_num=combo_num)
-    # this line allows for a classes to be scratched (or removed) at no additional cost
-    # the list will be changed based on what classes were removed
-    # classes will only be removed from the horse-rider combo object, not from the entire database
-
-
 def view_division_scores(request, show_date, division_id):
     """ displays list of classes in division, hrc winners of each of those classes from 1st-6th places, and form to enter champion info """
 
@@ -543,18 +490,6 @@ def view_class(request, show_date, division_id, class_num):
         "add_form": form,
     }
     return render(request, "view_class.html", context)  # render info
-
-
-def delete_combo(request, show_date, division_id, class_num, combo_num):
-    """ scratch a combo from the class page so that it reflects in the combo's billing """
-    combo = HorseRiderCombo.objects.get(num=combo_num)
-    show = Show.objects.get(date=show_date)
-    division = show.divisions.get(id=division_id)
-    class_obj = division.classes.get(num=class_num)
-    selected_class = ClassParticipation.objects.filter(
-        combo=combo).get(participated_class=class_obj)
-    selected_class.delete()
-    return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
 
 
 def select_division(request, show_date):  # pragma: no cover
@@ -1127,8 +1062,8 @@ def view_riders(request):
     return render(request, 'view_riders.html', context)
 
 
-def select_rider(request):
-    """ For selecting a rider and submitting a JSON response of the rider list """
+""" def select_rider(request):
+    
     if request.GET.get('q'):
         q = request.GET['q']
         riders = Rider.objects.filter(last_name__startswith=q)
@@ -1136,7 +1071,7 @@ def select_rider(request):
             rider.last_name + ", " + rider.first_name)} for rider in riders]
         return JsonResponse(json, safe=False)
     else:
-        HttpResponse("No cookies")
+        HttpResponse("No cookies") """
 
 
 def delete_rider(request, rider_pk):
@@ -1184,15 +1119,15 @@ def view_horses(request):
     return render(request, 'view_horses.html', context)
 
 
-def select_horse(request):
-    """ For selecting a horse and submitting a JSON response of the horse list """
+""" def select_horse(request):
+     
     if request.GET.get('q'):
         q = request.GET['q']
         horses = Horse.objects.filter(name__startswith=q)
         json = [{"value": horse.pk, "text": horse.name} for horse in horses]
         return JsonResponse(json, safe=False)
     else:
-        HttpResponse("No cookies")
+        HttpResponse("No cookies") """
 
 
 def delete_horse(request, horse_pk):
@@ -1274,7 +1209,7 @@ def edit_combo(request, combo_pk):
 
             return render(request, "combo_row.html", {'combo': edited_combo})
         else:
-            logger.error("this is invalid")
+
             return render(request, "form_errors.html", {'form': edit_combo_form}, status=400)
 
 
@@ -1305,10 +1240,12 @@ def view_combo(request, combo_pk):
     viewed_combo = HorseRiderCombo.objects.get(pk=combo_pk)
     return render(request, 'view_combo.html', {"combo": viewed_combo, 'combo_bill': calculate_combo_bill(viewed_combo)})
 
+
 def get_class_in_combo_row(request, participation_pk):
     """ return the template of the class row (in the view combo page) """
     participation = ClassParticipation.objects.get(pk=participation_pk)
     return render(request, 'class_in_combo_row.html', {'participation': participation})
+
 
 def add_class_to_combo(request, combo_pk):
     """ registering a class for a combo """
@@ -1335,7 +1272,7 @@ def add_class_to_combo(request, combo_pk):
 
             # give the link to the url that can supply the class row template
             response = {
-                'participation_url': reverse('get_class_in_combo_row', kwargs={'participation_pk' : participation.pk}),
+                'participation_url': reverse('get_class_in_combo_row', kwargs={'participation_pk': participation.pk}),
                 'combo_bill': calculate_combo_bill(combo)
             }
             return JsonResponse(response, status=200)
@@ -1344,8 +1281,6 @@ def add_class_to_combo(request, combo_pk):
             response = {
                 'message': "Class with that number does not exist in this show"}
             return JsonResponse(response, status=400)
-
-
 
 
 def delete_participation(request, class_pk, combo_pk):
@@ -1363,9 +1298,6 @@ def delete_participation(request, class_pk, combo_pk):
         return JsonResponse(response, status=200)
     else:
         response = {
-            'message': "De-registering the class from the horse-rider combination was unsuccessful. The removed class may not exist."
+            'message': "De-registering the class from the horse-rider combination was unsuccessful. The class or the combo may not exist"
         }
         return JsonResponse(response, status=400)
-
-
-    
