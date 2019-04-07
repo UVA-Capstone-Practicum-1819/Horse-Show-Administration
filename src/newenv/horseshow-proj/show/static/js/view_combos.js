@@ -67,7 +67,7 @@ $("#updateComboModal").on('show.bs.modal', function (event) {
 /* deletes a combo and also the combo row in which the button was located */
 function deleteCombo(event) {
     event.preventDefault();
-    button = $(this)
+    button = $(this);
     $.ajax({
         url: $(this).attr('href'),
         method: "get",

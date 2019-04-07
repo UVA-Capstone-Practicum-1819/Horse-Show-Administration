@@ -17,8 +17,8 @@ combo_patterns = [
 
     path('add-class', views.add_class_to_combo, name="add_class_to_combo"),
 
-    path('delete-class/<class_pk>', views.delete_class_from_combo,
-         name="delete_class_from_combo")
+    path('delete-participation/<class_pk>', views.delete_participation,
+         name="delete_participation")
 ]
 
 class_patterns = [
@@ -35,6 +35,11 @@ class_patterns = [
 
 
 
+]
+
+participation_patterns = [
+    path('get-class-in-combo-row', views.get_class_in_combo_row,
+         name="get_class_in_combo_row")
 ]
 
 division_patterns = [
@@ -170,7 +175,7 @@ urlpatterns = [
 
     path('logout', auth_views.LogoutView.as_view(), name='log_out'),
 
-
+    path('participations/<participation_pk>/', include(participation_patterns))
 
 
 

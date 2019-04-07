@@ -512,7 +512,7 @@ def view_class(request, show_date, division_id, class_num):
                         request, "Horse-Rider Combo is already in this class.")
                     return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
                 classParticipation = ClassParticipation(
-                    participated_class=class_obj, combo=combo, is_preregistered=form.cleaned_data['preregistered'])
+                    participated_class=class_obj, combo=combo)
                 classParticipation.save()
                 context = {
                     "combos": class_obj.combos.all(),
@@ -1301,9 +1301,14 @@ def calculate_combo_bill(combo):
 
 
 def view_combo(request, combo_pk):
+    """ show the page for a particular combo (has edit and class manipulation functionality) """
     viewed_combo = HorseRiderCombo.objects.get(pk=combo_pk)
     return render(request, 'view_combo.html', {"combo": viewed_combo, 'combo_bill': calculate_combo_bill(viewed_combo)})
 
+def get_class_in_combo_row(request, participation_pk):
+    """ return the template of the class row (in the view combo page) """
+    participation = ClassParticipation.objects.get(pk=participation_pk)
+    return render(request, 'class_in_combo_row.html', {'participation': participation})
 
 def add_class_to_combo(request, combo_pk):
     """ registering a class for a combo """
@@ -1316,8 +1321,9 @@ def add_class_to_combo(request, combo_pk):
 
         # if the selected class exists in the show
         if selected_class:
+            participated_class = selected_class[0]
             existing_participation = ClassParticipation.objects.filter(
-                combo=combo, participated_class=selected_class[0])
+                combo=combo, participated_class=participated_class)
             # if the class already has been added to the combo
             if existing_participation:
                 response = {
@@ -1325,32 +1331,29 @@ def add_class_to_combo(request, combo_pk):
                 return JsonResponse(response, status=400)
             # create the pairing between the combo and class
             participation = ClassParticipation.objects.create(
-                combo=combo, participated_class=selected_class[0])
+                combo=combo, participated_class=participated_class)
 
-            participated_class = selected_class[0]
-
-
+            # give the link to the url that can supply the class row template
             response = {
-                """ 'class_num': participated_class.num,
-                'class_name': participated_class.name,
-                'div_name': participated_class.division.name,
-                'delete_url': reverse('delete_class_from_combo', combo_pk=combo.pk, class_pk=participated_class.pk), """
-                'class_row_template': render(request, 'class_in_combo_row.html', {'participation': participation}),
+                'participation_url': reverse('get_class_in_combo_row', kwargs={'participation_pk' : participation.pk}),
                 'combo_bill': calculate_combo_bill(combo)
             }
-            return HttpResponse(response, status=200)
+            return JsonResponse(response, status=200)
         else:
+            # if the class doesn't belong to the show
             response = {
                 'message': "Class with that number does not exist in this show"}
             return JsonResponse(response, status=400)
 
 
-def delete_class_from_combo(request, combo_pk, class_pk):
-    """ removes a class (deregisters) from a combo  """
+
+
+def delete_participation(request, class_pk, combo_pk):
+    """ decouples a class from a combo. That is, it deregisters a combo from a class"""
     combo = HorseRiderCombo.objects.get(pk=combo_pk)
-    deleted_class = Class.objects.get(pk=class_pk)
+    participated_class = Class.objects.get(pk=class_pk)
     participation = ClassParticipation.objects.filter(
-        combo=combo, participated_class=deleted_class)
+        combo=combo, participated_class=participated_class)
     if participation:
         participation.delete()
         response = {
@@ -1363,3 +1366,6 @@ def delete_class_from_combo(request, combo_pk, class_pk):
             'message': "De-registering the class from the horse-rider combination was unsuccessful. The removed class may not exist."
         }
         return JsonResponse(response, status=400)
+
+
+    

@@ -169,30 +169,6 @@ class AddComboToClassForm(forms.Form):
 
     num = forms.IntegerField(
         validators=[MinValueValidator(100), MaxValueValidator(999)])
-    preregistered = forms.BooleanField(required=False)
-
-
-""" class HorseRiderComboCreateForm(forms.ModelForm):
-    
-    email = forms.EmailField(required=False, label="Email")
-    cell = forms.CharField(max_length=12, required=False,
-                           label="Cell Phone #")
-
-    class Meta:
-        model = HorseRiderCombo
-        fields = ('num', 'contact', 'email', 'cell')
-
-    def clean(self):
-        cleaned_data = self.cleaned_data
-        email = cleaned_data.get('email')
-        cell = cleaned_data.get('cell')
-
-        if not email and not cell:
-
-            raise forms.ValidationError(
-                'Have to include at least 1 contact (email or cell)')
-
-        return cleaned_data """
 
 
 class ComboForm(forms.ModelForm):

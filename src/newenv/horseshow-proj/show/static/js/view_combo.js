@@ -31,13 +31,24 @@ $("#updateComboModal").on('show.bs.modal', function (event) {
 });
 
 function addClass(data) {
-    var class_num = data['class_num'];
-    var class_name = data['class_name'];
-    var div_name = data['div_name'];
-    var delete_url = data['delete_url'];
+    var participation_url = data['participation_url'];
     var combo_bill = data['combo_bill'];
 
+    $.ajax({
+        url: participation_url,
+        type: 'get',
+        success: function (response) {
+            $("#classTable").append(response);
+        },
+        error: function (response, status, xhr) {
+            $("#messages").html(response.responseJSON['message']);
+        }
 
+    });
+
+    $("#classNumField").val("");
+    $("#messages").html("");
+    $("#billCell").html("$" + combo_bill);
 
 }
 
@@ -50,18 +61,9 @@ $("#addClassToComboForm").on('submit', function (event) {
         type: addClassForm.attr('method'),
         data: addClassForm.serialize(),
         success: function (response) {
-
-            var data = response.responseJSON;
-            var participation = data['participation'];
-
-            $("#classTable").append(data['template']);
-            $("#classNumField").html("");
-            $("#classNumHelp").html("");
-            $("#billCell").html(data['combo_bill']);
-
+            addClass(response);
         },
         error: function (response, status, xhr) {
-
             var data = response.responseJSON
             $("#messages").html(data['message']);
         }
@@ -72,17 +74,16 @@ $("#addClassToComboForm").on('submit', function (event) {
 $("#classTable").on('click', '.deleteClassFromComboButton', function (event) {
     event.preventDefault();
     var deleteButton = $(this);
-    console.log(deleteButton.data('url'));
     $.ajax({
         url: deleteButton.data('url'),
         type: "get",
         success: function (response) {
-            var data = response.responseJSON;
+            var data = response;
             deleteButton.parent().parent().remove();
             $("#billCell").html(data['combo_bill']);
         },
         error: function (response, status, xhr) {
-            var data = response.responseJSON;
+            var data = response
             $("#messages").html(data['message']);
         }
     });
