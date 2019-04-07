@@ -1,0 +1,21 @@
+<tr id="row-{{combo.pk}}">
+    <td>
+        {% comment %} button for editing the combo, brings up a modal window with the edit form {% endcomment %}
+        <a class="btn btn-sm  btn-warning editCombo" data-toggle="modal" data-target="#updateComboModal" data-op="edit"
+            data-combopk="{{combo.pk}}" , data-url="{% url 'edit_combo' combo_pk=combo.pk %}">Edit</a>
+
+        {% comment %} button for deleting the combo {% endcomment %}
+        <a href="{% url 'delete_combo' combo_pk=combo.pk %}" class="btn btn-sm btn-danger deleteCombo">X</a>
+    </td>
+
+
+    {% comment %} all the cells containing the combo information {% endcomment %}
+    <td> <a href="{% url 'view_combo' combo_pk=combo.pk %}">{{combo.num}}</a> </td>
+    <td> {{combo.rider.last_name}}, {{combo.rider.first_name}} </td>
+    <td> {{combo.horse.name}} </td>
+    <td> {{combo.contact}} </td>
+    <td> {{combo.email}} </td>
+    <td> {{combo.cell}} </td>
+    <td> {% if combo.is_preregistered %} Yes {% else %} No {% endif %}</td>
+
+</tr>

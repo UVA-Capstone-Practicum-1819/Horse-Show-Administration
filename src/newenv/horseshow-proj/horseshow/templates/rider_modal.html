@@ -1,0 +1,32 @@
+{% comment %} Responsible for presenting a popup form in which you can either add or edit a rider and then save the info
+{% endcomment %}
+<div class="modal fade" id="updateRiderModal" tabindex="-1" role="dialog" aria-labelledby="riderModalTitle"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="riderModalTitle"></h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      {% comment %} form wrapper {% endcomment %}
+
+      <form class="form" method="post" id="updateRiderForm">
+        {% csrf_token %}
+
+        {% comment %} The container for the actual form {% endcomment %}
+        <div class="modal-body" id="formContainer">
+          {% include 'simple_form.html' %}
+        </div>
+        {% comment %} Cancel and Save Buttons {% endcomment %}
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success" id="updateRiderButton"></button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
