@@ -66,12 +66,20 @@ def view_show(request, show_date):
         form = ComboNumForm(request.POST)
         if form.is_valid():
             num = form.cleaned_data['num']
-            for combo in HorseRiderCombo.objects.filter(show = show):
-                if combo.num==num:
-                    return redirect('edit_combo', combo_num=num, show_date=show_date)
-                else:
-                    messages.error(request, "The combination number entered does not exist in this show.")
-                    return redirect('view_show', show_date=show_date)
+            combo = show.combos.filter(num=num)
+            if combo:
+                return redirect('edit_combo', combo_num=num, show_date=show_date)
+            else:
+                messages.error(request, "The combination number entered does not exist in this show.")
+                return redirect('view_show', show_date=show_date)
+    #for combo in HorseRiderCombo.objects.filter(show = show):
+    #    if combo.num==num:
+    #        return redirect('edit_combo', combo_num=num, show_date=show_date)
+    #    else:
+    #        print(combo.num)
+    #        print(num)
+    #        messages.error(request, "The combination number entered does not exist in this show.")
+    #        return redirect('view_show', show_date=show_date)
 
     form = ComboNumForm()
     context = {
@@ -184,7 +192,7 @@ def scratch_combo(request, show_date, combo_num):
     show = Show.objects.get(date=show_date)
     combo = show.combos.get(num=combo_num)
     class_num = request.GET["cnum"]
-    class_obj = Class.objects.get(num=class_num)
+    class_obj = Class.objects.get(show=show, num=class_num)
     selected_class = ClassParticipation.objects.filter(
         combo=combo).get(participated_class=class_obj)
     selected_class.delete()

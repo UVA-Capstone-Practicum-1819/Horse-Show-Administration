@@ -7,6 +7,14 @@
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <!-- Include the above in your HEAD tag -->
 
+<style>
+  @media print {
+  a[href]:after {
+    content: none !important;
+  }
+}
+</style>
+
    <div id="wrapper">
 
         {% comment %} Sidebar {% endcomment %}
