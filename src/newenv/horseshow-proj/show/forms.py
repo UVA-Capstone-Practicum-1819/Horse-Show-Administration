@@ -243,7 +243,7 @@ class ShowSelectForm(forms.ModelForm):
         model = Show
         fields = ('date',)
 
-    def clean_date(self):
+    def clean_date(self): # pragma: no cover 
         showobj = self.cleaned_data['date']
         shows = Show.objects.all()
         if showobj in shows:
