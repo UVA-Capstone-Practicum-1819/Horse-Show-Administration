@@ -449,6 +449,7 @@ def view_division(request, show_date, division_id):
             class_obj.division = division
             class_obj.show = show
             class_obj.save()
+            #set first_class_num
             if(class_obj.num < division.first_class_num):
                 division.first_class_num = int(class_obj.num)
                 division.save()
