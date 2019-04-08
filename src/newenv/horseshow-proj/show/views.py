@@ -118,18 +118,11 @@ def add_show(request):
 
 def select_show(request):
     """ view that allows the user to select a show """
-    if request.method == "POST":
-        form = ShowSelectForm(request.POST)
-        if form.is_valid():
-            show = form.cleaned_data['date']
-            # for some reason, the regular show select autocompletion menu doesn't work, so to fix that, we need to add a few characters ("foo") to the show date and then strip them away (as they are here)
-            show.date = show.date[:-3]
-            show_date = show.date
-            request.session['show_date'] = show_date
-            return redirect('view_show', show_date)
-    else:
-        form = ShowSelectForm()
-    return render(request, 'select_show.html', {'form': form})
+    context = {
+        'shows': Show.objects.all()
+    }
+
+    return render(request, 'select_show.html', context)
 
 
 def sign_up(request):  #pragma: no cover # what does this comment mean?
