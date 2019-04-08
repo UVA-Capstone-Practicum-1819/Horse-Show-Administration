@@ -15,6 +15,7 @@ from django.urls import resolve, reverse
 from show.forms import *
 from django.contrib.auth import views as auth_views
 from django.forms.models import model_to_dict
+from django.db.models import Q
 from show.models import *
 from django.utils import timezone
 from dal import autocomplete
@@ -843,7 +844,7 @@ class RiderAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     def get_queryset(self):
         qs = Rider.objects.all().order_by('last_name')
         if self.q:
-            qs = qs.filter(name__istartswith=self.q)
+            qs = qs.filter(Q(last_name__istartswith=self.q) | Q(first_name__istartswith=self.q))
         return qs
 
 
