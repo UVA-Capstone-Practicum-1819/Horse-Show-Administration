@@ -11,6 +11,7 @@
         <th> Location </th>
         <th> Day-of Price </th>
         <th> Preregistration Price </th>
+        <th> DELETE SHOW </th>
     </thead>
     <tbody>
         {% for show in shows %}
@@ -31,6 +32,9 @@
             </td>
             <td>
                 {{ show.pre_reg_price}}
+            </td>
+            <td>
+            <button class="btn btn-danger" href="{% url 'delete_show' show_date=show.date %}">X</button>
             </td>
         </tr>
         {% endfor %}

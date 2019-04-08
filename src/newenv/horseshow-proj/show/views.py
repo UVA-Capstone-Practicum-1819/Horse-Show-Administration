@@ -66,7 +66,7 @@ class AuthRequiredMiddleware(object):
 def view_show(request, show_date):
     """ used as the home page for a selected show """
     show = Show.objects.get(date=show_date)
-    
+
     context = {
         "show_name": show.name,
         "date": show_date,
@@ -100,6 +100,14 @@ def add_show(request):
     else:
         return render(request, 'add_show.html', {'form': form})
 
+
+def delete_show(request, show_date):
+    """ deletes a show """
+    show = Show.objects.get(date=show_date)
+    # gets the division object from the division name that was passed in
+    show.delete()  # removes the show object
+    # redirects to division_classes and passes in the division's name
+    return redirect('select_show')
 
 def select_show(request):
 
@@ -1109,7 +1117,7 @@ def view_riders(request):
 
 
 """ def select_rider(request):
-    
+
     if request.GET.get('q'):
         q = request.GET['q']
         riders = Rider.objects.filter(last_name__startswith=q)
@@ -1166,7 +1174,7 @@ def view_horses(request):
 
 
 """ def select_horse(request):
-     
+
     if request.GET.get('q'):
         q = request.GET['q']
         horses = Horse.objects.filter(name__startswith=q)
