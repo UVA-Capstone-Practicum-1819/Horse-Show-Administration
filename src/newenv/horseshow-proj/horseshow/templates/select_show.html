@@ -17,7 +17,7 @@
         {% for show in shows %}
         <tr>
             <td>
-                <a class="viewShowLink" href="{% url 'store_show_date' show_date=show.date %}">{{ show.name}}</a>
+                <a href="{% url 'view_show' show_date=show.date %}">{{ show.name}}</a>
             </td>
             <td>
                 {{ show.date}}
@@ -39,6 +39,6 @@
 
 <a href="{% url 'add_show' %}" class="btn btn-success">Create New Show</a>
 
-<script type="text/javascript" src="{% static 'js/select_show.js' %}"></script>
+{% comment %} <script type="text/javascript" src="{% static 'js/select_show.js' %}"></script> {% endcomment %}
 
 {% endblock %}

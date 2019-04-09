@@ -67,7 +67,7 @@ class AuthRequiredMiddleware(object):
 def view_show(request, show_date):
     """ used as the home page for a selected show """
     show = Show.objects.get(date=show_date)
-
+    request.session["show_date"] = show_date
     context = {'request': request,
                "show_name": show.name,
                "date": show_date,
@@ -97,7 +97,7 @@ def add_show(request):
         new_show = Show.objects.create(
             name=show_name, date=show_date, location=show_location,
             day_of_price=f.cleaned_data['day_of_price'], pre_reg_price=f.cleaned_data['pre_reg_price'])
-        request.session['show_date'] = str(new_show.date)
+        
         return redirect('view_show', show_date=show_date)
     else:
         return render(request, 'add_show.html', {'form': form})
@@ -111,11 +111,6 @@ def select_show(request):
     }
 
     return render(request, 'select_show.html', context)
-
-
-def store_show_date(request, show_date):
-    request.session['show_date'] = show_date
-    return redirect('view_show', show_date=show_date)
 
 
 def sign_up(request):  # pragma: no cover # what does this comment mean?

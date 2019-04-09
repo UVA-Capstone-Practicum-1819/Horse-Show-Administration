@@ -92,7 +92,7 @@ horse_patterns = [
 show_patterns = [
     path('view', views.view_show, name='view_show'),
 
-    path('store-show-date', views.store_show_date, name="store_show_date"),
+
     path('division/add', views.add_division, name="add_division"),
 
     path('division/select', views.select_division, name="select_division"),
@@ -123,10 +123,6 @@ urlpatterns = [
 
     path('get_combo_form/<combo_pk>',
          views.get_combo_form, name="get_combo_form_edit"),
-
-
-
-
 
 
 
