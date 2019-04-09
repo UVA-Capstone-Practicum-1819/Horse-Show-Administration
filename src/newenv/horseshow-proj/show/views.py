@@ -26,10 +26,10 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from .labels import generate_show_labels
+import operator
 from xlutils.copy import copy
 import xlrd
 import xlwt
-from operator import itemgetter
 
 
 class AuthRequiredMiddleware(object):
@@ -198,34 +198,64 @@ def scratch_combo(request, show_date, combo_num):
 
 def view_division_scores(request, show_date, division_id):
     """ displays list of classes in division, hrc winners of each of those classes from 1st-6th places, and form to enter champion info """
-
+    score_dict = {}
+    
     # get the division from the show object
     show = Show.objects.get(date=show_date)
     division = show.divisions.get(id=division_id)
+    #moshimoshi
+    classes = Class.objects.filter(show=show_date).filter(division__name__icontains=division.name)
+    # print (classes)
+    for c in classes:
+        rank_dict = {c.first: 10, c.second: 6, c.third: 4, c.fourth: 2, c.fifth: 1, c.sixth: 0.5}
+        for key, value in rank_dict.items():
+            print(key)
+            if key is not None and key not in score_dict:
+                print("HIIIIII")
+                score_dict[key] = 0
+                # score_dict[rank] += HorseRiderCombo.objects.get(show=show, num=rank).participations.get(participated_class = c).score
+            if key is not None and key in score_dict:
+                print("BYYYYYE")
+                score_dict[key] += value
+        
+    print(score_dict)
 
     form = DivisionChampForm()
     if request.method == "POST":
         form = DivisionChampForm(request.POST)
+        bool_error = False
         if form.is_valid():
-            champion = form.cleaned_data['champion']
-            champion_pts = form.cleaned_data['champion_pts']
-            champion_reserve = form.cleaned_data['champion_reserve']
-            champion_reserve_pts = form.cleaned_data['champion_reserve_pts']
-            # sets the division's champion field  equal to the value entered into the "champion" field of the DivisionChampForm
-            division.champion = champion
-            # sets the division's champion_pts field equal to the value entered into the "champion_pts" field of DivisionChampForm
-            division.champion_pts = champion_pts
-            # sets the division's champion_reserve field equal to the value entered into the "champion_reserve" field of DivisionChampForm
-            division.champion_reserve = champion_reserve
-            # sets the division's champion_reserve_pts field equal to the value entered into the "champion_reserve_pts" field of DivisionChampForm
-            division.champion_reserve_pts = champion_reserve_pts
-            division.save()  # saves the division object fields in the database
+            rank_list = [form.cleaned_data['champion'], form.cleaned_data['champion_pts'], form.cleaned_data['champion_reserve'],form.cleaned_data['champion_reserve_pts']]
+
+            for i in range (0,3,2):
+                if rank_list[i] != 0 and show.combos.filter(num=rank_list[i]).count() == 0:
+                    messages.error(request, "Cannot score combination number " +
+                                   str(rank_list[i]) + ": it is not registered to the show")
+                    bool_error = True
+            if bool_error is True:
+                return redirect('view_division_scores', show_date=show_date, division_id=division_id)
+            division.champion = rank_list[0]
+            division.champion_pts = rank_list[1]
+            division.champion_reserve = rank_list[2]
+            division.champion_reserve_pts = rank_list[3]
+            division.save(update_fields=["champion", "champion_pts", "champion_reserve", "champion_reserve_pts"]) 
 
     else:
-        form = DivisionChampForm()
+        form = DivisionChampForm(initial={'champion': division.champion, 'champion_pts': division.champion_pts, 'champion_reserve': division.champion_reserve,
+                                    'champion_reserve_pts': division.champion_reserve_pts})
 
+    sorted_score_dict = sorted(score_dict.items(), key=operator.itemgetter(1), reverse=True)
+    del sorted_score_dict[6:]
+    # combo_list, score_list = zip(*sorted_score_dict)
+    # print(combo_list)
+    # print(score_list)
+    final_dict = dict((x, y) for x, y in sorted_score_dict)
+    final_list = []
+    for key, value in final_dict.items():
+        final_list.append(str(key) + ": " + str(value))
+    print(final_list)
     context = {'classes': division.classes.all(), 'date': show_date,
-               'id': division_id, 'name': division.name, 'form': form}
+               'id': division_id, 'name': division.name, 'form': form, "score_list":final_list}
     # passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
     return render(request, 'view_division_scores.html', context)
 
