@@ -1,7 +1,7 @@
 <tr id="row-{{combo.pk}}">
     <td>
         {% comment %} button for editing the combo, brings up a modal window with the edit form {% endcomment %}
-        <a class="btn btn-sm  btn-warning editCombo" data-toggle="modal" data-target="#updateComboModal" data-op="edit"
+        <a class="btn btn-sm  btn-dark text-white editCombo" data-toggle="modal" data-target="#updateComboModal" data-op="edit"
             data-combopk="{{combo.pk}}" , data-url="{% url 'edit_combo' combo_pk=combo.pk %}">Edit</a>
 
         {% comment %} button for deleting the combo {% endcomment %}
