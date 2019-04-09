@@ -36,10 +36,10 @@ division_patterns = [
          views.view_division, name="view_division"),
 
     path('delete',
-        views.delete_division, name="delete_division"),
+         views.delete_division, name="delete_division"),
 
     path('edit',
-        views.edit_division, name="edit_division"),
+         views.edit_division, name="edit_division"),
 
     path('class/add',
          views.add_class, name="add_class"),
@@ -92,6 +92,8 @@ show_patterns = [
     path('horse/<horse_pk>/edit', views.edit_horse, name="edit_horse"),
 
     path('populate-pdf', views.populate_pdf, name="populate_pdf"),
+
+    path('populate-excel', views.populate_excel, name="populate_excel"),
 ]
 
 urlpatterns = [

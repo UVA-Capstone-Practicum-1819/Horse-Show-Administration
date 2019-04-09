@@ -15,6 +15,7 @@ from django.urls import resolve, reverse
 from show.forms import *
 from django.contrib.auth import views as auth_views
 from django.forms.models import model_to_dict
+from django.db.models import Q
 from show.models import *
 from django.utils import timezone
 from dal import autocomplete
@@ -26,6 +27,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from .labels import generate_show_labels
 import operator
+from xlutils.copy import copy
+import xlrd
+import xlwt
 
 
 class AuthRequiredMiddleware(object):
@@ -63,15 +67,20 @@ def view_show(request, show_date):
         form = ComboNumForm(request.POST)
         if form.is_valid():
             num = form.cleaned_data['num']
-            try:
-                for combo in HorseRiderCombo.objects.filter(show = show):
-                    if combo.num==num:
-                        return redirect('edit_combo', combo_num=num, show_date=show_date)
-                    else:
-                        messages.error(request, "The combination number entered does not exist in this show.")
-                        return redirect('view_show', show_date=show_date)
-            except ObjectDoesNotExist:
+            combo = show.combos.filter(num=num)
+            if combo:
+                return redirect('edit_combo', combo_num=num, show_date=show_date)
+            else:
                 messages.error(request, "The combination number entered does not exist in this show.")
+                return redirect('view_show', show_date=show_date)
+    #for combo in HorseRiderCombo.objects.filter(show = show):
+    #    if combo.num==num:
+    #        return redirect('edit_combo', combo_num=num, show_date=show_date)
+    #    else:
+    #        print(combo.num)
+    #        print(num)
+    #        messages.error(request, "The combination number entered does not exist in this show.")
+    #        return redirect('view_show', show_date=show_date)
 
     form = ComboNumForm()
     context = {
@@ -110,18 +119,11 @@ def add_show(request):
 
 def select_show(request):
     """ view that allows the user to select a show """
-    if request.method == "POST":
-        form = ShowSelectForm(request.POST)
-        if form.is_valid():
-            show = form.cleaned_data['date']
-            # for some reason, the regular show select autocompletion menu doesn't work, so to fix that, we need to add a few characters ("foo") to the show date and then strip them away (as they are here)
-            show.date = show.date[:-3]
-            show_date = show.date
-            request.session['show_date'] = show_date
-            return redirect('view_show', show_date)
-    else:
-        form = ShowSelectForm()
-    return render(request, 'select_show.html', {'form': form})
+    context = {
+        'shows': Show.objects.all()
+    }
+
+    return render(request, 'select_show.html', context)
 
 
 def sign_up(request):  #pragma: no cover # what does this comment mean?
@@ -184,7 +186,7 @@ def scratch_combo(request, show_date, combo_num):
     show = Show.objects.get(date=show_date)
     combo = show.combos.get(num=combo_num)
     class_num = request.GET["cnum"]
-    class_obj = Class.objects.get(num=class_num)
+    class_obj = Class.objects.get(show=show, num=class_num)
     selected_class = ClassParticipation.objects.filter(
         combo=combo).get(participated_class=class_obj)
     selected_class.delete()
@@ -266,7 +268,7 @@ def delete_class(request, show_date, division_id, class_num):
     # gets the division object from the division name that was passed in
     class_obj.delete()  # removes the class object
     if(len(division.classes.all())>0):
-        division.first_class_num = division.classes.all()[0]
+        division.first_class_num = division.classes.all()[0].num
         division.save()
     else:
         division.first_class_num = 1000
@@ -558,7 +560,7 @@ def view_class(request, show_date, division_id, class_num):
                 messages.error(request, "Horse Rider Combo does not exist in this show.")
                 return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
     else:
-        form = AddComboToClassForm()
+        form = AddComboToClassForm(initial={'is_preregistered':True})
     # form = ComboSelectForm()
     context = {
         "combos": combos,
@@ -715,7 +717,7 @@ def select_horse(request, show_date):
     return render(request, 'select_horse.html', {'form': form, 'date': show_date})
 
 
-def add_combo(request, show_date):
+def add_combo(request, show_date): #pragma: no cover
     """
         creates a page for adding a horse-rider combination, taking in the session variables for the primary keys of the chosen horse and rider
         redirects to the edit combo page for the same combination after it is done
@@ -757,7 +759,7 @@ def add_combo(request, show_date):
     return render(request, 'add_combo.html', {'form': form,  'rider': rider, 'horse': horse, 'date': show_date, 'form_errors': form_errors})
 
 
-def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
+def edit_combo(request, show_date, combo_num, division_id=None, class_num=None): #pragma: no cover
     """
     edits the combination that was specified by num
     also handles the addition/removal of classes based on num and the calculation of price
@@ -814,7 +816,7 @@ def edit_combo(request, show_date, combo_num, division_id=None, class_num=None):
     edit_form = HorseRiderEditForm(
         {'email': combo.email, 'cell': combo.cell, 'contact': combo.contact}, instance=combo)
 
-    class_combo_form = ClassComboForm()
+    class_combo_form = ClassComboForm(initial={'is_preregistered':True})
     registered_classes = combo.classes.all()
     number_registered_classes = len(registered_classes)
     price = 0
@@ -872,7 +874,7 @@ class RiderAutocomplete(autocomplete.Select2QuerySetView):  #pragma: no cover
     def get_queryset(self):
         qs = Rider.objects.all().order_by('last_name')
         if self.q:
-            qs = qs.filter(name__istartswith=self.q)
+            qs = qs.filter(Q(last_name__istartswith=self.q) | Q(first_name__istartswith=self.q))
         return qs
 
 
@@ -1374,7 +1376,36 @@ def populate_pdf(request, show_date): #pragma: no cover
     # returns the populated pdf
     return render(request, 'final_results.html', {"filename": "show/static/VHSA_Final_Results.pdf"})
 
+def populate_excel(request, show_date): #pragma: no cover
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=district-qualified-youth-registration.xls'
 
+    rb = xlrd.open_workbook('show/static/district-qualified-youth-registration.xls')
+    wb = copy(rb)
+    sheet = wb.get_sheet(0)
+
+    list_4h = []
+    show = Show.objects.get(date=show_date)
+    combos = HorseRiderCombo.objects.filter(show=show)
+    for combo in combos:
+        print (combo)
+        if combo.rider.member_4H:
+            horse_name = combo.horse.name
+            entry = [combo.rider.first_name, combo.rider.last_name, horse_name.split("(", 1)[0], combo.rider.county]
+            list_4h.append(entry)
+    sorted_list_4h = sorted(list_4h, key=itemgetter(3, 1))
+    style0 = xlwt.easyxf('font: bold on')
+    style1 = xlwt.easyxf('font: bold on', num_format_str='D-MMM-YY')
+    sheet.write(3, 2, show.name, style0)
+    sheet.write(5, 2, show.location, style0)
+    sheet.write(5, 4, show.date, style1)
+
+    for i in range(0, len(sorted_list_4h)):
+        for j in range(0,4):
+            sheet.write(11+i, j, sorted_list_4h[i][j])
+
+    wb.save(response)
+    return response
 
 def generate_labels(request, show_date): #pragma: no cover
     # view to execute label generating

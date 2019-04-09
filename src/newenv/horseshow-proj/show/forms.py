@@ -176,7 +176,7 @@ class HorseRiderComboCreateForm(forms.ModelForm):
         model = HorseRiderCombo
         fields = ('num', 'contact', 'email', 'cell')
 
-    def clean(self):
+    def clean(self): # pragma: no cover
         cleaned_data = self.cleaned_data
         email = cleaned_data.get('email')
         cell = cleaned_data.get('cell')
@@ -243,7 +243,7 @@ class ShowSelectForm(forms.ModelForm):
         model = Show
         fields = ('date',)
 
-    def clean_date(self):
+    def clean_date(self): # pragma: no cover 
         showobj = self.cleaned_data['date']
         shows = Show.objects.all()
         if showobj in shows:
