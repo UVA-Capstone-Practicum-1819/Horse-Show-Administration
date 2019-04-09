@@ -7,7 +7,8 @@
   <div class="row">
     <div class="col-md-8">
       {% comment %} Display the show title {% endcomment %}
-      <h3><a href="{% url 'view_show' show_date=date %}">Show: {{show_name}}</a> > Division: {{name}} <a href="{% url 'edit_division' show_date=date division_id=id %}"><i style="font-size:24px" class="fa">&#xf044;</i></a></h3>
+      <h3><a href="{% url 'view_show' show_date=date %}">Show: {{show_name}}</a> > Division: {{name}} <a
+          href="{% url 'edit_division' show_date=date division_id=id %}">(Edit)</a></h3>
       {% comment %} Display the division title {% endcomment %}
 
       {% comment %} Show a list of all the classes {% endcomment %}
@@ -34,7 +35,8 @@
               </td>
 
               <td>
-                <a class="btn btn-danger" href="{% url 'delete_class' show_date=date division_id=id class_num=class.num %}">X</a>
+                <a class="btn btn-danger"
+                  href="{% url 'delete_class' show_date=date division_id=id class_num=class.num %}">X</a>
               </td>
 
 
@@ -68,7 +70,8 @@
 
   {% comment %} Button to view division scores {% endcomment %}
 
-  <a href="{% url 'view_division_scores' show_date=date division_id=id %}" class="btn btn-primary">View Division Scores</a>
+  <a href="{% url 'view_division_scores' show_date=date division_id=id %}" class="btn btn-primary">View Division
+    Scores</a>
 
   {% comment %} Delete division {% endcomment %}
   <a href="{% url 'delete_division' show_date=date division_id=id %}" class="btn btn-danger">Delete Division</a>
