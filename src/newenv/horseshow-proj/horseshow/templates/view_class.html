@@ -5,14 +5,15 @@
 
 <style>
   @media print {
-  a[href]:after {
-    content: none !important;
+    a[href]:after {
+      content: none !important;
+    }
   }
-}
 </style>
 
-<h3><a href="{% url 'view_show' show_date=date %}">Show: {{show_name}}</a> > <a href="{% url 'view_division' show_date=date division_id=id %}"> Division: {{name}}</a> > Class: {{class.num}} - {{class.name}}  <a href="{% url 'edit_class' show_date=date division_id=id class_num=class.num %}"><i style="font-size:24px" class="fa">&#xf044;</i></a></h3>
-
+<h3><a href="{% url 'view_show' show_date=date %}">Show: {{show_name}}</a> > <a
+    href="{% url 'view_division' show_date=date division_id=id %}"> Division: {{name}}</a> > Class: {{class.num}} -
+  {{class.name}}</h3>
 <div class="row">
   <form class="form" method="post">
     {% csrf_token %}
@@ -21,14 +22,18 @@
         <th>Combo</th>
         <th>Scratch</th>
       </thead>
-      <tbody>
+      <tbody id="comboTable">
         {% for combo in combos %}
         <tr>
           <td>
-            <a href="{% url 'edit_combo' show_date=date division_id=id class_num=class_num combo_num=combo.num %}">{{combo.num}}</a>: {{combo.rider.first_name}} {{combo.rider.last_name}} and {{combo.horse.name}}
+            {% with rider=combo.rider %}
+            <a href="{% url 'view_combo' combo_pk=combo.pk %}">{{combo.num}}</a>: {{rider.first_name}}
+            {{rider.last_name}} and {{combo.horse.name}}
+            {% endwith %}
           </td>
           <td>
-            <a class="btn btn-danger" href="{% url 'delete_combo' show_date=date division_id=id class_num=class_num combo_num=combo.num %}">X</a>
+            <button class="btn btn-danger deleteComboFromClassButton"
+              data-url="{% url 'delete_participation' combo_pk=combo.pk class_pk=class.pk %}">X</button>
 
           </td>
         </tr>
@@ -39,9 +44,9 @@
 
     <div class="alert alert-danger">
       <a class="close" href="." data-dismiss="alert">×</a>
-
-      {{ message }}
-
+      <div id="messages" class="container">
+        {{ message }}
+      </div>
 
     </div>
     {% endfor %}
@@ -52,7 +57,10 @@
     </form>
     {{ form.media }}
   </form>
-  <p><a class="btn btn-primary" href="{% url 'rank_class' show_date=date division_id=id class_num=class.num %}">Rank Class</a></p>
+  <p><a class="btn btn-dark text-white" href="{% url 'rank_class' show_date=date division_id=id class_num=class.num %}">Rank
+      Class</a></p>
 </div>
 {{ form.media }}
+
+<script src="{% static 'js/view_class.js' type="text/javascript%}"></script>
 {% endblock %}

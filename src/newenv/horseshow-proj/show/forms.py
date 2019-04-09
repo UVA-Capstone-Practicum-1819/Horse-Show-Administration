@@ -3,6 +3,7 @@ from django.utils import timezone
 from show.models import *
 from .models import *
 import datetime
+from django.urls import reverse_lazy
 from django.forms import HiddenInput, formset_factory
 from dal import autocomplete
 from django.core.exceptions import ValidationError
@@ -22,8 +23,10 @@ class ShowForm(forms.Form):
     day_of_price = forms.IntegerField(label="Day-of Price")
     pre_reg_price = forms.IntegerField(label="Preregistration Price")
 
+
 class EditDivisionForm(forms.Form):
     change_name_to = forms.CharField(max_length=100)
+
 
 class RegistrationBillForm(forms.Form):
     """
@@ -91,35 +94,29 @@ class RiderForm(forms.ModelForm):
     This allows you to enter information for an individual Rider. Birth date is necessary for people who are 18 or younger. Form for a rider with name, address, email, birth date, whether it is a member of the VHSA, and its county
     """
 
-    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
+    year_range = list(
+        reversed(range(1920, datetime.date.today().year + 1)))
 
     birth_date = forms.DateField(
-        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range))
+        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range), )
 
-    state = USStateField(widget=USStateSelect(), initial="VA")
+    state = USStateField(widget=USStateSelect(), initial="VA", required=False)
 
-    zip_code = USZipCodeField()
-
-    class Meta:
-        model = Rider
-        fields = ('first_name', 'last_name', 'address', 'city', 'state', 'zip_code', 'email',
-                  'adult', 'birth_date', 'member_VHSA', 'member_4H', 'county')
-
-
-class RiderSelectForm(forms.ModelForm):
-    """
-    Form for selecting a rider and returning its primary key. Used to select a rider from the database and prepopulate with options
-    """
-
-    rider = forms.ModelChoiceField(
-        queryset=Rider.objects.all(),
-        widget=autocomplete.ModelSelect2(
-            url='rider_autocomplete')
-    )
+    zip_code = USZipCodeField(required=False)
 
     class Meta:
+
         model = Rider
-        fields = ('rider',)
+        fields = '__all__'
+        exclude = ['horses']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data['member_4H'] and not cleaned_data['county']:
+            raise ValidationError(
+                "You must specify a county if the rider is a member of 4H.")
+
+        return cleaned_data
 
 
 class HorseForm(forms.ModelForm):
@@ -131,12 +128,20 @@ class HorseForm(forms.ModelForm):
     coggins_date = forms.DateField(
         widget=forms.SelectDateWidget(years=year_range))
 
-    accession_num = forms.CharField(widget=forms.TextInput(attrs={'autocomplete': 'off', }))
+    accession_num = forms.CharField(
+        widget=forms.TextInput(attrs={'autocomplete': 'off', }))
 
     class Meta:
         model = Horse
-        fields = ('name', 'coggins_date', 'accession_num',
-                  'owner', 'type', 'size', )
+        fields = ('__all__')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        horse_type = cleaned_data['type']
+        size = cleaned_data['size']
+        if horse_type == "Pony" and size == "N/A":
+            raise ValidationError("A pony must have its size specified.")
+        return cleaned_data
 
 
 class ComboSelectForm(forms.ModelForm):
@@ -163,103 +168,50 @@ class AddComboToClassForm(forms.Form):
 
     num = forms.IntegerField(
         validators=[MinValueValidator(100), MaxValueValidator(999)])
-    preregistered = forms.BooleanField(required=False)
 
 
-class HorseRiderComboCreateForm(forms.ModelForm):
-    """ # This creates the Horse Rider Combo itself. for creating a horse rider combo """
+class ExampleForm(forms.Form):
+    """ example """
+    rider = forms.ModelChoiceField(queryset=Rider.objects.all(
+    ), widget=autocomplete.ModelSelect2(url='rider_autocomplete'))
 
-    email = forms.EmailField(required=False, label="Email")
-    cell = forms.CharField(max_length=12, required=False, label="Cell Phone #")
+    horse = forms.ModelChoiceField(queryset=Horse.objects.all(
+    ), widget=autocomplete.ModelSelect2(url='horse_autocomplete'))
 
+
+class ComboForm(forms.ModelForm):
     class Meta:
         model = HorseRiderCombo
-        fields = ('num', 'contact', 'email', 'cell')
+        fields = ('__all__')
+        exclude = ('classes', 'show')
+        # autocomplete doesn't work with forms that are rerendered
+        """ widgets = {
+            'rider': autocomplete.ModelSelect2(url='rider_autocomplete'),
+            'horse': autocomplete.ModelSelect2(url='horse_autocomplete')
+        } """
 
-    def clean(self): # pragma: no cover
-        cleaned_data = self.cleaned_data
+    email = forms.EmailField(required=False, label="Email")
+    cell = forms.CharField(max_length=12, required=False,
+                           label="Cell Phone #")
+
+    def clean(self):
+        cleaned_data = super().clean()
         email = cleaned_data.get('email')
         cell = cleaned_data.get('cell')
 
-        print("This is the email: " + email)
-        print("This is the cell: " + cell)
-
         if not email and not cell:
-            print("do something!")
             raise forms.ValidationError(
                 'Have to include at least 1 contact (email or cell)')
 
-        return cleaned_data
+    def validate_unique(self):
+        exclude = self._get_validation_exclusions()
 
+        exclude.remove('show')  # allow checking against the missing attribute
 
-class HorseRiderEditForm(forms.ModelForm):
-    """ for updating a horse-rider combo """
-
-    class Meta:
-        model = HorseRiderCombo
-        fields = ('contact', 'email', 'cell')
-
-
-class RiderEditForm(forms.ModelForm):
-    """ for updating a rider """
-
-    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
-
-    birth_date = forms.DateField(
-        help_text="Only enter if you are 18 or younger", widget=forms.SelectDateWidget(years=year_range))
-
-    state = USStateField(widget=USStateSelect())
-
-    zip_code = USZipCodeField()
-
-    class Meta:
-        model = Rider
-        fields = ('first_name', 'last_name', 'address', 'city', 'state', 'zip_code',
-                  'birth_date', 'member_VHSA', 'member_4H', 'county')
-
-
-class HorseEditForm(forms.ModelForm):
-    """ for editing a horse """
-
-    year_range = list(reversed(range(1920, datetime.date.today().year + 1)))
-
-    coggins_date = forms.DateField(
-        widget=forms.SelectDateWidget(years=year_range))
-
-    class Meta:
-        model = Horse
-        fields = ('accession_num', 'coggins_date',
-                  'owner', 'type', 'size')
-
-
-class ShowSelectForm(forms.ModelForm):
-
-    date = forms.ModelChoiceField(
-        queryset=Show.objects.all(),
-        widget=autocomplete.ModelSelect2(url='show_autocomplete')
-    )
-
-    class Meta:
-        model = Show
-        fields = ('date',)
-
-    def clean_date(self):
-        showobj = self.cleaned_data['date']
-        shows = Show.objects.all()
-        if showobj in shows:
-            showobj.date = showobj.date + "foo"
-            return showobj
-
-
-class HorseSelectForm(forms.ModelForm):
-    horse = forms.ModelChoiceField(
-        queryset=Horse.objects.all(),
-        widget=autocomplete.ModelSelect2(url='horse_autocomplete')
-    )  # form with horse autocomplete dropdown
-
-    class Meta:
-        model = Horse
-        fields = ('horse',)
+        try:
+            self.instance.validate_unique(exclude=exclude)
+        except ValidationError as e:
+            self._update_errors(e.message_dict)
 
 
 class ClassForm(forms.ModelForm):
@@ -276,9 +228,8 @@ class ClassEditForm(forms.Form):
     name = forms.CharField(required=False, max_length=100)
     num = forms.IntegerField(required=False)
 
-class ClassComboForm(forms.ModelForm):
-    """ # This allows the user to add classes for a specific combo by entering the class number """
-    is_preregistered = forms.BooleanField(required=False)
+class RegisterClassForm(forms.ModelForm):
+    """ # This allows the user to add classes to a combo by entering the class number, while also specifying if the class was preregistered """
 
     class Meta:
         model = Class

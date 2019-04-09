@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
 <h3>Show Select</h3>
@@ -41,6 +42,6 @@
     <a href="{% url 'add_show' %}">Can't find it? Create a New Show</a>
 </div>
 
-{{ form.media }}
+{% comment %} <script type="text/javascript" src="{% static 'js/select_show.js' %}"></script> {% endcomment %}
 
 {% endblock %}
