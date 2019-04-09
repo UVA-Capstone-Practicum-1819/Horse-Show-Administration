@@ -185,11 +185,12 @@ class ComboForm(forms.ModelForm):
         model = HorseRiderCombo
         fields = ('__all__')
         exclude = ('classes', 'show')
+        # autocomplete doesn't work with forms that are rerendered
+        """ widgets = {
+            'rider': autocomplete.ModelSelect2(url='rider_autocomplete'),
+            'horse': autocomplete.ModelSelect2(url='horse_autocomplete')
+        } """
 
-    rider = forms.ModelChoiceField(queryset=Rider.objects.all(
-    ), widget=autocomplete.ModelSelect2(url='rider_autocomplete'))
-    horse = forms.ModelChoiceField(queryset=Horse.objects.all(
-    ), widget=autocomplete.ModelSelect2(url='horse_autocomplete'))
     email = forms.EmailField(required=False, label="Email")
     cell = forms.CharField(max_length=12, required=False,
                            label="Cell Phone #")

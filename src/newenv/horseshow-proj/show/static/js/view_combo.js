@@ -1,5 +1,5 @@
 /* when modal pops up, send button information (url) to the modal */
-$("#updateComboModal").on('show.bs.modal', function (event) {
+/* $("#updateComboModal").on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var url = button.data('url');
 
@@ -28,7 +28,7 @@ $("#updateComboModal").on('show.bs.modal', function (event) {
     });
 
 
-});
+}); */
 
 function addClass(data) {
     var participation_url = data['participation_url'];
@@ -80,7 +80,7 @@ $("#classTable").on('click', '.deleteClassFromComboButton', function (event) {
         success: function (response) {
             var data = response;
             deleteButton.parent().parent().remove();
-            $("#billCell").html(data['combo_bill']);
+            $("#billCell").html("$" + data['combo_bill']);
         },
         error: function (response, status, xhr) {
             var data = response
