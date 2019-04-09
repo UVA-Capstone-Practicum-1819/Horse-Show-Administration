@@ -1,43 +1,44 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
-<h3>Show Select</h3>
-<div>
-    <table class="table table-striped table-hover table-bordered">
-        <thead class="bg-info">
-            <th> Show </th>
-            <th> Date </th>
-            <th> Location </th>
-            <th> Day-of Price </th>
-            <th> Preregistration Price </th>
-        </thead>
-        <tbody>
-            {% for show in shows %}
-            <tr>
-                <td>
-                    <a class="viewShowLink" data-show="{{show.pk}}"
-                        href="{% url 'view_show' show_date=show.date %}">{{ show.name}}</a>
-                </td>
-                <td>
-                    {{ show.date}}
-                </td>
 
-                <td>
-                    {{ show.location}}
-                </td>
-                <td>
-                    {{ show.day_of_price}}
-                </td>
-                <td>
-                    {{ show.pre_reg_price}}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <a href="{% url 'add_show' %}">Can't find it? Create a New Show</a>
-</div>
+<h3>Select Show</h3>
 
-{{ form.media }}
+<table class="table table-striped table-hover table-bordered">
+    <thead class="table-success">
+        <th> Show </th>
+        <th> Date </th>
+        <th> Location </th>
+        <th> Day-of Price </th>
+        <th> Preregistration Price </th>
+    </thead>
+    <tbody>
+        {% for show in shows %}
+        <tr>
+            <td>
+                <a href="{% url 'view_show' show_date=show.date %}">{{ show.name}}</a>
+            </td>
+            <td>
+                {{ show.date}}
+            </td>
+
+            <td>
+                {{ show.location}}
+            </td>
+            <td>
+                {{ show.day_of_price}}
+            </td>
+            <td>
+                {{ show.pre_reg_price}}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'add_show' %}" class="btn btn-success">Create New Show</a>
+
+{% comment %} <script type="text/javascript" src="{% static 'js/select_show.js' %}"></script> {% endcomment %}
 
 {% endblock %}

@@ -1,0 +1,24 @@
+<tr id="row-{{rider.pk}}">
+  <td>
+    {% comment %} button for editing the rider, brings up a modal window with the edit form {% endcomment %}
+    <a class="btn btn-sm btn-dark text-white editRider" data-toggle="modal" data-target="#updateRiderModal" data-op="edit"
+      data-riderpk="{{rider.pk}}" , data-url="{% url 'edit_rider' rider_pk=rider.pk %}">Edit</a>
+
+    {% comment %} button for deleting the rider {% endcomment %}
+    <a href="{% url 'delete_rider' rider_pk=rider.pk %}" class="btn btn-sm btn-danger deleteRider">X</a>
+  </td>
+
+  {% comment %} all the cells containing the rider information {% endcomment %}
+  <td> {{rider.last_name}} </td>
+  <td> {{rider.first_name}} </td>
+  <td> {{rider.email}} </td>
+  <td> {{rider.address}} </td>
+  <td> {{rider.city}} </td>
+  <td> {{rider.state}} </td>
+  <td> {{rider.zip_code}} </td>
+  <td> {{rider.adult}} </td>
+  <td> {{rider.birth_date}} </td>
+  <td> {{rider.member_VHSA}} </td>
+  <td> {{rider.member_4H}} </td>
+  <td> {{rider.county}} </td>
+</tr>
