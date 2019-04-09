@@ -32,7 +32,7 @@ class Division(models.Model):
     class Meta:
         unique_together = ('show', 'name')
     id = models.AutoField(primary_key=True)
-    first_class_num = models.IntegerField(default = 1000)
+    first_class_num = models.IntegerField(default=1000)
     name = models.CharField(max_length=100, default="")
     champion = models.IntegerField(default=0)
     champion_pts = models.IntegerField(default=0)
@@ -74,18 +74,21 @@ class Horse(models.Model):
     """
     Model for a horse, includes possible sizes of the horse and the choice to refer to it as a horse or a Pony coggins date is important for health consideration and the owner is not necessarily the riders
     """
+
+    class Meta:
+        unique_together = ('name', 'owner')
+
     alphanumeric_validator = RegexValidator(
         r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
 
-    size_choices = (("NA", "N/A"), ("small", "SM"),
-                    ("medium", "MED"), ("large", "LG"), )
-    type_choices = (("horse", "Horse"), ("pony", "Pony"), )
-    name = models.CharField(primary_key=True, max_length=200,
-                            verbose_name="Name (Barn Name)")
+    size_choices = (("N/A", "N/A"), ("SM", "SM"),
+                    ("MED", "MED"), ("LG", "LG"), )
+    type_choices = (("Horse", "Horse"), ("Pony", "Pony"), )
+    name = models.CharField(max_length=200, verbose_name="Name (Barn Name)")
     accession_num = models.CharField(
         max_length=20, verbose_name="Accession Number", validators=[alphanumeric_validator])
     coggins_date = models.DateField(
-        default=datetime.date.today,  verbose_name="Coggins Date", )
+        default=datetime.date.today,  verbose_name="Coggins Date",)
     owner = models.CharField(max_length=200, verbose_name="Owner")
     type = models.CharField(
         max_length=200, choices=type_choices, default="Horse", verbose_name="Type")
@@ -93,7 +96,7 @@ class Horse(models.Model):
                             default="N/A", verbose_name="Size (if pony)")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} [Owner: {self.owner}]"
 
 
 class Rider(models.Model):
@@ -108,13 +111,13 @@ class Rider(models.Model):
 
     address = models.CharField(
         max_length=200, verbose_name="Street Address", blank=True)
-    city = models.CharField(default="", max_length=200, blank=True)
-    state = USStateField(default="VA")
-    zip_code = USZipCodeField()
+    city = models.CharField(max_length=200, blank=True)
+    state = USStateField(default="VA", blank=True)
+    zip_code = USZipCodeField(blank=True)
     adult = models.BooleanField(
         default=False, verbose_name="Adult")
     birth_date = models.DateField(
-        blank=True, null=True, verbose_name="Birth Date", )
+        default=datetime.date.today, verbose_name="Birth Date", )
     member_VHSA = models.BooleanField(
         default=False, blank=True, verbose_name="Member of the VHSA")
     member_4H = models.BooleanField(
@@ -124,7 +127,7 @@ class Rider(models.Model):
     horses = models.ManyToManyField(Horse, through='HorseRiderCombo')
 
     def __str__(self):
-        return f"{self.last_name}, {self.first_name}, Email: {self.email}"
+        return f"{self.last_name}, {self.first_name} [Email: {self.email}]"
 
 
 class HorseRiderCombo(models.Model):
@@ -139,22 +142,25 @@ class HorseRiderCombo(models.Model):
     num = models.IntegerField(validators=[MinValueValidator(
         100), MaxValueValidator(999)], verbose_name="Combination Number")
 
-    contact_choices = (("rider", "Rider"), ("owner", "Owner"),
-                       ("parent", "Parent"), ("trainer", "Trainer"))
+    contact_choices = (("Rider", "Rider"), ("Owner", "Owner"),
+                       ("Parent", "Parent"), ("Trainer", "Trainer"))
     rider = models.ForeignKey(
         Rider, on_delete=models.CASCADE, related_name='combos')
     horse = models.ForeignKey(
-        Horse, on_delete=models.CASCADE, verbose_name="Horse", related_name='combos')
+        Horse, on_delete=models.CASCADE,  related_name='combos')
     classes = models.ManyToManyField(
         Class, blank=True, through='ClassParticipation', related_name="combos")
     contact = models.CharField(
-        max_length=100, choices=contact_choices, default="rider")
+        max_length=100, choices=contact_choices, default="Rider")
     email = models.EmailField(blank=True, null=True,
                               verbose_name="Contact Email")
     cell = models.CharField(max_length=12, blank=True,
                             verbose_name="Contact Cell Phone Number")
     show = models.ForeignKey(
         Show, on_delete=models.CASCADE, null=True, related_name='combos')
+
+    is_preregistered = models.BooleanField(
+        default=False, verbose_name="Preregistered")
 
     def __str__(self):
         return f"Number: {self.num}, Rider: {self.rider.last_name}, Horse: {self.horse.name}, Show: {str(self.show.date)}"
@@ -166,6 +172,7 @@ class ClassParticipation(models.Model):
     """
     class Meta:
         unique_together = ('participated_class', 'combo')
+
     participated_class = models.ForeignKey(
         Class, on_delete=models.CASCADE, related_name="participations")
 
@@ -173,7 +180,6 @@ class ClassParticipation(models.Model):
                               on_delete=models.CASCADE, related_name="participations")
 
     score = models.IntegerField(default=0)
-    is_preregistered = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Combo #{self.combo.num} participates in class {self.participated_class.num}"

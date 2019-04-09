@@ -1,0 +1,56 @@
+{% comment %} Code for accordian  {% endcomment %}
+
+<div class="accordion" id="rider-accordian">
+  <div class="card">
+
+  
+  {% for rider in riders %}
+    <div class="card-header bg-primary" id="heading-for-{{rider.pk}}">
+      <h2 class="mb-0">
+        <button class="btn btn-primary btn-block" type="button" data-toggle="collapse" data-target="#collapse-{{rider.pk}}" aria-expanded="true" aria-controls="collapse-{{rider.pk}}">
+          {{rider.last_name}}, {{rider.first_name}} 
+
+          
+        </button>
+      </h2>
+    </div>
+
+    <div id="collapse-{{rider.pk}}" class="collapse show" aria-labelledby="heading-for-{{rider.pk}}" data-parent="#rider-accordian">
+      <div class="card-body">
+        <table class="table table-bordered">
+          <tbody>
+            <tr>
+              <td>Email</td>
+              <td>{{rider.email}}</td>
+            </tr>
+            <tr>
+              <td>Birth Date</td>
+              <td>{{rider.birth_date}}</td>
+            </tr>
+            <tr>
+              <td>City</td>
+              <td>{{rider.city}}</td>
+            </tr>
+            <tr>
+              <td>State</td>
+              <td>{{rider.state}}</td>
+            </tr>
+            <tr>
+              <td>Zip Code</td>
+              <td>{{rider.zip_code}}</td>
+            </tr>
+            <tr>
+              <td>County</td>
+              <td>{{rider.county}}</td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    </div>
+  </div>
+
+  {% endfor %}
+
+
+ </div> 
