@@ -115,7 +115,7 @@ def select_show(request):
     return render(request, 'select_show.html', context)
 
 
-def sign_up(request):  # pragma: no cover # what does this comment mean?
+def sign_up(request):  # pragma: no cover
     """ creates a new user account """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -132,7 +132,7 @@ def sign_up(request):  # pragma: no cover # what does this comment mean?
     return render(request, 'sign_up.html', {'form': form})
 
 
-def view_division_scores(request, show_date, division_id):
+def view_division_scores(request, show_date, division_id): # pragma: no cover
     """ displays list of classes in division, hrc winners of each of those classes from 1st-6th places, and form to enter champion info """
     score_dict = {}
     
