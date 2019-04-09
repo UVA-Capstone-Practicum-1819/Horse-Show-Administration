@@ -31,6 +31,7 @@ from xlutils.copy import copy
 import xlrd
 import xlwt
 from operator import itemgetter
+from django.template import RequestContext
 
 logger = logging.getLogger("logging")
 
@@ -66,16 +67,16 @@ class AuthRequiredMiddleware(object):
 def view_show(request, show_date):
     """ used as the home page for a selected show """
     show = Show.objects.get(date=show_date)
-    
-    context = {
-        "show_name": show.name,
-        "date": show_date,
-        "date_obj": datetime.datetime.strptime(show_date, "%Y-%m-%d"),
-        "location": show.location,
-        "divisions": show.divisions.all().order_by('first_class_num'),
+
+    context = {'request': request,
+               "show_name": show.name,
+               "date": show_date,
+               "date_obj": datetime.datetime.strptime(show_date, "%Y-%m-%d"),
+               "location": show.location,
+               "divisions": show.divisions.all().order_by('first_class_num'),
 
 
-    }
+               }
     return render(request, 'view_show.html', context)
 
 
@@ -96,6 +97,7 @@ def add_show(request):
         new_show = Show.objects.create(
             name=show_name, date=show_date, location=show_location,
             day_of_price=f.cleaned_data['day_of_price'], pre_reg_price=f.cleaned_data['pre_reg_price'])
+        request.session['show_date'] = str(new_show.date)
         return redirect('view_show', show_date=show_date)
     else:
         return render(request, 'add_show.html', {'form': form})
@@ -104,10 +106,16 @@ def add_show(request):
 def select_show(request):
 
     context = {
+        'request': request,
         'shows': Show.objects.all()
     }
 
     return render(request, 'select_show.html', context)
+
+
+def store_show_date(request, show_date):
+    request.session['show_date'] = show_date
+    return redirect('view_show', show_date=show_date)
 
 
 def sign_up(request):  # pragma: no cover # what does this comment mean?
@@ -125,7 +133,6 @@ def sign_up(request):  # pragma: no cover # what does this comment mean?
     else:
         form = UserCreationForm()
     return render(request, 'sign_up.html', {'form': form})
-
 
 
 def view_division_scores(request, show_date, division_id):
@@ -156,8 +163,9 @@ def view_division_scores(request, show_date, division_id):
     else:
         form = DivisionChampForm()
 
-    context = {'classes': division.classes.all(), 'date': show_date,
-               'id': division_id, 'name': division.name, 'form': form}
+    context = {
+        'request': request, 'classes': division.classes.all(), 'date': show_date,
+        'id': division_id, 'name': division.name, 'form': form}
     # passes the DivisionChampForm and the division's name and classes to "division_score.html" and renders that page
     return render(request, 'view_division_scores.html', context)
 
@@ -169,7 +177,7 @@ def delete_class(request, show_date, division_id, class_num):
     class_obj = division.classes.get(num=class_num)
     # gets the division object from the division name that was passed in
     class_obj.delete()  # removes the class object
-    if(len(division.classes.all())>0):
+    if(len(division.classes.all()) > 0):
         division.first_class_num = division.classes.all()[0].num
         division.save()
     else:
@@ -193,7 +201,8 @@ def view_division_classes(request, show_date, division_id):  # pragma: no cover
     """ lists the classes in a division """
     show = Show.objects.get(date=show_date)
     division = show.divisions.get(id=division_id)
-    context = {'classes': division.classes.all(), 'id': division_id}
+    context = {'request': request, 'classes': division.classes.all(),
+               'id': division_id}
     # passes the division's name and classes to the "division_classes.html" and renders that page
     return render(request, 'view_division_classes.html', context)
 
@@ -221,7 +230,8 @@ def add_class(request, show_date, division_id):
             return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_obj.num)
     else:
         form = ClassForm()
-        context = {'name': division.name, 'form': form, 'date': show_date}
+        context = {'request': request, 'name': division.name,
+                   'form': form, 'date': show_date}
     # goes to division page to add class
     return redirect('view_division', show_date=show_date, division_id=division_id)
 
@@ -321,6 +331,7 @@ def rank_class(request, show_date, division_id, class_num):
         form = RankingForm(initial={'first': class_obj.first, 'second': class_obj.second, 'third': class_obj.third,
                                     'fourth': class_obj.fourth, 'fifth': class_obj.fifth, 'sixth': class_obj.sixth})
         context = {
+            'request': request,
             "name": division.name,
             "class": class_obj,
             'form': form,
@@ -353,13 +364,13 @@ def add_division(request, show_date):
     else:
         form = DivisionForm()
 
-        context = {
-            "form": form,
-            "name": show.name,
-            "date": show_date,
-            "location": show.location,
-            "divisions": show.divisions.all(),
-        }
+        context = {'request': request,
+                   "form": form,
+                   "name": show.name,
+                   "date": show_date,
+                   "location": show.location,
+                   "divisions": show.divisions.all(),
+                   }
         return render(request, 'add_division.html', context)
 
 
@@ -393,14 +404,14 @@ def view_division(request, show_date, division_id):
     else:
         division_classes = division.classes.all()
         form = ClassForm()
-        context = {
-            "date": show_date,
-            "show_name": show.name,
-            "id": division_id,
-            "name": division.name,
-            "classes": division_classes,
-            "form": form,
-        }
+        context = {'request': request,
+                   "date": show_date,
+                   "show_name": show.name,
+                   "id": division_id,
+                   "name": division.name,
+                   "classes": division_classes,
+                   "form": form,
+                   }
         return render(request, 'view_division.html', context)
 
 
@@ -419,6 +430,7 @@ def edit_division(request, show_date, division_id):
         division_classes = division.classes.all()
         form = EditDivisionForm()
         context = {
+            'request': request,
             "date": show_date,
             "show_name": show.name,
             "id": division_id,
@@ -453,6 +465,7 @@ def view_class(request, show_date, division_id, class_num):
                     participated_class=class_obj, combo=combo)
                 classParticipation.save()
                 context = {
+                    'request': request,
                     "combos": class_obj.combos.all(),
                     "class": class_obj,
                     "class_num": class_obj.num,
@@ -468,18 +481,18 @@ def view_class(request, show_date, division_id, class_num):
                     request, "Horse Rider Combo does not exist in this show.")
                 return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_num)
     else:
-        form = AddComboToClassForm(initial={'is_preregistered':True})
+        form = AddComboToClassForm(initial={'is_preregistered': True})
     # form = ComboSelectForm()
-    context = {
-        "combos": combos,
-        "class": class_obj,
-        "class_num": class_obj.num,
-        "date": show_date,
-        "id": division_id,
-        "name": division.name,
-        "show_name": show.name,
-        "add_form": form,
-    }
+    context = {'request': request,
+               "combos": combos,
+               "class": class_obj,
+               "class_num": class_obj.num,
+               "date": show_date,
+               "id": division_id,
+               "name": division.name,
+               "show_name": show.name,
+               "add_form": form,
+               }
     return render(request, "view_class.html", context)  # render info
 
 
@@ -611,7 +624,8 @@ def populate_pdf_division(division_name, page, show, d):  # pragma: no cover
                                     num=list[i-1])
                                 # write to pdf the correct combo to that rank
                                 d[shorse] = combo.horse
-                                d[srider] = combo.rider.first_name + combo.rider.last_name
+                                d[srider] = combo.rider.first_name + \
+                                    combo.rider.last_name
                                 d[sowner] = combo.horse.owner
                             except ObjectDoesNotExist:
                                 print("")
@@ -666,15 +680,19 @@ def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, b
                                 if combo.rider.adult is False:
                                     # write to pdf the correct combo to that rank
                                     d[shorse] = combo.horse
-                                    d[srider] = combo.rider.first_name + combo.rider.last_name
+                                    d[srider] = combo.rider.first_name + \
+                                        combo.rider.last_name
                                     d[sowner] = combo.horse.owner
                                 else:
                                     bool_combine = True
 
-                                    d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse # write to pdf the correct combo to that rank
-                                    d[dp2 + '_c' + str(int) + '_rider' + str(i)] = combo.rider.first_name + combo.rider.last_name
-                                    d[dp2 + '_c' + str(int) + '_owner' + str(i)] = combo.horse.owner
-
+                                    # write to pdf the correct combo to that rank
+                                    d[dp2 + '_c' +
+                                        str(int) + '_combo' + str(i)] = combo.horse
+                                    d[dp2 + '_c' + str(int) + '_rider' + str(
+                                        i)] = combo.rider.first_name + combo.rider.last_name
+                                    d[dp2 + '_c' + str(int) + '_owner' +
+                                      str(i)] = combo.horse.owner
 
                             except ObjectDoesNotExist:
                                 print("")
@@ -736,7 +754,8 @@ def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d,
                                     if combo.horse.size == "large":
                                         # write to pdf the correct combo to that rank
                                         d[shorse] = combo.horse
-                                        d[srider] = combo.rider.first_name + combo.rider.last_name
+                                        d[srider] = combo.rider.first_name + \
+                                            combo.rider.last_name
                                         d[sowner] = combo.horse.owner
                                     elif combo.horse.size == "medium" or combo.horse.size == "small":
                                         bool_combine = True
@@ -806,7 +825,8 @@ def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d,
                                 if combo.horse.type == "pony":
                                     # write to pdf the correct combo to that rank
                                     d[shorse] = combo.horse
-                                    d[srider] = combo.rider.first_name + combo.rider.last_name
+                                    d[srider] = combo.rider.first_name + \
+                                        combo.rider.last_name
                                     d[sowner] = combo.horse.owner
                                 else:
                                     bool_combine = True
@@ -844,8 +864,8 @@ def calculate_age(born):
     return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
 
-def populate_pdf(request, show_date): #pragma: no cover
-    """ populate pdf for VHSA horse show reports """ #populates text fields of PDF
+def populate_pdf(request, show_date):  # pragma: no cover
+    """ populate pdf for VHSA horse show reports """  # populates text fields of PDF
     show = Show.objects.get(date=show_date)  # get the show by its date
     d = {
         'p2_show_name': show.name,
@@ -985,7 +1005,7 @@ def populate_pdf(request, show_date): #pragma: no cover
             d[dp + "_champ"] = division.champion
             d[dp + "_rchamp"] = division.champion_reserve
 
-    #p16 Associate Equitation On the Flat Classes (adult/children)
+    # p16 Associate Equitation On the Flat Classes (adult/children)
     for division in Division.objects.filter(name__icontains="Flat"):
         if division.show.date == show.date:
             dp = "p16"
@@ -1048,11 +1068,13 @@ def populate_pdf(request, show_date): #pragma: no cover
     # returns the populated pdf
     return render(request, 'final_results.html', {"filename": "show/static/VHSA_Final_Results.pdf"})
 
-def populate_excel(request, show_date): #pragma: no cover
+
+def populate_excel(request, show_date):  # pragma: no cover
     response = HttpResponse(content_type='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment; filename=district-qualified-youth-registration.xls'
 
-    rb = xlrd.open_workbook('show/static/district-qualified-youth-registration.xls')
+    rb = xlrd.open_workbook(
+        'show/static/district-qualified-youth-registration.xls')
     wb = copy(rb)
     sheet = wb.get_sheet(0)
 
@@ -1060,10 +1082,11 @@ def populate_excel(request, show_date): #pragma: no cover
     show = Show.objects.get(date=show_date)
     combos = HorseRiderCombo.objects.filter(show=show)
     for combo in combos:
-        print (combo)
+        print(combo)
         if combo.rider.member_4H:
             horse_name = combo.horse.name
-            entry = [combo.rider.first_name, combo.rider.last_name, horse_name.split("(", 1)[0], combo.rider.county]
+            entry = [combo.rider.first_name, combo.rider.last_name,
+                     horse_name.split("(", 1)[0], combo.rider.county]
             list_4h.append(entry)
     sorted_list_4h = sorted(list_4h, key=itemgetter(3, 1))
     style0 = xlwt.easyxf('font: bold on')
@@ -1073,13 +1096,14 @@ def populate_excel(request, show_date): #pragma: no cover
     sheet.write(5, 4, show.date, style1)
 
     for i in range(0, len(sorted_list_4h)):
-        for j in range(0,4):
+        for j in range(0, 4):
             sheet.write(11+i, j, sorted_list_4h[i][j])
 
     wb.save(response)
     return response
 
-def generate_labels(request, show_date): #pragma: no cover
+
+def generate_labels(request, show_date):  # pragma: no cover
     # view to execute label generating
     generate_show_labels(show_date)
     show = Show.objects.get(date=show_date)
@@ -1087,6 +1111,7 @@ def generate_labels(request, show_date): #pragma: no cover
         messages.error(
             request, "There are no Horse Rider Combos registered for this show.")
         context = {
+            'request': request,
             "show_name": show.name,
             "date": show_date,
             "location": show.location,
@@ -1103,7 +1128,7 @@ def view_riders(request):
     update_rider_form = RiderForm()
 
     context = {'riders': Rider.objects.all(
-    ), 'rider_form': update_rider_form}
+    ), 'rider_form': update_rider_form, 'request': request}
 
     return render(request, 'view_riders.html', context)
 
@@ -1160,7 +1185,8 @@ def view_horses(request):
     """ Renders the horse page, where one can see a table of all the horses and be able to filter through them by their information. You are also able to add, edit, or delete horses as desired. """
     update_horse_form = HorseForm()
 
-    context = {'horses': Horse.objects.all(), 'horse_form': update_horse_form}
+    context = {'request': request, 'horses': Horse.objects.all(),
+               'horse_form': update_horse_form}
 
     return render(request, 'view_horses.html', context)
 
@@ -1216,7 +1242,7 @@ def view_combos(request, show_date):
     """ Renders the combos page, where one can see a table of all the combos and be able to filter through them by their information. You are also able to add, edit, or delete combos as desired. """
     combo_form = ComboForm()
 
-    context = {'combos': HorseRiderCombo.objects.filter(
+    context = {'request': request, 'combos': HorseRiderCombo.objects.filter(
         show=show_date), 'combo_form': combo_form, 'show_date': show_date}
 
     return render(request, 'view_combos.html', context)

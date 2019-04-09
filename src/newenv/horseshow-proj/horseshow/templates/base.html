@@ -29,7 +29,9 @@
             </li>
 
             {% comment %} if a show is currently selected {% endcomment %}
-            {% if date %}
+            {% if request.session.show_date %}
+
+            {% with date=request.session.show_date %}
 
             <li>
 
@@ -50,6 +52,8 @@
                 <a href="{% url 'view_combos' show_date=date %}">Combos</a>
 
             </li>
+
+            {% endwith %}
 
             {% endif %}
 

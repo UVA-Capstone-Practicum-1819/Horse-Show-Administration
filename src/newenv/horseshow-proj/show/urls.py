@@ -86,11 +86,13 @@ horse_patterns = [
     path('edit', views.update_horse, name="edit_horse"),
 
 
+
 ]
 
 show_patterns = [
     path('view', views.view_show, name='view_show'),
 
+    path('store-show-date', views.store_show_date, name="store_show_date"),
     path('division/add', views.add_division, name="add_division"),
 
     path('division/select', views.select_division, name="select_division"),
