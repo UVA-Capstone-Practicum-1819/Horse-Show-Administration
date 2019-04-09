@@ -502,7 +502,25 @@ class CheckRider(TestCase):
     def test_get_rider_form_edit_get(self):
         response = self.client.get(reverse('get_rider_form_edit', kwargs={"rider_pk": self.rider1.pk}))
 
-    
+    def test_rider_form_4H_valid(self):
+        response = self.client.post(
+            reverse('add_rider'), data={'first_name': "firstname", "last_name": "LastName", 'address': "some new address", 'city': "some city", 'state': "VA", 'zip_code': 22903, 'email': "someemail@virignia.edu",
+             'birth_date': self.rider2.birth_date, 'member_4H' : False, 'member_VHSA': False, 'county': "some county"})
+
+    def test_rider_form_4H_invalid(self):
+        response = self.client.post(
+            reverse('add_rider'), data={'first_name': "firstname", "last_name": "LastName", 'address': "some new address", 'city': "some city", 'state': "VA", 'zip_code': 22903, 'email': "someemail@virignia.edu",
+             'birth_date': self.rider2.birth_date, 'member_4H' : True, 'member_VHSA': False})
+
+    def test_rider_form_birth_date_valid(self):
+        response = self.client.post(
+            reverse('add_rider'), data={'first_name': "firstname", "last_name": "LastName", 'address': "some new address", 'city': "some city", 'state': "VA", 'zip_code': 22903, 'email': "someemail@virignia.edu", 'adult' : True,
+              'member_4H' : False, 'member_VHSA': False})
+
+    def test_rider_form_birth_date_invalid(self):
+        response = self.client.post(
+            reverse('add_rider'), data={'first_name': "firstname", "last_name": "LastName", 'address': "some new address", 'city': "some city", 'state': "VA", 'zip_code': 22903, 'email': "someemail@virignia.edu",
+              'member_4H' : False, 'member_VHSA': False})
 
 class CheckHorse(TestCase):
     def setUp(self):
@@ -588,6 +606,10 @@ class ShowViewTestCases(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+
+    def test_show_str(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        self.assertIsNotNone(str(show))
 
     def test_accepted_get(self):
         self.client.login(username='john', password='johnpassword')

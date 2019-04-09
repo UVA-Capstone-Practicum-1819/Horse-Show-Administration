@@ -115,8 +115,7 @@ class RiderForm(forms.ModelForm):
         if cleaned_data['member_4H'] and not cleaned_data['county']:
             raise ValidationError(
                 "You must specify a county if the rider is a member of 4H.")
-        if not (cleaned_data['adult'] or cleaned_data['birth_date']):
-            raise ValidationError("You must specify a birth date for minors.")
+
         return cleaned_data
 
 
