@@ -1,25 +1,16 @@
-function setAutocomplete() {
-    $('.basicAutoComplete').autoComplete({
-        minLength: 1
-    });
-    $('.dropdown-menu').css({
-        'top': 'auto',
-        'left': 'auto'
-    });
-};
-
 /* when modal pops up, send button information (url, operation (e.g. add, edit) to the modal */
 $("#updateComboModal").on('show.bs.modal', function (event) {
+    /* grab relevant info */
     var button = $(event.relatedTarget);
     var op = button.data('op');
     var url = button.data('url');
-
     var formContainer = $("#formContainer");
     var updateComboForm = $("#updateComboForm");
     var updateComboButton = $("#updateComboButton");
     var comboModalTitle = $("#comboModalTitle");
     form_url = $("#formURL").data('url');
 
+    /* if the form being loaded is an add form */
     if (op == "add") {
 
         comboModalTitle.html("Add Combo");
@@ -32,7 +23,6 @@ $("#updateComboModal").on('show.bs.modal', function (event) {
                 updateComboForm.attr('action', url);
                 updateComboForm.data('op', op);
                 updateComboButton.html("Add Combo");
-                setAutocomplete();
 
             },
             error: function (response, status, xhr) {
@@ -41,6 +31,7 @@ $("#updateComboModal").on('show.bs.modal', function (event) {
 
         });
 
+        /* if the form that is loaded is an edit form */
     } else {
         comboModalTitle.html("Edit Combo");
 
@@ -53,7 +44,7 @@ $("#updateComboModal").on('show.bs.modal', function (event) {
                 updateComboForm.attr('action', url);
                 updateComboForm.data('op', op);
                 updateComboButton.html("Edit Combo");
-                setAutocomplete();
+
             },
             error: function (response, status, xhr) {
                 console.log(response.responseText);
@@ -101,7 +92,7 @@ $(document).ready(function () {
     $("#search").on("keyup", function () {
         var value = $(this).val().toLowerCase();
         $("#comboTable tr").filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            $(this).toggle($(this).find(".numLink").text().toLowerCase().indexOf(value) > -1)
         });
     });
 });

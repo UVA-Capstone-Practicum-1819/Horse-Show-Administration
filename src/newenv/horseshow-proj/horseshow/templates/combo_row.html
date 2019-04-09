@@ -10,7 +10,7 @@
 
 
     {% comment %} all the cells containing the combo information {% endcomment %}
-    <td> <a href="{% url 'view_combo' combo_pk=combo.pk %}">{{combo.num}}</a> </td>
+    <td> <a class="numLink" href="{% url 'view_combo' combo_pk=combo.pk %}">{{combo.num}}</a> </td>
     <td> {{combo.rider.last_name}}, {{combo.rider.first_name}} </td>
     <td> {{combo.horse.name}} </td>
     <td> {{combo.contact}} </td>

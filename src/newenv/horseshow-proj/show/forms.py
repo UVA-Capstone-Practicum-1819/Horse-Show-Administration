@@ -171,18 +171,25 @@ class AddComboToClassForm(forms.Form):
         validators=[MinValueValidator(100), MaxValueValidator(999)])
 
 
+class ExampleForm(forms.Form):
+    """ example """
+    rider = forms.ModelChoiceField(queryset=Rider.objects.all(
+    ), widget=autocomplete.ModelSelect2(url='rider_autocomplete'))
+
+    horse = forms.ModelChoiceField(queryset=Horse.objects.all(
+    ), widget=autocomplete.ModelSelect2(url='horse_autocomplete'))
+
+
 class ComboForm(forms.ModelForm):
     class Meta:
         model = HorseRiderCombo
         fields = ('__all__')
         exclude = ('classes', 'show')
-        widgets = {
-            'rider': autocomplete.ModelSelect2(url='rider_autocomplete'),
-            'horse': autocomplete.ModelSelect2(url='horse_autocomplete'),
-        }
 
-    rider = forms.ModelChoiceField(queryset=Rider.objects.all())
-    horse = forms.ModelChoiceField(queryset=Horse.objects.all())
+    rider = forms.ModelChoiceField(queryset=Rider.objects.all(
+    ), widget=autocomplete.ModelSelect2(url='rider_autocomplete'))
+    horse = forms.ModelChoiceField(queryset=Horse.objects.all(
+    ), widget=autocomplete.ModelSelect2(url='horse_autocomplete'))
     email = forms.EmailField(required=False, label="Email")
     cell = forms.CharField(max_length=12, required=False,
                            label="Cell Phone #")
@@ -205,25 +212,6 @@ class ComboForm(forms.ModelForm):
             self.instance.validate_unique(exclude=exclude)
         except ValidationError as e:
             self._update_errors(e.message_dict)
-
-
-class ShowSelectForm(forms.ModelForm):
-
-    date = forms.ModelChoiceField(
-        queryset=Show.objects.all(),
-        widget=autocomplete.ModelSelect2(url='show_autocomplete')
-    )
-
-    class Meta:
-        model = Show
-        fields = ('date',)
-
-    def clean_date(self):
-        showobj = self.cleaned_data['date']
-        shows = Show.objects.all()
-        if showobj in shows:
-            showobj.date = showobj.date + "foo"
-            return showobj
 
 
 class ClassForm(forms.ModelForm):
