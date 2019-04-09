@@ -15,10 +15,10 @@
   {% comment %} table containing all the divisions and their respective classes {% endcomment %}
   <table class="table table-striped table-bordered">
     {% comment %} the table header (division, classes) {% endcomment %}
-    <thead class="bg-primary">
+    <thead class="table-success">
 
-      <th>Division</th>
-      <th colspan="10">Classes</th>
+      <th class="text-black"> Division</th>
+      <th class="text-black" colspan="10">Classes</th>
 
     </thead>
 
@@ -62,7 +62,7 @@
       {% comment %} another row for the add division button {% endcomment %}
       <tr>
         <td>
-          <a class="btn btn-primary" href="{% url 'add_division' show_date=date %}">+ Add Another Division</a>
+          <a class="btn btn-info" href="{% url 'add_division' show_date=date %}">+ Add Another Division</a>
         </td>
       </tr>
 
