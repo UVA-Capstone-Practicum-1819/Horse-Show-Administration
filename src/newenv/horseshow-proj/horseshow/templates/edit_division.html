@@ -14,7 +14,7 @@
       <form class="form-inline" method="POST">
         {% csrf_token %}
         {{ form | crispy}}
-        <button type="submit" class="btn btn-success">Submit</button>
+        <button type="submit" class="btn btn-success">Submit</button> <a href='.' class="btn btn-danger">Cancel</a>
       </form>
 
       {% endif %}

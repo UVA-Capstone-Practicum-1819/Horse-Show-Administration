@@ -18,7 +18,8 @@ combo_patterns = [
 class_patterns = [
     path('',
          views.view_class, name="view_class"),
-
+    path('edit',
+         views.edit_class, name="edit_class"),
     path('rank',
          views.rank_class, name='rank_class'),
 
@@ -60,6 +61,8 @@ division_patterns = [
 
 show_patterns = [
     path('', views.view_show, name='view_show'),
+
+    path('delete', views.delete_show, name='delete_show'),
 
     path('division/add', views.add_division, name="add_division"),
 

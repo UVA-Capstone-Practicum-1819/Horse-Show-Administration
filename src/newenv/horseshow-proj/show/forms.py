@@ -268,11 +268,13 @@ class ClassForm(forms.ModelForm):
         model = Class
         fields = ('num', 'name')
 
-
 class RemoveClassForm(forms.Form):
     """ # This allows the user to remove classes by entering the class number """
     num = models.IntegerField()
 
+class ClassEditForm(forms.Form):
+    name = forms.CharField(required=False, max_length=100)
+    num = forms.IntegerField(required=False)
 
 class ClassComboForm(forms.ModelForm):
     """ # This allows the user to add classes for a specific combo by entering the class number """
