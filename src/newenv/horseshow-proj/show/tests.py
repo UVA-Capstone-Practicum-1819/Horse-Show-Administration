@@ -904,6 +904,26 @@ class DivisionsTestCase(TestCase): #sprint 11 unit tests shannon
         request = HttpRequest()
         response = self.client.post('/show/2018-12-10/division/1/edit', {'change_name_to':'equitation'})
 
+class ShowsTestCase(TestCase): #sprint 11 unit tests shannon
+    def test_delete_show(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        self.client.login(username='john', password='johnpassword')
+        request = HttpRequest()
+        response = self.client.get('/show/2018-12-10/delete')
+
+    def test_edit_show(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        self.client.login(username='john', password='johnpassword')
+        request = HttpRequest()
+        response = self.client.get('/show/2018-12-10/edit')
+
+    def test_edit_show_post(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        self.client.login(username='john', password='johnpassword')
+        request = HttpRequest()
+        response = self.client.post('/show/2018-12-10/edit', {'location':'there', 'name':'this','day_of_price':'10','pre_reg_price':'12'})
+
+
 class RiderTestCase(TestCase): #sprint 11 unit tests shannon
     def test_add_rider(self):
         show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
@@ -980,6 +1000,31 @@ class ClassTestCase(TestCase):
         self.client.login(username='john', password='johnpassword')
         request = HttpRequest()
         response = self.client.get('/show/2018-12-10/division/1/class/1/delete')
+
+    def test_edit_class(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        d1 = Division.objects.create(name="jump", show=show)
+        c1 = Class.objects.create(name="Test", num="1", division=d1, show=show)
+        self.client.login(username='john', password='johnpassword')
+        request = HttpRequest()
+        response = self.client.get('/show/2018-12-10/division/1/class/1/edit')
+
+    def test_edit_class_post(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        d1 = Division.objects.create(name="jump", show=show)
+        c1 = Class.objects.create(name="Test", num="1", division=d1, show=show)
+        self.client.login(username='john', password='johnpassword')
+        request = HttpRequest()
+        response = self.client.post('/show/2018-12-10/division/1/class/1/edit', {'name':'change', 'num':'2'})
+
+    def test_edit_class_error(self):
+        show = Show.objects.create(name="test", date="2018-12-10", location="here", day_of_price=10, pre_reg_price=5)
+        d1 = Division.objects.create(name="jump", show=show)
+        c1 = Class.objects.create(name="Test", num="1", division=d1, show=show)
+        c2 = Class.objects.create(name="Test", num="2", division=d1, show=show)
+        self.client.login(username='john', password='johnpassword')
+        request = HttpRequest()
+        response = self.client.post('/show/2018-12-10/division/1/class/1/edit', {'name':'change', 'num':'2'})
 
 class DivisionScoreTestCase(TestCase):
     def test_division_scores(self):
