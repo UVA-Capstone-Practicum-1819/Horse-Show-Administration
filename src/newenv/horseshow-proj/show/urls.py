@@ -94,8 +94,10 @@ horse_patterns = [
 show_patterns = [
     path('view', views.view_show, name='view_show'),
 
+    path('edit', views.edit_show, name='edit_show'),
+
     path('delete', views.delete_show, name='delete_show'),
-    
+
     path('division/add', views.add_division, name="add_division"),
 
     path('division/select', views.select_division, name="select_division"),

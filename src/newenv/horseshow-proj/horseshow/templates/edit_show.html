@@ -1,16 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Show</title>
-</head>
-<body>
-{% extends 'add_show.html' %}
-
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
 {% block content %}
-<h1>Show</h1>
-<form class="form" method="POST" class="post-form">{% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Save</button>
-</form>
+
+<body>
+
+  <h3>EDIT Show: {{ show_name }}</h3>
+
+  {% comment %} show information {% endcomment %}
+  <h4><b>Date:</b> {{date_obj | date:"m-d-Y"}}
+    <br><b>Location:</b> {{ location }}
+    <br>Pre-Registration Price: ${{show.pre_reg_price}}, Day of Price: ${{show.day_of_price}}</h4>
+
+  <form class="form" method="post">
+    {% csrf_token %}
+    {{ edit_form }}
+    <button type="submit" class="btn btn-success">Update Show Info</button> <a href="{% url 'view_show' show_date=show.date %}" class="btn btn-danger">Cancel</a>
+  </form>
+{{ form.media }}
+  {% comment %} table containing all the divisions and their respective classes {% endcomment %}
+  <table class="table table-striped table-bordered">
+    {% comment %} the table header (division, classes) {% endcomment %}
+    <thead class="table-success">
+
+      <th class="text-black"> Division</th>
+      <th class="text-black" colspan="10">Classes</th>
+
+    </thead>
+
+    {% comment %} table body (each row contains division and then its classes) {% endcomment %}
+    <tbody>
+
+      {% for division in divisions %}
+      <tr>
+        {% comment %} the cell containing the clickable division name {% endcomment %}
+        <td>
+
+          {{division.name}}
+
+        </td>
+
+        {% comment %} cells for each of the classes {% endcomment %}
+        {% for class in division.classes.all %}
+        <td>
+
+            {{class.num}} - {{class.name}}
+
+          </a>
+
+        </td>
+
+        {% endfor %}
+
+      </tr>
+
+
+      {% endfor %}
+
+    </tbody>
+  </table>
+
+  {% for message in messages %}
+
+  <div class="alert alert-warning">
+    <a class="close" href="." data-dismiss="alert">×</a>
+
+    {{ message }}
+
+
+  </div>
+  {% endfor %}
+
+
+</body>
 {% endblock %}

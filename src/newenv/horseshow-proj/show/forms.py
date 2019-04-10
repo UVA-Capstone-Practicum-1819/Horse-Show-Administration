@@ -12,7 +12,7 @@ from localflavor.us.forms import USStateField, USZipCodeField, USStateSelect
 
 class ShowForm(forms.Form):
     """
-    Form for creating a Show and saving its information. This information doesn't get edited per Bertha and Rebecca's request as the name, date, and location will be set early on
+    Form for creating a Show and saving its information
     """
     name = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'autocomplete': 'off', }))
@@ -23,9 +23,19 @@ class ShowForm(forms.Form):
     day_of_price = forms.IntegerField(label="Day-of Price")
     pre_reg_price = forms.IntegerField(label="Preregistration Price")
 
+class ShowEditForm(forms.Form):
+    """
+    Form for editing a Show, date is not editable.
+    """
+    name = forms.CharField(required=False, max_length=100, widget=forms.TextInput(
+        attrs={'autocomplete': 'off', }))
+    location = forms.CharField(required=False, 
+        max_length=100, widget=forms.TextInput(attrs={'autocomplete': 'off', }))
+    pre_reg_price = forms.IntegerField(required=False, label="Preregistration Price")
+    day_of_price = forms.IntegerField(required=False, label="Day-of Price")
 
 class EditDivisionForm(forms.Form):
-    change_name_to = forms.CharField(max_length=100)
+    change_name_to = forms.CharField(max_length=100, label="Change division name to")
 
 
 class RegistrationBillForm(forms.Form):

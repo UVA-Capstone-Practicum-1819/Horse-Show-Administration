@@ -76,9 +76,53 @@ def view_show(request, show_date):
                "date_obj": datetime.datetime.strptime(show_date, "%Y-%m-%d"),
                "location": show.location,
                "divisions": show.divisions.all().order_by('first_class_num'),
-
+               "show": show, 
                }
     return render(request, 'view_show.html', context)
+
+def edit_show(request, show_date):
+    """ used as the home page for a selected show """
+    show = Show.objects.get(date=show_date)
+    request.session["show_date"] = show_date
+    if request.method == "POST":
+        form = ShowEditForm(request.POST)
+        if form.is_valid():
+            try:
+                if(form.cleaned_data['location']):
+                    show.location = form.cleaned_data['location']
+                if(form.cleaned_data['name']):
+                    show.name = form.cleaned_data['name']
+                if(form.cleaned_data['day_of_price']):
+                    show.day_of_price = form.cleaned_data['day_of_price']
+                if(form.cleaned_data['pre_reg_price']):
+                    show.pre_reg_price = form.cleaned_data['pre_reg_price']
+                show.save()
+                context = {
+                   'request': request,
+                   "show_name": show.name,
+                   "date": show_date,
+                   "date_obj": datetime.datetime.strptime(show_date, "%Y-%m-%d"),
+                   "location": show.location,
+                   "divisions": show.divisions.all().order_by('first_class_num'),
+                   "show": show, 
+                   "edit_form": form,
+                }
+                return render(request, 'view_show.html', context)
+            except:
+                messages.error(request, "Error editing show.")
+                return redirect('edit_show', show_date=show_date)
+    else:
+        form = ShowEditForm()
+        context = {'request': request,
+               "show_name": show.name,
+               "date": show_date,
+               "date_obj": datetime.datetime.strptime(show_date, "%Y-%m-%d"),
+               "location": show.location,
+               "divisions": show.divisions.all().order_by('first_class_num'),
+               "show": show, 
+               "edit_form": form,
+               }
+        return render(request, 'edit_show.html', context)    
 
 def delete_show(request, show_date):
     """ deletes a show entirely from the database """
