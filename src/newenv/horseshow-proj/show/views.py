@@ -76,7 +76,7 @@ def view_show(request, show_date):
                "date_obj": datetime.datetime.strptime(show_date, "%Y-%m-%d"),
                "location": show.location,
                "divisions": show.divisions.all().order_by('first_class_num'),
-               "show": show, 
+               "show": show,
                }
     return render(request, 'view_show.html', context)
 
@@ -115,10 +115,10 @@ def edit_show(request, show_date):
                "date_obj": datetime.datetime.strptime(show_date, "%Y-%m-%d"),
                "location": show.location,
                "divisions": show.divisions.all().order_by('first_class_num'),
-               "show": show, 
+               "show": show,
                "edit_form": form,
                }
-        return render(request, 'edit_show.html', context)    
+        return render(request, 'edit_show.html', context)
 
 def delete_show(request, show_date):
     """ deletes a show entirely from the database """
@@ -144,7 +144,7 @@ def add_show(request):
         new_show = Show.objects.create(
             name=show_name, date=show_date, location=show_location,
             day_of_price=f.cleaned_data['day_of_price'], pre_reg_price=f.cleaned_data['pre_reg_price'])
-        
+
         return redirect('view_show', show_date=show_date)
     else:
         return render(request, 'add_show.html', {'form': form})
@@ -180,7 +180,7 @@ def sign_up(request):  # pragma: no cover
 def view_division_scores(request, show_date, division_id): # pragma: no cover
     """ displays list of classes in division, hrc winners of each of those classes from 1st-6th places, and form to enter champion info """
     score_dict = {}
-    
+
     # get the division from the show object
     show = Show.objects.get(date=show_date)
     division = show.divisions.get(id=division_id)
@@ -198,7 +198,7 @@ def view_division_scores(request, show_date, division_id): # pragma: no cover
             if key is not None and key in score_dict:
                 print("BYYYYYE")
                 score_dict[key] += value
-        
+
     print(score_dict)
 
     form = DivisionChampForm()
@@ -219,7 +219,7 @@ def view_division_scores(request, show_date, division_id): # pragma: no cover
             division.champion_pts = rank_list[1]
             division.champion_reserve = rank_list[2]
             division.champion_reserve_pts = rank_list[3]
-            division.save(update_fields=["champion", "champion_pts", "champion_reserve", "champion_reserve_pts"]) 
+            division.save(update_fields=["champion", "champion_pts", "champion_reserve", "champion_reserve_pts"])
 
     else:
         form = DivisionChampForm(initial={'champion': division.champion, 'champion_pts': division.champion_pts, 'champion_reserve': division.champion_reserve,
@@ -1248,7 +1248,7 @@ def view_riders(request):
 
 
 """ def select_rider(request):
-    
+
     if request.GET.get('q'):
         q = request.GET['q']
         riders = Rider.objects.filter(last_name__startswith=q)
@@ -1306,7 +1306,7 @@ def view_horses(request):
 
 
 """ def select_horse(request):
-     
+
     if request.GET.get('q'):
         q = request.GET['q']
         horses = Horse.objects.filter(name__startswith=q)
