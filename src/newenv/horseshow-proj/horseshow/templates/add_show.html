@@ -1,19 +1,22 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
 <title>Create Show</title>
-{% if ok %}
-<h1 class="center" id="green"> {{ success_msg }} </h1> </br>
-{% else %}
-<h1 class="center" id="red"> {{ error_msg }} </h1> </br>
-{% endif %}
-
-<h3> Create a Show </h3> </br>
+<body>
+<h3> Create a Show </h3>
 <form class="form" method="post" class="center">
   {% csrf_token %}
   {{ form|crispy }}
+  {% for message in messages %}
+
+    <div class="alert alert-danger">
+        <a class="close" href="#" data-dismiss="alert">×</a>
+            {{ message }}
+    </div>
+  {% endfor %}
   <button class="btn btn-success" type="submit">Create</button>
   <a class="btn btn-danger" href="{% url 'select_show'%}">Cancel</a>
 </form>
-
+</body>
 {% endblock %}

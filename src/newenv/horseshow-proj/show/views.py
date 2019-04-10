@@ -137,9 +137,9 @@ def add_show(request):
         show_name = f.cleaned_data['name']
         show_date = f.cleaned_data['date']
         if Show.objects.filter(date=show_date).count() == 1:
-            response = {'ok': True, 'success_msg': "Cannot have Shows with same date",
-                        'form': form}
-            return render(request, 'add_show.html', response, {'form': f})
+            messages.error(
+                    request, 'Cannot have another show on ' +str(show_date))
+            return render(request, 'add_show.html', {'form': f})
         show_location = f.cleaned_data['location']
         new_show = Show.objects.create(
             name=show_name, date=show_date, location=show_location,
