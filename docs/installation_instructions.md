@@ -28,7 +28,10 @@ This program is deployed on a server that can run locally without internet conne
 
 1. On your machine, go to the search tab on the start menu, and type in "Settings"
 2. Click on "Account"
-3. Under "Family & Other People", click "Add Someone Else to this PC" and create your new account while making sure that the username is "Club"
+3. Under "Family & Other People", click "Add Someone Else to this PC"
+4. Click "I don't have this person's sign-in information"
+5. Click "Add a user without a Microsoft account"
+6. Create the new account while making sure that the username is "Club"
 4. Click on the Club account from the "Family & other people" screen and change the account type to Administrator
 5. Log into the new "Club" account
 
@@ -89,6 +92,9 @@ This program is deployed on a server that can run locally without internet conne
 
 
     - pip3 install reportlab
+    
+    
+    - pip3 install xlutils
 
 
 ### Create the database
