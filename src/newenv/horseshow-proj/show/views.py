@@ -591,7 +591,7 @@ def edit_class(request, show_date, division_id, class_num):
                     "show_name": show.name,
                     "class_form": form,
                 }
-                return render(request, 'view_class.html', context)
+                return redirect('view_class', show_date=show_date, division_id=division_id, class_num=class_obj.num)
             except:
                 messages.error(request, "Class number already in use.")
                 return redirect('edit_class', show_date=show_date, division_id=division_id, class_num=class_num)
