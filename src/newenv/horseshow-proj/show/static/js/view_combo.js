@@ -66,7 +66,6 @@ $("#addClassToComboForm").on('submit', function (event) {
         error: function (response, status, xhr) {
             var data = response.responseJSON
             $("#messages").html(data['message']);
-        }
     })
 });
 
