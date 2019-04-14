@@ -5,7 +5,7 @@
 
 <body>
 
-  <h3>Show: {{ show_name }}  <a href="{% url 'edit_show' show_date=date %}"><i style="font-size:24px" class="fa">&#xf044;</i></a></h3>
+  <h3>Show: {{ show_name }}  <a style="font-size:16px;" href="{% url 'edit_show' show_date=date %}">Edit</a></h3>
 
   {% comment %} show information {% endcomment %}
   <h4><b>Date:</b> {{date_obj | date:"m-d-Y"}}
