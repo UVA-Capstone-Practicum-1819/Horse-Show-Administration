@@ -8,7 +8,7 @@
     
     
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for manage.py: 78%</title>
+    <title>Coverage for manage.py: 100%</title>
     <link rel="stylesheet" href="style.css" type="text/css">
     
     <script type="text/javascript" src="jquery.min.js"></script>
@@ -24,16 +24,16 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>manage.py</b> :
-            <span class="pc_cov">78%</span>
+            <span class="pc_cov">100%</span>
         </h1>
 
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
 
         <h2 class="stats">
-            9 statements &nbsp;
+            7 statements &nbsp;
             <span class="run hide_run shortkey_r button_toggle_run">7 run</span>
-            <span class="mis shortkey_m button_toggle_mis">2 missing</span>
-            <span class="exc shortkey_x button_toggle_exc">0 excluded</span>
+            <span class="mis shortkey_m button_toggle_mis">0 missing</span>
+            <span class="exc shortkey_x button_toggle_exc">2 excluded</span>
 
             
         </h2>
@@ -75,8 +75,8 @@
 <p id="n6" class="stm run hide_run"><a href="#n6">6</a></p>
 <p id="n7" class="stm run hide_run"><a href="#n7">7</a></p>
 <p id="n8" class="stm run hide_run"><a href="#n8">8</a></p>
-<p id="n9" class="stm mis"><a href="#n9">9</a></p>
-<p id="n10" class="stm mis"><a href="#n10">10</a></p>
+<p id="n9" class="exc"><a href="#n9">9</a></p>
+<p id="n10" class="exc"><a href="#n10">10</a></p>
 <p id="n11" class="pln"><a href="#n11">11</a></p>
 <p id="n12" class="pln"><a href="#n12">12</a></p>
 <p id="n13" class="pln"><a href="#n13">13</a></p>
@@ -93,8 +93,8 @@
 <p id="t6" class="stm run hide_run">    <span class="nam">os</span><span class="op">.</span><span class="nam">environ</span><span class="op">.</span><span class="nam">setdefault</span><span class="op">(</span><span class="str">'DJANGO_SETTINGS_MODULE'</span><span class="op">,</span> <span class="str">'horseshow.settings'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t7" class="stm run hide_run">    <span class="key">try</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t8" class="stm run hide_run">        <span class="key">from</span> <span class="nam">django</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">management</span> <span class="key">import</span> <span class="nam">execute_from_command_line</span><span class="strut">&nbsp;</span></p>
-<p id="t9" class="stm mis">    <span class="key">except</span> <span class="nam">ImportError</span> <span class="key">as</span> <span class="nam">exc</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
-<p id="t10" class="stm mis">        <span class="key">raise</span> <span class="nam">ImportError</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
+<p id="t9" class="exc">    <span class="key">except</span> <span class="nam">ImportError</span> <span class="key">as</span> <span class="nam">exc</span><span class="op">:</span> <span class="com">#pragma: no cover</span><span class="strut">&nbsp;</span></p>
+<p id="t10" class="exc">        <span class="key">raise</span> <span class="nam">ImportError</span><span class="op">(</span> <span class="com">#pragma: no cover</span><span class="strut">&nbsp;</span></p>
 <p id="t11" class="pln">            <span class="str">"Couldn't import Django. Are you sure it's installed and "</span><span class="strut">&nbsp;</span></p>
 <p id="t12" class="pln">            <span class="str">"available on your PYTHONPATH environment variable? Did you "</span><span class="strut">&nbsp;</span></p>
 <p id="t13" class="pln">            <span class="str">"forget to activate a virtual environment?"</span><span class="strut">&nbsp;</span></p>
@@ -110,7 +110,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.5.3</a>,
-            created at 2019-03-21 13:44
+            created at 2019-04-14 20:28
         </p>
     </div>
 </div>

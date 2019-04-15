@@ -1,0 +1,26 @@
+Name                                         Stmts   Miss  Cover
+----------------------------------------------------------------
+horseshow/__init__.py                            0      0   100%
+horseshow/settings.py                           24      0   100%
+horseshow/templatetags/__init__.py               0      0   100%
+horseshow/templatetags/js.py                     7      0   100%
+horseshow/urls.py                                3      0   100%
+horseshow/wsgi.py                                0      0   100%
+manage.py                                        7      0   100%
+show/__init__.py                                 0      0   100%
+show/admin.py                                   12      0   100%
+show/apps.py                                     0      0   100%
+show/forms.py                                  122      0   100%
+show/labels.py                                  23     16    30%
+show/migrations/0001_initial.py                  9      0   100%
+show/migrations/0002_auto_20190331_2220.py       7      0   100%
+show/migrations/0003_auto_20190403_2040.py       4      0   100%
+show/migrations/0004_auto_20190407_2251.py       4      0   100%
+show/migrations/__init__.py                      0      0   100%
+show/models.py                                  98      0   100%
+show/populatepdf.py                             40     25    38%
+show/tests.py                                  766     78    90%
+show/urls.py                                    17      0   100%
+show/views.py                                  402      0   100%
+----------------------------------------------------------------
+TOTAL                                         1545    119    92%
