@@ -737,17 +737,24 @@ def populate_pdf_division(division_name, page, show, d):  # pragma: no cover
                                 combo = HorseRiderCombo.objects.get(
                                     num=list[i-1])
                                 # write to pdf the correct combo to that rank
-                                sh0 = combo.horse.name.split("(", 1)[1]
-                                d[shorse] = sh0.split(")", 1)[0]
+                                try:
+                                    sh0 = combo.horse.name.split("(", 1)[1]
+                                    d[shorse] = sh0.split(")", 1)[0]
+                                except IndexError:
+                                    d[shorse] = combo.horse.name
                                 d[srider] = combo.rider.first_name + " " + combo.rider.last_name
                                 d[sowner] = combo.horse.owner
                             except ObjectDoesNotExist:
                                 print("")
                 int += 1
-            sh = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
-            d[dp + "_champ"] = sh.split(")", 1)[0]
-            sh2 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
-            d[dp + "_rchamp"] = sh2.split(")", 1)[0]
+            try:
+                sh = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
+                d[dp + "_champ"] = sh.split(")", 1)[0]
+                sh2 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
+                d[dp + "_rchamp"] = sh2.split(")", 1)[0]
+            except IndexError:
+                d[dp + "_champ"] = HorseRiderCombo.objects.get(num=division.champion).horse.name
+                d[dp + "_rchamp"] = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name
             
 
 def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, bool_combine):  # pragma: no cover
@@ -784,17 +791,23 @@ def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, b
                                     num=list[i-1])
                                 if combo.rider.adult is False:
                                     # write to pdf the correct combo to that rank
-                                    sh0 = combo.horse.name.split("(", 1)[1]
-                                    d[shorse] = sh0.split(")", 1)[0]
+                                    try:
+                                        sh0 = combo.horse.name.split("(", 1)[1]
+                                        d[shorse] = sh0.split(")", 1)[0]
+                                    except IndexError:
+                                        d[shorse] = combo.horse.name
                                     d[srider] = combo.rider.first_name + " " + combo.rider.last_name
                                     d[sowner] = combo.horse.owner
                                 else:
                                     bool_combine = True
-
+                                    try:
                                     # write to pdf the correct combo to that rank
-                                    sh0 = combo.horse.name.split("(", 1)[1]
-                                    d[dp2 + '_c' +
-                                        str(int) + '_combo' + str(i)] = sh0.split(")", 1)[0]
+                                        sh0 = combo.horse.name.split("(", 1)[1]
+                                        d[dp2 + '_c' +
+                                            str(int) + '_combo' + str(i)] = sh0.split(")", 1)[0]
+                                    except IndexError:
+                                        d[dp2 + '_c' +
+                                            str(int) + '_combo' + str(i)] = combo.horse.name
                                     d[dp2 + '_c' + str(int) + '_rider' + str(
                                         i)] = combo.rider.first_name + " " + combo.rider.last_name
                                     d[dp2 + '_c' + str(int) + '_owner' +
@@ -815,14 +828,20 @@ def populate_pdf_division_combine_by_age(division_name, page1, page2, show, d, b
                             participated_class=c).count()
                         d[e] = num_entry
                 int += 1
-            sh = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
-            d[dp + "_champ"] = sh.split(")", 1)[0]
-            sh1 = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
-            d[dp2 + "_champ"] = sh1.split(")", 1)[0]
-            sh2 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
-            d[dp + "_rchamp"] = sh2.split(")", 1)[0]
-            sh3 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
-            d[dp2 + "_rchamp"] = sh3.split(")", 1)[0]
+            try:
+                sh = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
+                d[dp + "_champ"] = sh.split(")", 1)[0]
+                sh1 = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
+                d[dp2 + "_champ"] = sh1.split(")", 1)[0]
+                sh2 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
+                d[dp + "_rchamp"] = sh2.split(")", 1)[0]
+                sh3 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
+                d[dp2 + "_rchamp"] = sh3.split(")", 1)[0]
+            except IndexError:
+                d[dp + "_champ"] = HorseRiderCombo.objects.get(num=division.champion).horse.name
+                d[dp2 + "_champ"] = HorseRiderCombo.objects.get(num=division.champion).horse.name
+                d[dp + "_rchamp"] = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name
+                d[dp2 + "_rchamp"] = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name
     return bool_combine
 
 
@@ -863,16 +882,23 @@ def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d,
                                 if combo.horse.type == "pony":
                                     if combo.horse.size == "large":
                                         # write to pdf the correct combo to that rank
-                                        sh0 = combo.horse.name.split("(", 1)[1]
-                                        d[shorse] = sh0.split(")", 1)[0]
+                                        try:
+                                            sh0 = combo.horse.name.split("(", 1)[1]
+                                            d[shorse] = sh0.split(")", 1)[0]
+                                        except IndexError:
+                                            d[shorse] = combo.horse.name
                                         d[srider] = combo.rider.first_name + " " + combo.rider.last_name
                                         d[sowner] = combo.horse.owner
                                     elif combo.horse.size == "medium" or combo.horse.size == "small":
                                         bool_combine = True
                                         # write to pdf the correct combo to that rank
-                                        sh0 = combo.horse.name.split("(", 1)[1]
-                                        d[dp2 + '_c' +
-                                            str(int) + '_combo' + str(i)] = sh0.split(")", 1)[0]
+                                        try:
+                                            sh0 = combo.horse.name.split("(", 1)[1]
+                                            d[dp2 + '_c' +
+                                                str(int) + '_combo' + str(i)] = sh0.split(")", 1)[0]
+                                        except IndexError:
+                                            d[dp2 + '_c' +
+                                                str(int) + '_combo' + str(i)] = combo.horse.name
                                         d[dp2 + '_c' + str(int) + '_rider' +
                                           str(i)] = combo.rider.first_name + " " + combo.rider.last_name
                                         d[dp2 + '_c' + str(int) + '_owner' +
@@ -892,14 +918,20 @@ def populate_pdf_division_combine_by_hsize(division_name, page2, page1, show, d,
                             participated_class=c).count()
                         d[e] = num_entry
                 int += 1
-            sh = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
-            d[dp + "_champ"] = sh.split(")", 1)[0]
-            sh1 = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
-            d[dp2 + "_champ"] = sh1.split(")", 1)[0]
-            sh2 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
-            d[dp + "_rchamp"] = sh2.split(")", 1)[0]
-            sh3 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
-            d[dp2 + "_rchamp"] = sh3.split(")", 1)[0]
+            try:
+                sh = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
+                d[dp + "_champ"] = sh.split(")", 1)[0]
+                sh1 = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
+                d[dp2 + "_champ"] = sh1.split(")", 1)[0]
+                sh2 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
+                d[dp + "_rchamp"] = sh2.split(")", 1)[0]
+                sh3 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
+                d[dp2 + "_rchamp"] = sh3.split(")", 1)[0]
+            except IndexError:
+                d[dp + "_champ"] = HorseRiderCombo.objects.get(num=division.champion).horse.name
+                d[dp2 + "_champ"] = HorseRiderCombo.objects.get(num=division.champion).horse.name
+                d[dp + "_rchamp"] = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name
+                d[dp2 + "_rchamp"] = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name
     return bool_combine
 
 
@@ -939,16 +971,22 @@ def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d,
                                 print(combo.horse.type)
                                 if combo.horse.type == "pony":
                                     # write to pdf the correct combo to that rank
-                                    sh0 = combo.horse.name.split("(", 1)[1]
-                                    d[shorse] = sh0.split(")", 1)[0]
+                                    try:
+                                        sh0 = combo.horse.name.split("(", 1)[1]
+                                        d[shorse] = sh0.split(")", 1)[0]
+                                    except IndexError:
+                                        d[shorse] = combo.horse.name
                                     d[srider] = combo.rider.first_name + " " + combo.rider.last_name
                                     d[sowner] = combo.horse.owner
                                 else:
                                     bool_combine = True
                                     # write to pdf the correct combo to that rank
-                                    sh0 = combo.horse.name.split("(", 1)[1]
-                                    d[dp2 + '_c' +
-                                        str(int) + '_combo' + str(i)] = sh0.split(")", 1)[0]
+                                    try:
+                                        sh0 = combo.horse.name.split("(", 1)[1]
+                                        d[dp2 + '_c' +
+                                            str(int) + '_combo' + str(i)] = sh0.split(")", 1)[0]
+                                    except IndexError:
+                                        d[dp2 + '_c' + str(int) + '_combo' + str(i)] = combo.horse.name
                                     d[dp2 + '_c' + str(int) + '_rider' +
                                       str(i)] = combo.rider.first_name + " " + combo.rider.last_name
                                     d[dp2 + '_c' + str(int) + '_owner' +
@@ -968,14 +1006,20 @@ def populate_pdf_division_combine_by_htype(division_name, page1, page2, show, d,
                             participated_class=c).count()
                         d[e] = num_entry
                 int += 1
-            sh = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
-            d[dp + "_champ"] = sh.split(")", 1)[0]
-            sh1 = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
-            d[dp2 + "_champ"] = sh1.split(")", 1)[0]
-            sh2 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
-            d[dp + "_rchamp"] = sh2.split(")", 1)[0]
-            sh3 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
-            d[dp2 + "_rchamp"] = sh3.split(")", 1)[0]
+            try:
+                sh = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
+                d[dp + "_champ"] = sh.split(")", 1)[0]
+                sh1 = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
+                d[dp2 + "_champ"] = sh1.split(")", 1)[0]
+                sh2 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
+                d[dp + "_rchamp"] = sh2.split(")", 1)[0]
+                sh3 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
+                d[dp2 + "_rchamp"] = sh3.split(")", 1)[0]
+            except IndexError:
+                d[dp + "_champ"] = HorseRiderCombo.objects.get(num=division.champion).horse.name
+                d[dp2 + "_champ"] = HorseRiderCombo.objects.get(num=division.champion).horse.name
+                d[dp + "_rchamp"] = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name
+                d[dp2 + "_rchamp"] = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name
     return bool_combine
 
 
@@ -1139,10 +1183,14 @@ def populate_pdf(request, show_date):  # pragma: no cover
                         num_entry = ClassParticipation.objects.filter(
                             participated_class=c).count()
                         d[e] = num_entry
-            sh = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
-            d[dp + "_champ"] = sh.split(")", 1)[0]
-            sh2 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
-            d[dp + "_rchamp"] = sh2.split(")", 1)[0]
+            try:
+                sh = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
+                d[dp + "_champ"] = sh.split(")", 1)[0]
+                sh2 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
+                d[dp + "_rchamp"] = sh2.split(")", 1)[0]
+            except IndexError:
+                d[dp + "_champ"] = HorseRiderCombo.objects.get(num=division.champion).horse.name
+                d[dp + "_rchamp"] = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name
 
     # p16 Associate Equitation On the Flat Classes (adult/children)
     for division in Division.objects.filter(name__icontains="Flat"):
@@ -1199,10 +1247,15 @@ def populate_pdf(request, show_date):  # pragma: no cover
                         num_entry = ClassParticipation.objects.filter(
                             participated_class=c).count()
                         d[e] = num_entry
-            sh = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
-            d[dp + "_champ"] = sh.split(")", 1)[0]
-            sh2 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
-            d[dp + "_rchamp"] = sh2.split(")", 1)[0]
+            try:
+                sh = HorseRiderCombo.objects.get(num=division.champion).horse.name.split("(", 1)[1]
+                d[dp + "_champ"] = sh.split(")", 1)[0]
+                sh2 = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name.split("(", 1)[1]
+                d[dp + "_rchamp"] = sh2.split(")", 1)[0]
+            except IndexError:
+                d[dp + "_champ"] = HorseRiderCombo.objects.get(num=division.champion).horse.name
+                d[dp + "_rchamp"] = HorseRiderCombo.objects.get(num=division.champion_reserve).horse.name
+
     write_fillable_pdf("show/static/VHSA_Results_2015.pdf",
                        "show/static/VHSA_Final_Results.pdf", d)  # uses "VHSA_Results_2015.pdf" and populates it's fields with the info in data dict, then it saves this new populated pdf to "VHSA_Final_Results.pdf"
 
