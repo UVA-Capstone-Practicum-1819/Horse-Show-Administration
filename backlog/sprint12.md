@@ -1,12 +1,12 @@
-User manual -- Anna, Lalita, Shannon, Rhea, Shivani
+User manual -- Everyone - (Completed: Y, Proofread:Y)
 
-Debugging and cleaning up code -- everyone
+Debugging and cleaning up code -- Everyone (Developed: Y, Tested: Y)
 
-Send email to client -- Shannon
+Send email to client -- Shannon (Completed: Y)
 
-Fixing horse/rider/combo navigation -- Tarun
+Fixing horse/rider/combo navigation -- Tarun (Developed: Y, Tested: Y, Tested by Client: Y)
 
-debugging labels -- Gina
+debugging labels -- Gina (Developed: Y, Tested: Y, Tested by Client: Y)
 
-Ranking checks -- Lalita, Shannon
+Ranking checks -- Lalita, Shannon (Developed: Y, Tested: Y, Tested by Client: Y)
 
